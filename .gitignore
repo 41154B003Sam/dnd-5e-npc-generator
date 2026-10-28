@@ -11,6 +11,10 @@ venv/
 .venv/
 env/
 
+# Large temporary / experimental spreadsheets
+*.xlsx
+*.xls
+
 # IDE & OS
 .vscode/
 .idea/

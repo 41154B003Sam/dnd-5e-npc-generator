@@ -7,13 +7,13 @@ chcp 65001 >nul
 cd /d "%~dp0"
 
 if not exist "gui.py" (
-    if exist "%USERPROFILE%\OneDrive\Documents\0921test\gui.py" (
-        cd /d "%USERPROFILE%\OneDrive\Documents\0921test"
+    if exist "%USERPROFILE%\OneDrive\Documents\dnd-5e-npc-generator\gui.py" (
+        cd /d "%USERPROFILE%\OneDrive\Documents\dnd-5e-npc-generator"
     )
 )
 if not exist "gui.py" (
-    if exist "%USERPROFILE%\OneDrive\Documents\dnd-5e-npc-generator\gui.py" (
-        cd /d "%USERPROFILE%\OneDrive\Documents\dnd-5e-npc-generator"
+    if exist "%USERPROFILE%\OneDrive\Documents\0921test\gui.py" (
+        cd /d "%USERPROFILE%\OneDrive\Documents\0921test"
     )
 )
 
