@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D&D 5E 劇情導向非典型 NPC 智慧生成系統</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 30, 49, 0.85);
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --gold: #f59e0b;
+      --cyan: #38bdf8;
+      --green: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0%, #0b0f19 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.18);
+      border: 1px solid rgba(129, 140, 248, 0.4);
+      color: #818cf8;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: #080c14;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.5;
+    }
+
+    .quick-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .tag-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid #334155;
+      color: #94a3b8;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tag-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .btn-generate {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    /* Output Card */
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .btn-action {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action:hover {
+      background: #334155;
+      border-color: #475569;
+    }
+
+    .preview-card {
+      background: #080c14;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .preview-card h2 {
+      font-size: 22px;
+      color: #ffffff;
+      margin-bottom: 4px;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+    }
+
+    .preview-card .meta-strip {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .section-h3 {
+      font-size: 16px;
+      color: var(--cyan);
+      margin: 18px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-bottom: 4px;
+    }
+
+    .stats-table, .equip-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .stats-table th, .stats-table td,
+    .equip-table th, .equip-table td {
+      border: 1px solid #1e293b;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .stats-table th, .equip-table th {
+      background: #0f172a;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .stat-mod {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .trait-alert {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--gold);
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    .hook-alert {
+      background: rgba(99, 102, 241, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    /* Print optimization */
+    @media print {
+      body { background: white; color: black; padding: 0; }
+      .main-grid { display: block; }
+      .panel:first-child, header, .card-actions { display: none; }
+      .panel { border: none; box-shadow: none; padding: 0; background: transparent; }
+      .preview-card { border: 1px solid #ccc; background: white; color: black; }
+      .preview-card h2 { color: black; border-color: black; }
+      .section-h3 { color: black; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge">D&D 5E 劇情向專用生成器</div>
+      <h1>D&D 5E 劇情導向非典型 NPC 智慧生成系統</h1>
+      <p class="subtitle">告別死板冒險者模板 • 解耦生活外貌與戰鬥底層 • 生活道具自動映射武器法器</p>
+    </header>
+
+    <div class="main-grid">
+      <!-- 左側：輸入表單 -->
+      <div class="panel">
+        <div class="panel-title">⚙️ 角色靈感與條件設定</div>
+
+        <div class="form-group">
+          <label>快速填入經典範例：</label>
+          <div class="quick-tags">
+            <button class="tag-btn" onclick="applyPreset('farmer')">🌾 麥農草耙退隱戰士</button>
+            <button class="tag-btn" onclick="applyPreset('wizard')">💨 抽煙斗的14環大魔導師</button>
+            <button class="tag-btn" onclick="applyPreset('undertaker')">⛏️ 鐵鎬茶杯守墓人</button>
+            <button class="tag-btn" onclick="applyPreset('chef')">🍖 剁骨刀火爆大廚</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>角色姓名 (留空則隨機生成)：</label>
+          <input type="text" id="npcName" placeholder="例如：老丹恩、摩斯、高登">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>種族：</label>
+            <select id="npcRace">
+              <option value="RANDOM">🎲 隨機決定</option>
+              <option value="人類 (Human)">人類 (Human)</option>
+              <option value="山地矮人 (Mountain Dwarf)">山地矮人 (Mountain Dwarf)</option>
+              <option value="丘陵矮人 (Hill Dwarf)">丘陵矮人 (Hill Dwarf)</option>
+              <option value="高等精靈 (High Elf)">高等精靈 (High Elf)</option>
+              <option value="輕足半身人 (Lightfoot Halfling)">輕足半身人 (Lightfoot Halfling)</option>
+              <option value="提夫林 (Tiefling)">提夫林 (Tiefling)</option>
+              <option value="半獸人 (Half-Orc)">半獸人 (Half-Orc)</option>
+              <option value="岩石侏儒 (Rock Gnome)">岩石侏儒 (Rock Gnome)</option>
+              <option value="龍裔 (Dragonborn)">龍裔 (Dragonborn)</option>
+              <option value="半精靈 (Half-Elf)">半精靈 (Half-Elf)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>職業：</label>
+            <select id="npcClass">
+              <option value="RANDOM">🎲 隨機決定</option>
+              <option value="戰士 (Fighter)">戰士 (Fighter)</option>
+              <option value="法師 (Wizard)">法師 (Wizard)</option>
+              <option value="遊盪者 (Rogue)">遊盪者 (Rogue)</option>
+              <option value="野蠻人 (Barbarian)">野蠻人 (Barbarian)</option>
+              <option value="牧師 (Cleric)">牧師 (Cleric)</option>
+              <option value="聖騎士 (Paladin)">聖騎士 (Paladin)</option>
+              <option value="遊俠 (Ranger)">遊俠 (Ranger)</option>
+              <option value="吟遊詩人 (Bard)">吟遊詩人 (Bard)</option>
+              <option value="德魯伊 (Druid)">德魯伊 (Druid)</option>
+              <option value="武僧 (Monk)">武僧 (Monk)</option>
+              <option value="契術師 (Warlock)">契術師 (Warlock)</option>
+              <option value="術士 (Sorcerer)">術士 (Sorcerer)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>背景歷練：</label>
+            <select id="npcBackground">
+              <option value="RANDOM">🎲 隨機決定</option>
+              <option value="民間英雄 (Folk Hero)">民間英雄 (Folk Hero)</option>
+              <option value="士兵 (Soldier)">士兵 (Soldier)</option>
+              <option value="侍祭 (Acolyte)">侍祭 (Acolyte)</option>
+              <option value="行會工匠 (Guild Artisan)">行會工匠 (Guild Artisan)</option>
+              <option value="貴族 (Noble)">貴族 (Noble)</option>
+              <option value="流浪兒 (Urchin)">流浪兒 (Urchin)</option>
+              <option value="學者 (Sage)">學者 (Sage)</option>
+              <option value="水手 (Sailor)">水手 (Sailor)</option>
+              <option value="罪犯 (Criminal)">罪犯 (Criminal)</option>
+              <option value="隱士 (Hermit)">隱士 (Hermit)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>等級 / 關鍵字：</label>
+            <input type="text" id="npcLevel" value="1" placeholder="例如：1、14、大魔導師、老兵、封印">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>獨特超常特質 (預設無，為常規凡人)：</label>
+          <input type="text" id="npcTrait" placeholder="留空或輸入：無、火焰、霜凍、靈魂、自訂">
+        </div>
+
+        <div class="form-group">
+          <label>劇情線索與非典型生活裝備補充：</label>
+          <textarea id="npcStory" placeholder="輸入當前劇情或生活描述。例如：『表面是麥農，但真實身分是退隱禁衛長戰士，武器是一柄鋼齒長草耙』"></textarea>
+        </div>
+
+        <button class="btn-generate" onclick="generateNPC()">
+          <span>🎲 立即智慧生成 NPC 角色卡</span>
+        </button>
+      </div>
+
+      <!-- 右側：即時角色卡預覽 -->
+      <div class="panel">
+        <div class="card-actions">
+          <button class="btn-action" onclick="copyCardMarkdown()">📋 複製 Markdown 卡片</button>
+          <button class="btn-action" onclick="exportCSV()">📑 匯出 CSV (Excel 相容)</button>
+          <button class="btn-action" onclick="window.print()">🖨️ 列印 / 另存 PDF</button>
+        </div>
+
+        <div class="preview-card" id="cardContent">
+          <!-- 角色卡內容將由 JS 即時渲染於此 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 規則庫資料字典 (D&D 5E Traditional Chinese)
+    // ==========================================
+    const RACES = {
+      "人類 (Human)": { saves: "適應力強", langs: ["通用語", "自選任意 1 種語言"], bonus: "全屬性 +1", darkvision: "無 (常規視力)" },
+      "山地矮人 (Mountain Dwarf)": { saves: "矮人抗毒", langs: ["通用語", "矮人語"], bonus: "力量 +2、體質 +2", darkvision: "60 呎" },
+      "丘陵矮人 (Hill Dwarf)": { saves: "矮人抗毒", langs: ["通用語", "矮人語"], bonus: "體質 +2、感知 +1", darkvision: "60 呎" },
+      "高等精靈 (High Elf)": { saves: "妖精血統", langs: ["通用語", "精靈語"], bonus: "敏捷 +2、智力 +1", darkvision: "60 呎" },
+      "輕足半身人 (Lightfoot Halfling)": { saves: "勇氣、幸運", langs: ["通用語", "半身人語"], bonus: "敏捷 +2、魅力 +1", darkvision: "無 (常規視力)" },
+      "提夫林 (Tiefling)": { saves: "地獄抗性", langs: ["通用語", "煉獄語"], bonus: "魅力 +2、智力 +1", darkvision: "60 呎" },
+      "半獸人 (Half-Orc)": { saves: "堅韌不屈", langs: ["通用語", "獸人語"], bonus: "力量 +2、體質 +1", darkvision: "60 呎" },
+      "岩石侏儒 (Rock Gnome)": { saves: "侏儒狡黠", langs: ["通用語", "侏儒語"], bonus: "智力 +2、體質 +1", darkvision: "60 呎" },
+      "龍裔 (Dragonborn)": { saves: "吐息傷害抗性", langs: ["通用語", "龍語"], bonus: "力量 +2、魅力 +1", darkvision: "無 (常規視力)" },
+      "半精靈 (Half-Elf)": { saves: "妖精血統", langs: ["通用語", "精靈語"], bonus: "魅力 +2、任選兩項 +1", darkvision: "60 呎" }
+    };
+
+    const CLASSES = {
+      "戰士 (Fighter)": { hd: "1d10", hpBase: 10, hpPer: 6, saves: ["力量 (STR)", "體質 (CON)"], primary: ["STR", "CON", "DEX", "WIS", "CHA", "INT"], defaultWeapon: "長劍 (1d8/1d10 揮砍)", defaultArmor: "鏈甲 (16 AC)" },
+      "法師 (Wizard)": { hd: "1d6", hpBase: 6, hpPer: 4, saves: ["智力 (INT)", "感知 (WIS)"], primary: ["INT", "CON", "DEX", "WIS", "CHA", "STR"], defaultWeapon: "短劍 / 匕首 (1d4 穿刺)", defaultArmor: "學者長袍 (10 + 敏捷)" },
+      "遊盪者 (Rogue)": { hd: "1d8", hpBase: 8, hpPer: 5, saves: ["敏捷 (DEX)", "智力 (INT)"], primary: ["DEX", "CON", "INT", "WIS", "CHA", "STR"], defaultWeapon: "細劍 (1d8 穿刺)", defaultArmor: "皮甲 (11 + 敏捷)" },
+      "野蠻人 (Barbarian)": { hd: "1d12", hpBase: 12, hpPer: 7, saves: ["力量 (STR)", "體質 (CON)"], primary: ["STR", "CON", "DEX", "WIS", "CHA", "INT"], defaultWeapon: "巨斧 (1d12 揮砍)", defaultArmor: "無甲防禦 (10 + 敏捷 + 體質)" },
+      "牧師 (Cleric)": { hd: "1d8", hpBase: 8, hpPer: 5, saves: ["感知 (WIS)", "魅力 (CHA)"], primary: ["WIS", "CON", "STR", "DEX", "CHA", "INT"], defaultWeapon: "戰錘 (1d8/1d10 鈍擊)", defaultArmor: "鱗甲 (14 + 敏捷上限2)" },
+      "聖騎士 (Paladin)": { hd: "1d10", hpBase: 10, hpPer: 6, saves: ["感知 (WIS)", "魅力 (CHA)"], primary: ["STR", "CHA", "CON", "WIS", "DEX", "INT"], defaultWeapon: "戰錘 / 長劍 (1d8/1d10)", defaultArmor: "板條甲 (17 AC)" },
+      "遊俠 (Ranger)": { hd: "1d10", hpBase: 10, hpPer: 6, saves: ["力量 (STR)", "敏捷 (DEX)"], primary: ["DEX", "WIS", "CON", "STR", "INT", "CHA"], defaultWeapon: "長弓 (1d8 穿刺)", defaultArmor: "鑲嵌皮甲 (12 + 敏捷)" },
+      "吟遊詩人 (Bard)": { hd: "1d8", hpBase: 8, hpPer: 5, saves: ["敏捷 (DEX)", "魅力 (CHA)"], primary: ["CHA", "DEX", "CON", "WIS", "INT", "STR"], defaultWeapon: "細劍 (1d8 穿刺)", defaultArmor: "皮甲 (11 + 敏捷)" },
+      "德魯伊 (Druid)": { hd: "1d8", hpBase: 8, hpPer: 5, saves: ["智力 (INT)", "感知 (WIS)"], primary: ["WIS", "CON", "DEX", "STR", "CHA", "INT"], defaultWeapon: "彎刀 (1d6 揮砍)", defaultArmor: "皮革甲 (11 + 敏捷)" },
+      "武僧 (Monk)": { hd: "1d8", hpBase: 8, hpPer: 5, saves: ["力量 (STR)", "敏捷 (DEX)"], primary: ["DEX", "WIS", "CON", "STR", "CHA", "INT"], defaultWeapon: "短劍 / 徒手 (1d4/1d6)", defaultArmor: "無甲防禦 (10 + 敏捷 + 感知)" },
+      "契術師 (Warlock)": { hd: "1d8", hpBase: 8, hpPer: 5, saves: ["感知 (WIS)", "魅力 (CHA)"], primary: ["CHA", "CON", "DEX", "WIS", "INT", "STR"], defaultWeapon: "短劍 (1d6 穿刺)", defaultArmor: "皮甲 (11 + 敏捷)" },
+      "術士 (Sorcerer)": { hd: "1d6", hpBase: 6, hpPer: 4, saves: ["體質 (CON)", "魅力 (CHA)"], primary: ["CHA", "CON", "DEX", "WIS", "INT", "STR"], defaultWeapon: "輕弩 (1d8 穿刺)", defaultArmor: "無甲法袍 (10 + 敏捷)" }
+    };
+
+    const THEMATIC_WEAPONS = [
+      { keywords: ["草耙", "長草耙", "麥耙", "鐵耙", "耙子", "耙", "rake"], name: "鋼齒長草耙 (Steel-Toothed Farm Rake)", type: "農具 / 改裝雙手長柄武器", damage: "1d8 (雙手 1d10) 穿刺", properties: "多用 (Versatile)、長柄武器、重擊時可嘗試進行推撞伏地" },
+      { keywords: ["草叉", "乾草叉", "叉子", "pitchfork", "fork"], name: "強化鐵製乾草叉 (Reinforced Pitchfork)", type: "農具 / 近戰刺擊武器", damage: "1d6 (雙手 1d8) 穿刺", properties: "投擲 (射程 20/60)、多用" },
+      { keywords: ["鐵鎬", "鶴嘴鎬", "鎬子", "十字鎬", "鎬", "pick"], name: "厚重礦工鎬 (Heavy Mining Pick)", type: "採礦工具 / 破甲武器", damage: "1d8 穿刺", properties: "多用 (雙手 1d10)、對厚重護甲具有破甲破壞感" },
+      { keywords: ["剁刀", "剁骨刀", "砍刀", "菜刀", "斬骨刀", "屠刀", "骨刀", "cleaver"], name: "沈重剁骨刀 (Heavy Bone-Cleaver)", type: "屠宰刀具 / 近戰劈砍武器", damage: "1d6 (雙手 1d8) 揮砍", properties: "輕型 (Light)、靈巧 (Finesse)、破骨重擊" },
+      { keywords: ["手杖", "盲杖", "拐杖", "木杖", "cane"], name: "包鉛厚橡木手杖 (Lead-Weighted Walking Cane)", type: "隨身手杖 / 隱蔽近戰武器", damage: "1d6 (雙手 1d8) 鈍擊", properties: "多用、外表極似日常拄行工具，不易被衛兵查扣" },
+      { keywords: ["鐵錘", "大方錘", "鍛造大錘", "大鐵錘", "sledgehammer"], name: "鍛造大方錘 (Blacksmith's Sledgehammer)", type: "鐵匠工具 / 近戰重鈍武器", damage: "2d6 鈍擊", properties: "重型、雙手、猛擊碎骨" },
+      { keywords: ["魚叉", "捕鯨矛", "捕鯨叉", "harpoon"], name: "倒鉤捕鯨矛 (Barbed Whaling Harpoon)", type: "漁民獵具 / 遠程投擲武器", damage: "1d8 穿刺", properties: "投擲 (射程 30/120)、帶細麻繩可將命中目標拉扯回身旁" }
+    ];
+
+    const THEMATIC_FOCUSES = [
+      { keywords: ["煙斗", "老煙斗", "煙草", "抽煙", "青煙", "pipe"], name: "刻印符文石楠木老煙斗 (Rune-Carved Briar Pipe)", desc: "抽吸時吐出微帶幽光的藍白色青煙，透過吞吐煙圈勾勒引導法術塑形。" },
+      { keywords: ["算盤", "算珠", "銅算盤", "帳本", "abacus"], name: "黃銅微縮算盤 (Brass Mini-Abacus)", desc: "撥動算珠時發出金屬震顫音，以精密的數術幾何共振施展奧術或結界。" },
+      { keywords: ["茶杯", "瓷杯", "茶葉", "茶漬", "茶", "teacup"], name: "裂紋青花占卜瓷杯 (Cracked Divination Teacup)", desc: "晃動殘留茶漬，茶葉碎屑會如活物般排列出相應的咒術符印。" }
+    ];
+
+    let currentNPCData = null;
+
+    // 4d6 drop lowest
+    function roll4d6dl1() {
+      let dice = [Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*6)+1];
+      dice.sort((a,b) => b-a);
+      return { total: dice[0]+dice[1]+dice[2], dice: dice, dropped: dice[3] };
+    }
+
+    function calcMod(score) {
+      let mod = Math.floor((score - 10) / 2);
+      return mod >= 0 ? `+${mod}` : `${mod}`;
+    }
+
+    function parseLevel(input) {
+      let text = (input || "").trim().toLowerCase();
+      let lv = 1;
+      let note = "";
+      if (text.includes("大魔導師") || text.includes("大魔導") || text.includes("archmage")) {
+        lv = 14; note = "大魔導師階級 (Lv.14)";
+      } else if (text.includes("老兵") || text.includes("veteran")) {
+        lv = 5; note = "精銳老兵 (Lv.5)";
+      } else if (text.includes("學徒") || text.includes("apprentice")) {
+        lv = 2; note = "見習學徒 (Lv.2)";
+      } else {
+        let match = text.match(/\d+/);
+        if (match) lv = Math.min(20, Math.max(1, parseInt(match[0])));
+      }
+      if (text.includes("封印") || text.includes("詛咒") || text.includes("受限")) {
+        note += " [⚠️ 部分法術環位已遭封印/限制]";
+      }
+      return { level: lv, note: note };
+    }
+
+    function applyPreset(type) {
+      if (type === 'farmer') {
+        document.getElementById('npcName').value = "老丹恩";
+        document.getElementById('npcClass').value = "戰士 (Fighter)";
+        document.getElementById('npcBackground').value = "民間英雄 (Folk Hero)";
+        document.getElementById('npcLevel').value = "1";
+        document.getElementById('npcTrait').value = "無";
+        document.getElementById('npcStory').value = "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙。";
+      } else if (type === 'wizard') {
+        document.getElementById('npcName').value = "布倫希爾德學者";
+        document.getElementById('npcClass').value = "法師 (Wizard)";
+        document.getElementById('npcLevel').value = "大魔導師";
+        document.getElementById('npcTrait').value = "無";
+        document.getElementById('npcStory').value = "隱居在迷霧森林邊界的神秘老學者，不使用常規魔杖，施法時總是抽著一支刻印符文的石楠木老煙斗，透過吞吐青煙引導奧術。";
+      } else if (type === 'undertaker') {
+        document.getElementById('npcName').value = "守墓人摩斯";
+        document.getElementById('npcRace').value = "提夫林 (Tiefling)";
+        document.getElementById('npcClass').value = "法師 (Wizard)";
+        document.getElementById('npcLevel').value = "6";
+        document.getElementById('npcTrait').value = "靈魂";
+        document.getElementById('npcStory').value = "老守墓人摩斯，平日在鎮郊墓園挖土埋棺，看似駝背衰老，實則是隱退的死靈法師。他不帶法杖魔杖，施法時總是捧著一只裂紋的占卜茶杯喝冷茶；遇到盜墓賊時，便抄起隨身那把挖墳用的沉重鐵鎬砸向對方。";
+      } else if (type === 'chef') {
+        document.getElementById('npcName').value = "大廚高登";
+        document.getElementById('npcRace').value = "半獸人 (Half-Orc)";
+        document.getElementById('npcClass').value = "野蠻人 (Barbarian)";
+        document.getElementById('npcLevel').value = "4";
+        document.getElementById('npcTrait').value = "霜凍";
+        document.getElementById('npcStory').value = "鯨骨酒館的脾氣火爆主廚，看似天天在後廚燉湯，實際上是狂暴圖騰戰士。打架時抄起浸透油漬的沉重厚背剁骨刀，體表生來散發著冰霜寒氣。";
+      }
+      generateNPC();
+    }
+
+    function generateNPC() {
+      let raceKey = document.getElementById('npcRace').value;
+      if (raceKey === 'RANDOM') {
+        let keys = Object.keys(RACES);
+        raceKey = keys[Math.floor(Math.random()*keys.length)];
+      }
+
+      let classKey = document.getElementById('npcClass').value;
+      if (classKey === 'RANDOM') {
+        let keys = Object.keys(CLASSES);
+        classKey = keys[Math.floor(Math.random()*keys.length)];
+      }
+
+      let bgKey = document.getElementById('npcBackground').value;
+      if (bgKey === 'RANDOM') {
+        let bgs = ["民間英雄 (Folk Hero)", "士兵 (Soldier)", "侍祭 (Acolyte)", "行會工匠 (Guild Artisan)", "貴族 (Noble)", "流浪兒 (Urchin)", "學者 (Sage)"];
+        bgKey = bgs[Math.floor(Math.random()*bgs.length)];
+      }
+
+      let name = document.getElementById('npcName').value.trim();
+      if (!name) {
+        let names = ["羅蘭", "達格瑪", "貝拉", "摩斯", "芬恩", "艾德加", "奧爾森", "莉莉安", "維克多", "賽蓮娜"];
+        name = names[Math.floor(Math.random()*names.length)];
+      }
+
+      let lvParsed = parseLevel(document.getElementById('npcLevel').value);
+      let level = lvParsed.level;
+      let levelNote = lvParsed.note;
+      let pb = Math.floor((level - 1) / 4) + 2;
+
+      let story = document.getElementById('npcStory').value.trim();
+      let traitInput = document.getElementById('npcTrait').value.trim();
+
+      // 骰出 6 組點數
+      let rolls = [];
+      for (let i = 0; i < 6; i++) rolls.push(roll4d6dl1().total);
+      rolls.sort((a,b) => b-a);
+
+      let clsData = CLASSES[classKey];
+      let raceData = RACES[raceKey];
+
+      let stats = {};
+      clsData.primary.forEach((stat, idx) => {
+        stats[stat] = { score: rolls[idx], mod: calcMod(rolls[idx]) };
+      });
+
+      // 武器與生活法器映射
+      let combined = (story + " " + traitInput).toLowerCase();
+      let weapon = { name: clsData.defaultWeapon, type: "標準軍用武器", damage: "正常", properties: "常規配置" };
+      for (let w of THEMATIC_WEAPONS) {
+        if (w.keywords.some(k => combined.includes(k))) {
+          weapon = w;
+          break;
+        }
+      }
+
+      let focus = null;
+      for (let f of THEMATIC_FOCUSES) {
+        if (f.keywords.some(k => combined.includes(k))) {
+          focus = f;
+          break;
+        }
+      }
+
+      // 特質
+      let trait = null;
+      if (traitInput && !["無", "沒有", "none", "nothing"].includes(traitInput.toLowerCase())) {
+        if (traitInput.includes("火")) trait = { name: "炎脈共鳴", cat: "元素異能", desc: "受火焰傷害減半，攻擊自帶 1d4 火焰傷害。" };
+        else if (traitInput.includes("霜") || traitInput.includes("冰")) trait = { name: "霜凍微光", cat: "元素異能", desc: "受寒冷傷害減半，受到暴擊時爆發冰霧使周遭敵人減速。" };
+        else if (traitInput.includes("魂") || traitInput.includes("靈")) trait = { name: "靈視眼眸", cat: "超感官知", desc: "可看見 30 呎內靈體殘影，對幻術豁免優勢。" };
+        else trait = { name: `${traitInput}之印`, cat: "自訂超常特質", desc: `在【${traitInput}】領域具備非凡天賦，檢定具優勢。` };
+      }
+
+      let hp = clsData.hpBase + (level - 1) * clsData.hpPer;
+
+      currentNPCData = {
+        name, raceKey, classKey, bgKey, level, levelNote, pb, hp, hd: `${level}${clsData.hd}`,
+        rolls, stats, weapon, focus, trait, story, raceData, clsData
+      };
+
+      renderCard();
+    }
+
+    function renderCard() {
+      let d = currentNPCData;
+      if (!d) return;
+
+      let html = `
+        <h2>📜 D&D 5E 劇情向 NPC 角色卡：${d.name}</h2>
+        <div class="meta-strip">
+          等級：Lv.${d.level} ${d.levelNote ? `(${d.levelNote})` : ''} | 熟練加值 (PB)：+${d.pb} | 生命值約：${d.hp} (${d.hd}) | 感官：${d.raceData.darkvision}
+        </div>
+
+        <div class="section-h3">👤 基礎身分與背景歷練</div>
+        <p>• <strong>種族</strong>：${d.raceKey} ｜ <strong>職業</strong>：${d.classKey}</p>
+        <p>• <strong>背景歷練</strong>：${d.bgKey}</p>
+        <p>• <strong>已知語言</strong>：${d.raceData.langs.join(", ")}</p>
+
+        <div class="section-h3">🎲 靈活屬性面板 (4d6 drop lowest 1 實擲)</div>
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 6px;">原始擲骰池：[${d.rolls.join(", ")}] ｜ 依職業優先權推薦配置：</p>
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>屬性 (Stat)</th>
+              <th>建議基礎點數</th>
+              <th>調整值</th>
+              <th>適用種族加值清單</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>力量 STR</strong></td><td class="stat-val">${d.stats.STR.score}</td><td class="stat-mod">${d.stats.STR.mod}</td><td>可自由選用：${d.raceData.bonus}</td></tr>
+            <tr><td><strong>敏捷 DEX</strong></td><td class="stat-val">${d.stats.DEX.score}</td><td class="stat-mod">${d.stats.DEX.mod}</td><td>可自由選用：${d.raceData.bonus}</td></tr>
+            <tr><td><strong>體魄 CON</strong></td><td class="stat-val">${d.stats.CON.score}</td><td class="stat-mod">${d.stats.CON.mod}</td><td>可自由選用：${d.raceData.bonus}</td></tr>
+            <tr><td><strong>智力 INT</strong></td><td class="stat-val">${d.stats.INT.score}</td><td class="stat-mod">${d.stats.INT.mod}</td><td>可自由選用：${d.raceData.bonus}</td></tr>
+            <tr><td><strong>感知 WIS</strong></td><td class="stat-val">${d.stats.WIS.score}</td><td class="stat-mod">${d.stats.WIS.mod}</td><td>可自由選用：${d.raceData.bonus}</td></tr>
+            <tr><td><strong>魅力 CHA</strong></td><td class="stat-val">${d.stats.CHA.score}</td><td class="stat-mod">${d.stats.CHA.mod}</td><td>可自由選用：${d.raceData.bonus}</td></tr>
+          </tbody>
+        </table>
+
+        <div class="section-h3">🎒 隨身裝備、武器與故事道具</div>
+        <table class="equip-table">
+          <thead>
+            <tr>
+              <th>道具 / 武器名稱</th>
+              <th>類型</th>
+              <th>傷害骰 / 防護</th>
+              <th>故事特性與規則備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>${d.weapon.name}</strong></td>
+              <td>${d.weapon.type}</td>
+              <td style="color: #38bdf8; font-weight: bold;">${d.weapon.damage}</td>
+              <td>${d.weapon.properties}</td>
+            </tr>
+            ${d.focus ? `
+            <tr>
+              <td><strong>${d.focus.name}</strong></td>
+              <td>特殊故事法器 / 奇物</td>
+              <td>—</td>
+              <td>${d.focus.desc}</td>
+            </tr>
+            ` : ''}
+            <tr>
+              <td><strong>防護衣物</strong></td>
+              <td>護甲防禦</td>
+              <td>${d.clsData.defaultArmor}</td>
+              <td>隨身日常穿著</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="section-h3">⚔️ 職業與施法者特長 (Lv.${d.level})</div>
+        <p>• <strong>豁免熟練</strong>：${d.clsData.saves.join(", ")}</p>
+        ${d.levelNote.includes("封印") ? `<div class="trait-alert">⚠️ <strong>封印警示</strong>：該角色處於封印狀態，高環法術位與特長受到限制！</div>` : ''}
+
+        <div class="section-h3">✨ 獨特非傳統特質</div>
+        ${d.trait ? `
+          <div class="trait-alert">
+            <strong>🌟 【${d.trait.name}】（${d.trait.cat}）</strong><br>
+            ${d.trait.desc}
+          </div>
+        ` : `
+          <p style="color: #10b981;">🌿 <strong>常規市井人物/普通冒險者</strong>：無超常神異異能，完全依循常規 D&D 5E 規則。</p>
+        `}
+
+        <div class="section-h3">📖 劇本引子與劇情關聯線索</div>
+        <div class="hook-alert">
+          🎯 <strong>【劇本關聯線索】</strong>：${d.story || '此角色常駐於本地市井，表面上看似普通市民，暗中掌握地方關鍵情報，可作為 DM 推進劇情的關鍵樞紐。'}
+        </div>
+      `;
+
+      document.getElementById('cardContent').innerHTML = html;
+    }
+
+    function copyCardMarkdown() {
+      if (!currentNPCData) return;
+      let d = currentNPCData;
+      let md = `# 📜 D&D 5E 劇情向 NPC 角色卡：${d.name}\n` +
+               `> 等級：Lv.${d.level} | 熟練加值 (PB)：+${d.pb} | 生命值約：${d.hp} (${d.hd})\n\n` +
+               `## 👤 基礎身分\n- 種族：${d.raceKey}\n- 職業：${d.classKey}\n- 背景：${d.bgKey}\n\n` +
+               `## 🎲 靈活屬性建議 (4d6dl1 [${d.rolls.join(", ")}])\n` +
+               `STR: ${d.stats.STR.score} (${d.stats.STR.mod}) | DEX: ${d.stats.DEX.score} (${d.stats.DEX.mod}) | CON: ${d.stats.CON.score} (${d.stats.CON.mod})\n` +
+               `INT: ${d.stats.INT.score} (${d.stats.INT.mod}) | WIS: ${d.stats.WIS.score} (${d.stats.WIS.mod}) | CHA: ${d.stats.CHA.score} (${d.stats.CHA.mod})\n\n` +
+               `## 🎒 隨身裝備與生活武器\n- 武器：${d.weapon.name} (${d.weapon.damage}) [${d.weapon.properties}]\n` +
+               (d.focus ? `- 故事法器：${d.focus.name} [${d.focus.desc}]\n` : '') +
+               `\n## 🎯 劇本線索\n${d.story || '掌握關鍵情資的樞紐角色'}`;
+
+      navigator.clipboard.writeText(md).then(() => {
+        alert("✅ 角色卡 Markdown 已成功複製至剪貼簿！");
+      });
+    }
+
+    function exportCSV() {
+      if (!currentNPCData) return;
+      let d = currentNPCData;
+      let rows = [
+        ["欄位名稱", "數值內容"],
+        ["角色姓名", d.name],
+        ["等級", `Lv.${d.level}`],
+        ["熟練加值", `+${d.pb}`],
+        ["種族", d.raceKey],
+        ["職業", d.classKey],
+        ["背景", d.bgKey],
+        ["生命值_HP", `${d.hp}`],
+        ["4d6dl1原始點數池", d.rolls.join(", ")],
+        ["建議力量_STR", `${d.stats.STR.score} (${d.stats.STR.mod})`],
+        ["建議敏捷_DEX", `${d.stats.DEX.score} (${d.stats.DEX.mod})`],
+        ["建議體魄_CON", `${d.stats.CON.score} (${d.stats.CON.mod})`],
+        ["建議智力_INT", `${d.stats.INT.score} (${d.stats.INT.mod})`],
+        ["建議感知_WIS", `${d.stats.WIS.score} (${d.stats.WIS.mod})`],
+        ["建議魅力_CHA", `${d.stats.CHA.score} (${d.stats.CHA.mod})`],
+        ["武器與裝備", `${d.weapon.name} (${d.weapon.damage})`],
+        ["劇本關聯線索", d.story]
+      ];
+
+      let csvContent = "\uFEFF" + rows.map(e => e.map(x => `"${(x||'').toString().replace(/"/g, '""')}"`).join(",")).join("\n");
+      let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      let url = URL.createObjectURL(blob);
+      let a = document.createElement("a");
+      a.href = url;
+      a.download = `NPC_${d.name}_角色數據.csv`;
+      a.click();
+    }
+
+    // 初始載入自動生成一個示範角色
+    window.onload = function() {
+      applyPreset('farmer');
+    };
+  </script>
+</body>
+</html>
