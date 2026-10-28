@@ -32,7 +32,17 @@ class DndWebHandler(SimpleHTTPRequestHandler):
                 custom_trait_keyword=params.get("trait") or None
             )
 
-            template_path = os.path.abspath("dnd_5e_character_template.xlsx")
+            # 自動搜尋模板檔案路徑
+            template_candidates = [
+                os.path.abspath("dnd_5e_character_template.xlsx"),
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), "dnd_5e_character_template.xlsx"),
+                os.path.expanduser(r"~\OneDrive\Documents\0921test\dnd_5e_character_template.xlsx"),
+                os.path.expanduser(r"~\OneDrive\Documents\dnd-5e-npc-generator\dnd_5e_character_template.xlsx"),
+            ]
+            template_path = next((p for p in template_candidates if os.path.exists(p)), None)
+            if not template_path:
+                self.send_error(500, "Character sheet template not found")
+                return
             temp_output = os.path.abspath("temp_download_character_card.xlsx")
 
             fill_excel_template(npc, template_path, temp_output)

@@ -277,10 +277,12 @@ class DndNpcApp:
         if not self.current_npc:
             return
 
-        # 尋找模板位置
+        # 尋找模板位置 (多重路徑自動偵測)
         template_candidates = [
             "dnd_5e_character_template.xlsx",
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "dnd_5e_character_template.xlsx")
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "dnd_5e_character_template.xlsx"),
+            os.path.expanduser(r"~\OneDrive\Documents\0921test\dnd_5e_character_template.xlsx"),
+            os.path.expanduser(r"~\OneDrive\Documents\dnd-5e-npc-generator\dnd_5e_character_template.xlsx"),
         ]
         template_path = None
         for p in template_candidates:
