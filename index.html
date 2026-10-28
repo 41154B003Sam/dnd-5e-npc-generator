@@ -418,9 +418,10 @@
       <!-- 右側：即時角色卡預覽 -->
       <div class="panel">
         <div class="card-actions">
-          <button class="btn-action" onclick="copyCardMarkdown()">📋 複製 Markdown 卡片</button>
-          <button class="btn-action" onclick="exportCSV()">📑 匯出 CSV (Excel 相容)</button>
-          <button class="btn-action" onclick="window.print()">🖨️ 列印 / 另存 PDF</button>
+          <button class="btn-action" style="background: #10b981; border-color: #059669; font-weight: bold; color: white;" onclick="exportExcel()">📗 匯出官方 Excel 卡 (.xlsx 模板回填)</button>
+          <button class="btn-action" onclick="copyCardMarkdown()">📋 複製 Markdown</button>
+          <button class="btn-action" onclick="exportCSV()">📑 匯出 CSV</button>
+          <button class="btn-action" onclick="window.print()">🖨️ 列印 / 存 PDF</button>
         </div>
 
         <div class="preview-card" id="cardContent">
@@ -736,6 +737,46 @@
       navigator.clipboard.writeText(md).then(() => {
         alert("✅ 角色卡 Markdown 已成功複製至剪貼簿！");
       });
+    }
+
+    function exportExcel() {
+      let params = {
+        name: document.getElementById('npcName').value.trim(),
+        race: document.getElementById('npcRace').value === 'RANDOM' ? null : document.getElementById('npcRace').value,
+        class: document.getElementById('npcClass').value === 'RANDOM' ? null : document.getElementById('npcClass').value,
+        background: document.getElementById('npcBackground').value === 'RANDOM' ? null : document.getElementById('npcBackground').value,
+        level: document.getElementById('npcLevel').value.trim() || '1',
+        trait: document.getElementById('npcTrait').value.trim() || null,
+        story: document.getElementById('npcStory').value.trim() || null
+      };
+
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/generate-and-download-excel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(params)
+        })
+        .then(response => {
+          if (!response.ok) throw new Error("伺服器處理失敗");
+          return response.blob();
+        })
+        .then(blob => {
+          let url = window.URL.createObjectURL(blob);
+          let a = document.createElement('a');
+          a.href = url;
+          a.download = `DND5E_角色卡_${currentNPCData ? currentNPCData.name : 'NPC'}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        })
+        .catch(err => {
+          alert("無法從伺服器取得 Excel 檔案，將為您切換為 CSV 匯出。\n提示：請使用【點我開啟網頁版.bat】啟動以啟用完整的後端 Excel 回填引擎！");
+          exportCSV();
+        });
+      } else {
+        alert("💡 提示：您目前直接以檔案模式開啟 index.html。\n如需直接匯出已回填的官方 Excel (.xlsx) 檔案，請點擊資料夾中的【點我開啟網頁版.bat】或【點我啟動桌面程式.bat】！\n現在將先為您下載 CSV 數據檔。");
+        exportCSV();
+      }
     }
 
     function exportCSV() {
