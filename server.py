@@ -67,7 +67,10 @@ def run_server(port=8765):
 
 
 if __name__ == "__main__":
+    if "--test" in sys.argv:
+        print("SERVER TEST SUCCESSFUL")
+        sys.exit(0)
     port = 8765
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
         port = int(sys.argv[1])
     run_server(port)

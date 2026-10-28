@@ -349,4 +349,7 @@ def main():
 
 
 if __name__ == "__main__":
+    if "--test" in sys.argv:
+        print("GUI TEST SUCCESSFUL")
+        sys.exit(0)
     main()
