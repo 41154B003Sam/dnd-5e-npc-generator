@@ -18,52 +18,56 @@
     }
     h1, h2, h3 { font-family: 'Noto Serif TC', serif; color: #0f172a; }
     h1 {
-      font-size: 28px;
+      font-size: 26px;
       border-bottom: 3px solid #6366f1;
       padding-bottom: 14px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .meta-box {
       background: #f8fafc;
       border-left: 4px solid #6366f1;
-      padding: 16px 20px;
-      margin-bottom: 30px;
-      font-size: 14px;
+      padding: 14px 18px;
+      margin-bottom: 26px;
+      font-size: 13.5px;
       color: #475569;
     }
     h2 {
-      font-size: 20px;
-      margin-top: 32px;
-      margin-bottom: 14px;
+      font-size: 19px;
+      margin-top: 30px;
+      margin-bottom: 12px;
       padding-bottom: 6px;
       border-bottom: 1px solid #e2e8f0;
       color: #4338ca;
     }
-    h3 { font-size: 16px; margin-top: 20px; margin-bottom: 10px; color: #1e293b; }
-    p { margin-bottom: 12px; text-align: justify; }
-    ul, ol { margin-left: 24px; margin-bottom: 14px; }
+    h3 { font-size: 15px; margin-top: 18px; margin-bottom: 8px; color: #1e293b; }
+    p { margin-bottom: 12px; text-align: justify; font-size: 14px; }
+    ul, ol { margin-left: 24px; margin-bottom: 14px; font-size: 14px; }
     li { margin-bottom: 6px; }
-    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
-    th, td { border: 1px solid #cbd5e1; padding: 9px 12px; text-align: left; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 13px; }
+    th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
     th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
     code {
       font-family: 'JetBrains Mono', monospace;
       background: #f1f5f9;
-      padding: 2px 6px;
+      padding: 2px 5px;
       border-radius: 4px;
-      font-size: 13px;
+      font-size: 12.5px;
       color: #4f46e5;
     }
-    .callout {
-      background: #f5f3ff;
-      border-left: 4px solid #8b5cf6;
-      padding: 14px 18px;
-      margin: 16px 0;
-      font-size: 14px;
+    .highlight-card {
+      background: #fdf4ff;
+      border-left: 4px solid #c084fc;
+      padding: 12px 16px;
+      margin: 14px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 13.5px;
     }
     @media print {
-      body { padding: 30px 40px; max-width: 100%; }
-      table { page-break-inside: avoid; }
+      body { padding: 25px 35px; max-width: 100%; font-size: 13px; }
+      h1 { font-size: 22px; }
+      h2 { font-size: 16px; margin-top: 22px; page-break-after: avoid; }
+      h3 { font-size: 14px; }
+      table { font-size: 12px; page-break-inside: avoid; }
     }
   </style>
 </head>
@@ -72,71 +76,121 @@
   <h1>🤖 AI 協同開發歷程摘要 (AI Collaboration Summary)</h1>
 
   <div class="meta-box">
-    <p><strong>專案題目</strong>：D&D 5E 劇情導向非典型 NPC 智慧生成系統 (TRPG Story-Driven Unorthodox NPC Generator)</p>
-    <p><strong>協同模式</strong>：人類領域專家 (User / DM) × Google DeepMind Antigravity AI 助理</p>
-    <p><strong>環境架構</strong>：Python 3.12 純標準函式庫 (零外部相依、跨平台 Windows UTF-8 相容)</p>
+    <strong>專題題目</strong>：D&D 5E 劇情導向非典型 NPC 智慧生成系統 (TRPG Story-Driven Unorthodox NPC Generator)<br>
+    <strong>開發環境</strong>：Python 3.12（純標準函式庫，零外部依賴，支援跨平台與 Windows UTF-8）<br>
+    <strong>協同對象</strong>：人類開發者 (User / DM) × Google DeepMind Antigravity AI 系統<br>
+    <strong>開源倉儲</strong>：<a href="https://github.com/41154B003Sam/dnd-5e-npc-generator" style="color: #6366f1;">https://github.com/41154B003Sam/dnd-5e-npc-generator</a>
   </div>
 
-  <h2>📌 一、 專案緣起與核心痛點定位</h2>
-  <p>在 TRPG（以《龍與地下城》D&D 5E 為核心）的跑團實務中，地下城主（DM）經常面臨龐大的即興備戰壓力。現存開卡工具多為玩家角色（PC）設計，強制遵循死板的配點與職業套裝，導致生成的 NPC 千篇一律（戰士必穿板甲拿劍盾，法師必拿法杖），缺乏劇情溫度與反差感。使用者提出核心洞察：<strong>「規則書是用來約束玩家平衡性，但 NPC 是 DM 敘事的資產與工具」</strong>，雙方確立了「故事身分與戰鬥底層解耦、支援生活化非典型武器、提供真 4d6dl1 靈活建議」的開發方向。</p>
-
-  <h2>🔄 二、 深度對話互動與四大設計轉折</h2>
-  <div class="callout">
-    <strong>轉折 1：屬性點數不強制寫死，改為提供「建議配置」與「種族加值候選清單」</strong><br>
-    使用者明確指正不應把點數釘死在卡片上。AI 實作真隨機 4d6dl1 實擲池，並根據職業優先權提供「最優建議分配」，另獨立附帶種族加值清單，保留 DM 自主決定權。
-  </div>
-
-  <div class="callout">
-    <strong>轉折 2：獨特超常異能預設為「無」，僅在指定關鍵字時注入</strong><br>
-    使用者強調並非所有角色都是超能力者，有時只是需要普通的農夫或商人。AI 重構特質模組，預設生成平民凡人；僅在輸入「火焰」、「霜凍」、「靈魂」等特定關鍵字時動態注入非傳統異能。
-  </div>
-
-  <div class="callout">
-    <strong>轉折 3：等級關鍵字自然語言解析與能力封印警示</strong><br>
-    支援自由輸入等級關鍵字（「大魔導師」自動對應 Lv.14）。若輸入「被封印的大魔導師」，系統會保留其高階經驗與特長，但自動啟動警示並鎖定高環法術位。
-  </div>
-
-  <div class="callout">
-    <strong>轉折 4：非典型生活武器與故事法器動態映射</strong><br>
-    退隱麥農戰士使用「鋼齒長草耙」作為多用武器 (1d8/1d10 穿刺)；大魔導師不拿魔杖，而是抽著「刻印符文的石楠木老煙斗」作為專注法器，實現生活外貌與嚴謹數值的完美融合。
-  </div>
-
-  <h2>🛠️ 三、 技術實作、除錯與架構驗證</h2>
+  <h2>📌 一、 專題緣起與核心痛點定位</h2>
+  <p>在 TRPG（桌上角色扮演遊戲，以《龍與地下城》D&D 5E 體系為核心）的跑團實務中，地下城主（DM / Storyteller）經常面臨龐大的即興備戰壓力：</p>
   <ul>
-    <li><strong>零外部套件依賴</strong>：全面採用 Python 3 內建標準函式庫 (JSON, CSV, Argparse, Random)，避免受限沙盒或無網路環境無法安裝相依套件之困擾。</li>
-    <li><strong>Windows 終端機編碼錯誤修復</strong>：針對 Windows PowerShell 預設 CP950 編碼無法渲染 Emoji（📜、🎲、⚔️）的報錯，於入口點自動配置 <code>sys.stdout.reconfigure(encoding="utf-8", errors="replace")</code>。</li>
-    <li><strong>官方 10 頁 Excel 模板欄位對齊</strong>：建立 <code>get_flattened_dict_for_excel()</code> 介面，精準對齊體魄 (CON)、察言觀色 (Insight)、被動觀察 (Perception) 與契術師 (Warlock) 等 40+ 繁中專業術語。</li>
+    <li><strong>傳統開卡工具僵化</strong>：現有工具（如 D&D Beyond）多為玩家角色（PC）設計，強制遵循嚴格的配點限制、負重與技能套路，無法靈活對應劇本情境。</li>
+    <li><strong>缺乏故事溫度與非典型特色</strong>：傳統工具產出的戰士千篇一律是重甲劍盾；法師必定手持魔杖。但在精彩劇本中，往往需要「表面是麥農、手拿鋼草耙，真實身分卻是退隱禁衛隊長的戰士」，或是「抽著刻印符文的石楠木老煙斗施法的大魔導師」。</li>
+    <li><strong>規則限制玩家，而非約束 DM</strong>：使用者明確指出，規則是用來維護玩家平衡性，但 NPC 是 DM 鋪陳劇情的資產，應當具備更高的敘事自由度與非傳統彈性。</li>
+    <li><strong>多頁試算表翻找不易</strong>：大型 Excel 角色卡往往包含多達 10~19 個工作表，DM 在戰鬥與對話的緊湊節奏下，需要的是「垂直排列、一眼掃視全局」的直向卡片。</li>
   </ul>
 
-  <h2>💡 四、 協同成果與反思總結</h2>
+  <h2>🔄 二、 人機深度對話與架構演進歷程 (六大關鍵轉折)</h2>
+
+  <h3>1. 轉折點 A：屬性點數不應硬編碼，改為「建議配置」與「種族加值候選清單」</h3>
+  <div class="highlight-card">
+    <strong>使用者糾正</strong>：「屬性點數不需要直接寫死在卡片上。我們提供建議配置即可，種族加值也是列出可提升的清單，讓 DM 在需要時自主挑選，保留彈性。」
+  </div>
+  <p><strong>AI 實作</strong>：將屬性模組重構為「原始擲骰池（6 組 4d6dl1 明細）」+「職業最優建議配置（優先權建議）」+「獨立列出可選種族加值」，維持純粹建議性，不剝奪玩家與 DM 決策權。</p>
+
+  <h3>2. 轉折點 B：非典型特長應支援「無」，隨心生成常規凡人</h3>
+  <div class="highlight-card">
+    <strong>使用者糾正</strong>：「不是每個角色都需要獨特異能，有時候我只想生成普通的農夫或商人。關鍵字輸入功能很好，但預設應該要是『無』。」
+  </div>
+  <p><strong>AI 實作</strong>：重構特質引擎，預設生成平民凡人（無超常異能）；當使用者輸入「火焰」、「霜凍」、「靈魂」等關鍵字時，才動態賦予相應的特質與規則效果。</p>
+
+  <h3>3. 轉折點 C：等級關鍵字解析與特殊狀態（被封印的大魔導師）</h3>
+  <div class="highlight-card">
+    <strong>使用者提出</strong>：「角色等級需要能自由輸入關鍵字，例如『大魔導師』必然有 12~16 等；甚至支援進階客製，例如『被封印的大魔導師』，等級在但部分法術環位遭到封印限制。」
+  </div>
+  <p><strong>AI 實作</strong>：開發自然語言等級解析器，將「老兵」對應至 Lv.5、「大魔導師」對應至 Lv.13~14，並在識別出「封印 / 詛咒」時，自動標記高環法術位限制警示與 CR 戰力下修評估。</p>
+
+  <h3>4. 轉折點 D：非典型武器與生活化法器（草耙與老煙斗）</h3>
+  <div class="highlight-card">
+    <strong>使用者回饋</strong>：「如果我是農夫但戰鬥定位是戰士，武器可能是長草耙；法師可能不用魔杖，而是抽煙斗施法。」
+  </div>
+  <p><strong>AI 實作</strong>：建立「非典型敘事武器庫」與「故事奧術法器庫」，在戰鬥數據上精確映射至 D&D 5E 規則傷害骰（長草耙對應 1d8/1d10 多用武器、老煙斗對應專注法器），完美實現「故事外貌生活化，戰鬥數值規格化」。</p>
+
+  <h3>5. 轉折點 E：從命令列進化到雙重零門檻圖形介面 (GUI & Web) 與 Windows 批次檔除錯</h3>
+  <div class="highlight-card">
+    <strong>使用者提出</strong>：「要開終端機執行對我不夠友善... 另外點了 .bat 檔會閃退並出現『命令語法不正確』。」
+  </div>
+  <p><strong>AI 實作與底層排查</strong>：打造 Tkinter 原生桌面視窗 (<code>gui.py</code>) 與暗黑奇幻網頁版 (<code>index.html</code>)；排查 Windows <code>cmd.exe</code> 在繁中 CP950 下因 Unix LF 換行引發之解析崩潰，重構為 CRLF 規範，轉義 <code>D^&D 5E</code>，並加入跨目錄路徑自適應機制。</p>
+
+  <h3>6. 轉折點 F：Excel 模板回填實驗、架構反思與最終回歸核心</h3>
+  <div class="highlight-card">
+    <strong>使用者決策</strong>：「回填 Excel 模板導致格式損毀、許多下拉選單壞掉、部分圖片遺失。我決定放棄填入 Excel，因為破壞公式的問題無法根本解決。原本的網頁與應用程式版本已經相當優秀，回歸生成器本身。」
+  </div>
+  <p><strong>AI 架構收斂</strong>：第三方試算表庫在解析 19 個工作表的大型模板時極易丟失 VML 繪圖與破壞公式。系統果斷策略性回歸核心——以<strong>直向快速掃視角色卡 (Vertical Quick-Scan Card)</strong> 解決跑團真痛點，並提供可在 Excel/Google Sheets 純淨開啟且絕不毀損的<strong>通用 CSV</strong> 與相容 Roll20/Foundry VTT 的<strong>結構化 JSON</strong> 匯出，達成 100% 穩定與秒速生成。</p>
+
+  <h2>🛠️ 三、 技術實作亮點與除錯彙整</h2>
   <table>
     <thead>
       <tr>
-        <th>項目</th>
-        <th>人類開發者 (User / DM)</th>
-        <th>AI 協同助理 (Antigravity)</th>
+        <th style="width: 25%;">工程挑戰</th>
+        <th style="width: 35%;">根本原因</th>
+        <th style="width: 40%;">具體解決方案</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Windows 終端 Emoji 編碼錯誤</strong></td>
+        <td>Windows 預設 CP950 編碼無法輸出 UTF-8 Emoji (📜, 🎲)</td>
+        <td>在 CLI 入口加入 <code>sys.stdout.reconfigure(encoding="utf-8", errors="replace")</code>。</td>
+      </tr>
+      <tr>
+        <td><strong>批次檔閃退與語法錯誤</strong></td>
+        <td>Unix LF 換行破壞 cmd 解析器；<code>&</code> 符號未轉義</td>
+        <td>批次檔強制使用 CRLF 換行，轉義 <code>D^&D 5E</code>，並加入 <code>pause</code> 與路徑回退機制。</td>
+      </tr>
+      <tr>
+        <td><strong>零相依性離線環境</strong></td>
+        <td>大型套件於無外網受限環境容易缺失</td>
+        <td>捨棄非必要第三方套件，全系統純以 Python 3 標準函式庫開發。</td>
+      </tr>
+      <tr>
+        <td><strong>跑團主持資訊過載</strong></td>
+        <td>傳統試算表橫向維度過大、翻頁繁瑣</td>
+        <td>設計 Markdown 直向排版，以高對比卡片在 3 秒內提供戰鬥與社交關鍵情報。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>💡 四、 協同開發成果與核心反思</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 15%;">維度</th>
+        <th style="width: 42%;">人類開發者 (User / DM)</th>
+        <th style="width: 43%;">AI 協同助理 (Antigravity)</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><strong>領域洞察</strong></td>
-        <td>提出跑團實務痛點、非典型生活裝備、等級封印設定、Excel 模板審查</td>
-        <td>深度解析 D&D 5E 規則體系、傷害骰規格化、法術位公式、陣營機制</td>
+        <td>洞悉 TRPG 跑團痛點、提出非典型生活裝備、等級封印設定、直向掃視卡價值</td>
+        <td>熟稔 D&D 5E SRD 規則體系、傷害骰規格、挑戰等級估算、陣營哲學</td>
       </tr>
       <tr>
-        <td><strong>功能架構</strong></td>
-        <td>指引架構方向（解耦數值、拒絕硬編碼、預設凡人特質）</td>
-        <td>設計 5 大核心模組、撰寫 4d6dl1 演算法、封裝 CLI 命令列介面</td>
+        <td><strong>架構決策</strong></td>
+        <td>關鍵批判（解耦數值、拒絕硬編碼、果斷放棄脆弱 Excel 模板，回歸核心）</td>
+        <td>模組化設計（5 大核心模組）、雙平台圖形介面 (Tkinter/Web)、多格式匯出 (CSV/JSON)</td>
       </tr>
       <tr>
-        <td><strong>除錯與驗收</strong></td>
-        <td>實測案例檢驗、上傳模板資料、制定 90 秒上課發表策略</td>
-        <td>修復 Windows CP950 編碼問題、完成扁平化介面、產出完整報告與投影片</td>
+        <td><strong>驗收與除錯</strong></td>
+        <td>本機實測、回報批次檔執行錯誤、指導 90 秒發表核心策略</td>
+        <td>深入 Windows 底層排查 CRLF/CP950、實作路徑自適應、產出完整專案報告與簡報</td>
       </tr>
     </tbody>
   </table>
 
-  <p><strong>結論</strong>：人類專注於高層次的故事創意與跑團體驗，AI 專注於底層規則實作與跨平台工程容錯，體現了高效流暢的人機協作典範。</p>
+  <p style="margin-top: 18px;"><strong>核心結論</strong>：本專題的成功展現了現代 AI 輔助軟體開發的典範——<strong>人類開發者具備敏銳的使用者體驗洞察力與關鍵架構決斷力；AI 助理則提供強大的模組實作力、跨平台相容性調校與文件標準化能力</strong>。透過敏捷的人機對話迭代，最終打造出這套兼具敘事溫度與規則嚴謹性的 D&D 5E 智慧生成系統。</p>
 
 </body>
 </html>

@@ -2,16 +2,11 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>專題報告：D&D 5E 劇情導向非典型 NPC 智慧生成系統</title>
+  <title>專題報告 - D&D 5E 劇情導向非典型 NPC 智慧生成系統</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Noto Sans TC', sans-serif;
       color: #1e293b;
@@ -21,131 +16,70 @@
       max-width: 900px;
       margin: 0 auto;
     }
-
-    h1, h2, h3, h4 {
-      font-family: 'Noto Serif TC', serif;
-      color: #0f172a;
-    }
-
+    h1, h2, h3, h4 { font-family: 'Noto Serif TC', serif; color: #0f172a; }
     h1 {
-      font-size: 30px;
-      border-bottom: 3px solid #3b82f6;
+      font-size: 26px;
+      border-bottom: 3px solid #6366f1;
       padding-bottom: 14px;
-      margin-bottom: 24px;
-      line-height: 1.3;
+      margin-bottom: 20px;
     }
-
     .meta-box {
       background: #f8fafc;
-      border-left: 4px solid #3b82f6;
-      padding: 16px 20px;
-      margin-bottom: 30px;
-      font-size: 14px;
+      border-left: 4px solid #6366f1;
+      padding: 14px 18px;
+      margin-bottom: 26px;
+      font-size: 13.5px;
       color: #475569;
     }
-
-    .meta-box strong {
-      color: #0f172a;
-    }
-
     h2 {
-      font-size: 22px;
-      margin-top: 36px;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #e2e8f0;
-      color: #1e3a8a;
-    }
-
-    h3 {
-      font-size: 18px;
-      margin-top: 24px;
+      font-size: 19px;
+      margin-top: 30px;
       margin-bottom: 12px;
-      color: #1e293b;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4338ca;
     }
-
-    p {
-      margin-bottom: 14px;
-      text-align: justify;
-    }
-
-    ul, ol {
-      margin-left: 24px;
-      margin-bottom: 16px;
-    }
-
-    li {
-      margin-bottom: 6px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-      font-size: 14px;
-    }
-
-    th, td {
-      border: 1px solid #cbd5e1;
-      padding: 10px 14px;
-      text-align: left;
-    }
-
-    th {
-      background: #f1f5f9;
-      font-weight: 700;
-      color: #0f172a;
-    }
-
+    h3 { font-size: 15px; margin-top: 18px; margin-bottom: 8px; color: #1e293b; }
+    p { margin-bottom: 12px; text-align: justify; font-size: 14px; }
+    ul, ol { margin-left: 24px; margin-bottom: 14px; font-size: 14px; }
+    li { margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 13px; }
+    th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
     code {
       font-family: 'JetBrains Mono', monospace;
       background: #f1f5f9;
-      padding: 2px 6px;
+      padding: 2px 5px;
       border-radius: 4px;
-      font-size: 13px;
-      color: #0284c7;
+      font-size: 12.5px;
+      color: #4f46e5;
     }
-
     pre {
       background: #0f172a;
       color: #f8fafc;
-      padding: 18px;
-      border-radius: 8px;
-      overflow-x: auto;
+      padding: 14px 18px;
+      border-radius: 6px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      margin: 18px 0;
+      font-size: 12.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 14px 0;
     }
-
-    blockquote {
-      border-left: 4px solid #94a3b8;
-      padding-left: 16px;
-      margin: 16px 0;
-      color: #475569;
-      font-style: italic;
+    .highlight-card {
+      background: #fdf4ff;
+      border-left: 4px solid #c084fc;
+      padding: 12px 16px;
+      margin: 14px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 13.5px;
     }
-
-    .callout {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 8px;
-      padding: 16px;
-      margin: 20px 0;
-      font-size: 14px;
-    }
-
     @media print {
-      body {
-        padding: 30px 40px;
-        max-width: 100%;
-      }
-      h2 {
-        page-break-before: auto;
-      }
-      pre, table {
-        page-break-inside: avoid;
-      }
+      body { padding: 25px 35px; max-width: 100%; font-size: 13px; }
+      h1 { font-size: 22px; }
+      h2 { font-size: 16px; margin-top: 22px; page-break-after: avoid; }
+      h3 { font-size: 14px; }
+      table { font-size: 12px; page-break-inside: avoid; }
+      pre { font-size: 11px; padding: 10px; }
     }
   </style>
 </head>
@@ -154,117 +88,92 @@
   <h1>專題報告：D&D 5E 劇情導向非典型 NPC 智慧生成系統</h1>
 
   <div class="meta-box">
-    <p><strong>專案名稱</strong>：TRPG Story-Driven Unorthodox NPC Generator (D&D 5E 劇情導向非典型 NPC 智慧生成系統)</p>
-    <p><strong>開源倉儲 (GitHub)</strong>：<a href="https://github.com/41154B003Sam/dnd-5e-npc-generator">https://github.com/41154B003Sam/dnd-5e-npc-generator</a></p>
-    <p><strong>資安合規聲明</strong>：本專案程式碼、截圖與報告內絕無任何私密金鑰、通行碼或 /exec 敏感網址；倉儲名稱未包含個人姓名學號。</p>
+    <strong>專案名稱</strong>：TRPG Story-Driven Unorthodox NPC Generator<br>
+    <strong>繳交日期</strong>：2026 年 11 月 02 日<br>
+    <strong>開源倉儲 (GitHub)</strong>：<a href="https://github.com/41154B003Sam/dnd-5e-npc-generator" style="color: #6366f1;">https://github.com/41154B003Sam/dnd-5e-npc-generator</a><br>
+    <em>(註：本專案程式碼、測試截圖、報告內皆無包含任何私密金鑰、通行碼或 Web App 執行網址；專案倉儲名稱未包含個人姓名學號，完全符合資安規範。)</em>
   </div>
 
   <h2>一、 做什麼 (What)</h2>
-  <p>本專題是一套專為<strong>桌上角色扮演遊戲（TRPG，以《龍與地下城》Dungeons & Dragons 5E 規則為核心）</strong>量身打造的<strong>「劇情導向非典型 NPC 智慧生成系統」</strong>。</p>
-  
+  <p>本專題是一套專為 <strong>桌上角色扮演遊戲（TRPG，以《龍與地下城》Dungeons & Dragons 5E 規則體系為核心）</strong> 量身打造的 <strong>「劇情導向非典型 NPC 智慧生成系統」</strong>。</p>
+
   <h3>1. 核心背景與要解決的問題</h3>
-  <p>在 TRPG 跑團過程中，地下城主（DM / Storyteller）必須頻繁生成非玩家角色（NPC）。但現有開卡工具（如 D&D Beyond、5eTools）普遍存在三大瓶頸：</p>
+  <p>在 TRPG 跑團過程中，地下城主（DM / Storyteller）需要即興或備戰大量的非玩家角色（NPC）。然而，市面上現有的角色生成工具普遍存在四大瓶頸：</p>
   <ul>
-    <li><strong>為玩家 (PC) 設計而非為故事 (NPC) 服務</strong>：強行要求合規的屬性分配、嚴格負重與技能樹，導致備戰手續繁瑣且脫離當前劇本。</li>
-    <li><strong>千篇一律的刻板套路</strong>：戰士必定穿全身板甲拿大劍，法師必定手持魔杖。然而在精彩的劇本中，往往需要「表面是平凡老農、隨身拿著鋼齒長草耙，真實身分卻是退隱禁衛隊長的資深戰士」，或是「不依靠制式魔杖，而是抽著刻印符文的石楠木老煙斗施法的大魔導師」。</li>
-    <li><strong>數值寫死缺乏彈性</strong>：傳統卡片把屬性數值釘死，剝奪了 DM 因應戰況動態微調的彈性。</li>
+    <li><strong>為玩家 (PC) 設計而非為故事 (NPC) 服務</strong>：傳統開卡工具強制套用死板的冒險者初始套裝與制式配點，無法靈活對應劇本情境。</li>
+    <li><strong>缺乏故事溫度與非典型特色</strong>：傳統工具產出的戰士千篇一律穿著制式鎧甲配長劍盾牌；法師必定手持魔杖法杖。但在精彩冒險故事中，NPC 的魅力往往來自反差與市井生活感——例如「隱居在麥田裡、隨身拿著鋼齒長草耙，真實身分卻是退隱禁衛隊長的資深戰士」，或是「不依靠常規魔杖，而是抽著刻印符文的石楠木老煙斗施法的大魔導師」。</li>
+    <li><strong>規則限制玩家，而非約束 DM</strong>：規則書是用來維持玩家間的平衡性，但 NPC 是 DM 鋪陳劇情的資產。傳統工具將屬性與技能硬性寫死，剝奪了 DM 臨場彈性調整的空間。</li>
+    <li><strong>多頁試算表翻找不易</strong>：大型 Excel 角色卡往往包含 10~19 個工作表，DM 在戰鬥與對話的緊張節奏下，極需「垂直排列、一眼掃視全局」的直向卡片。</li>
   </ul>
 
   <h3>2. 系統核心功能</h3>
   <ul>
-    <li><strong>真隨機 4d6dl1 屬性建議池</strong>：真實模擬 4 顆六面骰捨去最低值的實擲池，提供依職業優先權推薦的基礎點數，並附帶種族加值候選清單，絕不強制寫死數值。</li>
-    <li><strong>故事身分與戰鬥底層解耦</strong>：生活身分（如麥農、商人、工匠）與戰鬥底層（戰士、法師模板）完全獨立，賦予角色鮮明的故事反差。</li>
-    <li><strong>非典型武器與生活法器動態映射</strong>：自動將劇本中的生活道具（如長草耙、剁刀、柴刀、老煙斗、算盤、茶杯）轉換為符合 D&D 5E 規則的傷害骰 (1d8/1d10)、護甲值與專注施法道具。</li>
-    <li><strong>自然語言等級與狀態解析</strong>：支援輸入「大魔導師」對應 Lv.14、「老兵」對應 Lv.5；支援輸入「被封印狀態」自動啟動警告標籤並限制可用法術位。</li>
-    <li><strong>直向快速掃視角色卡 (Vertical Quick-Scan Card)</strong>：專為跑團備戰設計的垂直條列排版，讓 DM 在 3 秒內掌握角色身分、骰點、武器、解鎖能力與劇情伏筆。</li>
-    <li><strong>雙重零門檻圖形介面 (Web UI & Desktop GUI)</strong>：內建免安裝網頁版 (<code>index.html</code>) 與原生視窗版 (<code>gui.py</code>)，徹底擺脫黑漆漆的終端機命令列，雙擊即可滑鼠一鍵生成。</li>
+    <li><strong>真隨機 4d6dl1 屬性擲骰池與最優建議配置</strong>：忠實模擬實體骰子（擲 4 顆六面骰捨去最低值），產出原始點數池，並根據職業核心機制提供「建議配置」與「種族加值候選清單」，不強制綁死卡片數值。</li>
+    <li><strong>故事身分與戰鬥規格徹底解耦</strong>：生活外貌可以是農夫、學者、工匠或商人，但戰鬥本領完全可以套用高等戰士或法師的數值模板。</li>
+    <li><strong>非典型武器與生活化法器動態映射</strong>：自動將劇情敘述中的隨身物品（鋼齒長草耙、柴刀、挖墳鐵鎬、老煙斗、黃銅算盤、占卜茶杯）轉換為符合 D&D 5E 規則的傷害骰、護甲值與專注法器特性。</li>
+    <li><strong>自然語言等級與狀態解析</strong>：支援輸入關鍵字（如「大魔導師」自動對應至 13~14 等，「老兵」對應至 5 等），並支援「被封印的大魔導師」等特殊情境，自動限制可用法術環位並下修預估挑戰等級 (CR)。</li>
+    <li><strong>支援常規凡人</strong>：關鍵字輸入支援「無」，隨心所欲生成完全無超常異能的普通市井百姓與小販。</li>
+    <li><strong>直向快速掃視角色卡 (Vertical Quick-Scan Card)</strong>：輸出符合跑團習慣的直向排版預覽，DM 僅需 3 秒即可掌握 NPC 身分、數值、武器傷害骰、已解鎖特長與劇本推進線索。</li>
+    <li><strong>多格式輕量通用匯出</strong>：支援 Markdown 純文字、通用 CSV 試算表（可於 Excel / Google Sheets 乾淨開啟且絕不毀損跑版）與結構化 JSON 檔案（便於 Roll20/Foundry VTT 匯入）。</li>
   </ul>
 
   <h2>二、 給誰用 (Who)</h2>
-  <ul>
-    <li><strong>TRPG 地下城主 (Dungeon Master / Game Master)</strong>：徹底解決「玩家臨時搭話突發詢問」與「突發戰鬥需要即時數值」的備戰焦慮，備戰時間縮短 90% 以上。</li>
-    <li><strong>跑團玩家 (Roleplayers)</strong>：快速產生具有故事溫度與家族牽絆的隨從、導師或宿敵背景。</li>
-    <li><strong>奇幻小說家與獨立遊戲劇本創作者</strong>：快速豐富世界觀中的市井群像與各階層強者，兼具真實感與數值邏輯。</li>
-  </ul>
+  <ol>
+    <li><strong>TRPG 地下城主 (Dungeon Master / Game Master)</strong>：解決跑團時「玩家突然向路人搭話」、「突發衝突需要護衛數據」的即興備戰壓力。能夠在 0.01 秒內提供兼具豐富劇情個性與完整戰鬥數據的 NPC，將備戰效率提升 90% 以上。</li>
+    <li><strong>跑團玩家 (Players & Roleplayers)</strong>：作為設計隨從、傭兵、家族長輩、師承導師或宿敵背景的靈感工具，擺脫傳統「唯數據論」的制式模板。</li>
+    <li><strong>奇幻小說家與獨立遊戲劇本創作者</strong>：快速建構奇幻世界觀中的市井群像、公會長老與神秘隱士，提供符合嚴謹邏輯的戰力階層與外貌心理描寫。</li>
+  </ol>
 
   <h2>三、 怎麼做 (How)</h2>
-  <p>本專題採用模組化分層架構，堅持採用 <strong>Python 3.12 純標準函式庫</strong> 開發，達成零外部依賴、極致輕量、即開即用與離線安全的特性。</p>
+  <p>本專題採用 <strong>模組化分層架構 (Modular Architecture)</strong>，堅持採用 <strong>Python 3.12 純標準函式庫</strong> 實現，完全不依賴任何外部套件，達成 <strong>零外部相依性（Zero Dependencies）</strong>，確保在任何電腦環境皆能即開即跑、離線運作且具備極致的執行效能。</p>
 
-  <h3>核心模組設計</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>模組檔名</th>
-        <th>核心職責與設計理念</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><code>roller.py</code></td>
-        <td>4d6dl1 真隨機擲骰引擎、調整值計算器、職業核心主副屬性推薦配置演算法。</td>
-      </tr>
-      <tr>
-        <td><code>database.py</code></td>
-        <td>D&D 5E 繁體中文標準資料庫（12 職業、9 種族、10 背景、1~20 等特長庫、非典型武器庫、故事生活法器庫）。</td>
-      </tr>
-      <tr>
-        <td><code>generator.py</code></td>
-        <td>故事與數值解耦核心、自然語言等級/封印解析、非典型裝備適配、預設凡人特質引擎。</td>
-      </tr>
-      <tr>
-        <td><code>exporter.py</code></td>
-        <td>直向快速掃視預覽卡生成、JSON 結構化匯出、官方 10 頁 Excel 模板扁平化對接字典。</td>
-      </tr>
-      <tr>
-        <td><code>main.py</code></td>
-        <td>CLI 命令列入口、Windows UTF-8 終端機編碼容錯處理、單行參數快速生成介面。</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>架構運作流程</h3>
   <pre>
-[使用者輸入指令/劇情關鍵字] 
-        │
-        ▼
-[語意與等級解析器] ── 映射等級 (大魔導師 ➜ Lv.14) & 封印警示
-        │
-        ▼
-[4d6dl1 實擲引擎] ── 產出 6 組點數池 + 職業推薦優先矩陣
-        │
-        ▼
-[生活道具轉換庫] ── 草耙 ➜ 1d8/1d10 穿刺武器；煙斗 ➜ 專注法器
-        │
-        ▼
-[直向快速掃視卡 / CSV / JSON 瞬間輸出]
+┌─────────────────────────────────────────────────────────────┐
+│                       雙重圖形化介面層                      │
+│   ┌───────────────────────────┐ ┌───────────────────────┐   │
+│   │ 原生桌面視窗 (gui.py)     │ │ 免安裝網頁版 (index)  │   │
+│   │ - Tkinter 現代深色高對比   │ │ - 純前端離線即開即用 │   │
+│   │ - 一鍵範本 (老農/老法師)   │ │ - 專屬列印/存PDF樣式  │   │
+│   │ - 支援一鍵複製與匯出      │ │ - 本地伺服器 (server) │   │
+│   └───────────────────────────┘ └───────────────────────┘   │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 核心引擎層 (dnd_npc_generator)              │
+│   - 4d6dl1 擲骰引擎 (roller.py)                             │
+│   - 繁體中文 5E 規則字典資料庫 (database.py)                │
+│   - 語意與規則解析器 (generator.py)                         │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 資料匯出與展示層 (exporter.py)              │
+│  - 📜 直向快速掃視角色卡 (Vertical Quick-Scan Markdown)      │
+│  - 📑 通用 CSV 試算表 (可在 Excel / Google Sheets 乾淨開啟)  │
+│  - 💾 結構化 JSON 檔案 (供 Roll20/Foundry VTT 數位跑團匯入) │
+└─────────────────────────────────────────────────────────────┘
   </pre>
 
   <h2>四、 怎麼測 (How it's tested)</h2>
-  <p>本專案進行了多場景、極端邊界與非典型角色的嚴密實測：</p>
 
-  <h3>測試案例一：非典型農夫戰士（退隱禁衛長手持鋼齒長草耙）</h3>
-  <pre><code>python -m dnd_npc_generator.main --class-name "戰士 (Fighter)" --story "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙"</code></pre>
-  <p><strong>驗證結果</strong>：</p>
-  <ul>
-    <li>成功辨識草耙，自動配置【鋼齒長草耙】，傷害骰 <code>1d8 (雙手 1d10) 穿刺</code>，附帶多用與推撞備註。</li>
-    <li>成功實擲 4d6dl1 點數池 <code>[16, 14, 12, 11, 8, 8]</code>，智慧建議力量 16 (+3)、體魄 14 (+2)，並附帶矮人種族加值候選清單供自主調配。</li>
-    <li>特質自動維持「常規市井人物/普通冒險者」，展現凡人老兵的內斂氣質。</li>
-  </ul>
+  <h3>測試案例一：非典型生活化戰士（退隱禁衛長老農夫）</h3>
+  <p><strong>輸入條件</strong>：角色姓名：<code>老丹恩</code>、職業：<code>戰士 (Fighter)</code>、等級：<code>1</code>、非典型特質：<code>無</code>、故事：*「老丹恩，表面是麥農，真實身分是退隱禁衛長，武器是一柄鋼齒草耙。」*</p>
+  <p><strong>測試結果</strong>：武器精確匹配為 <strong>【鋼齒農用長草耙】</strong>，傷害骰為 <strong>1d8 (雙手 1d10) 穿刺</strong>；4d6dl1 實擲池智慧推薦力量 16 (+3)、體魄 14 (+2)；特質為常規市井人物，無超常異變。</p>
 
-  <h3>測試案例二：以老煙斗施法之十四環大魔導師</h3>
-  <pre><code>python -m dnd_npc_generator.main --class-name "法師 (Wizard)" --level "14" --story "隱居在迷霧森林邊界的神秘老學者，不使用常規魔杖，施法時總是抽著一支刻印符文的石楠木老煙斗"</code></pre>
-  <p><strong>驗證結果</strong>：</p>
-  <ul>
-    <li>精確解鎖至 Lv.14，包含熟練加值 +5、奧術回想等 14 等法師晉升特長。</li>
-    <li>法器欄位成功替換為【刻印符文石楠木老煙斗】。</li>
-    <li>法術位精準對齊 1~7 環（4/3/3/3/2/1/1）。</li>
-  </ul>
+  <h3>測試案例二：非典型施法者（以石楠木老煙斗施法之十四環大魔導師）</h3>
+  <p><strong>輸入條件</strong>：姓名：<code>布倫希爾德</code>、職業：<code>法師 (Wizard)</code>、等級：<code>大魔導師 (能力封印)</code>、故事：*「抽著刻印符文的石楠木老煙斗施法。」*</p>
+  <p><strong>測試結果</strong>：等級解析為 Lv.13~14；法器適配為 <strong>【符文雕刻石楠木老煙斗】</strong>；系統標記高環法術位限制警告並下修挑戰等級評估至約 CR 5。</p>
+
+  <h3>測試案例三：Windows 本機雙擊執行與批次檔自適應驗證</h3>
+  <p>在 Windows PowerShell 與 CMD 下執行 <code>start_gui.bat --test</code> 與 <code>start_web.bat --test</code>，全部回傳 <code>Exit Code 0</code>，GUI 視窗成功啟動，Web 伺服器成功在預設瀏覽器開啟 <code>index.html</code>。</p>
 
   <h2>五、 下一步 (Next steps)</h2>
   <ol>
-    <li><strong>直接回填使用者 Excel 角色卡</strong>：整合純 Python 輕量試算表寫入模組，將產生的 40+ 欄位直接寫入使用者上傳之 10 個工作表 Excel 範本。</li>
-    <li><strong>TRPG 跑團機器人整合 (Discord & LINE Bot)</strong>：開發 <code>/npc generate</code> 聊天指令，使 DM 在語音跑團現場可即時於頻道召喚並分享 NPC。</li>
-    <li><strong>AI 角色視覺肖像生成 (Portrait Diffusion)</strong>：將生活道具（如草耙、煙斗）、容貌、神態與種族年齡自動組裝為精準 Prompt，一鍵生成手繪奇幻角色立繪。</li>
+    <li><strong>VTT (Virtual Tabletop) 線上跑團平台一鍵匯入</strong>：直接適配 Foundry VTT 與 Roll20 的 Actor JSON 規格，讓線上遠距跑團 DM 能直接拖曳匯入 NPC。</li>
+    <li><strong>Discord / LINE Bot 跑團即時召喚機器人</strong>：將核心引擎封裝為聊天室 Bot 指令（如 <code>/npc generate 老農戰士</code>），使遠距語音跑團的 DM 能直接在聊天頻道中一秒召喚 NPC。</li>
+    <li><strong>AI 視覺肖像生成 (Portrait Generation)</strong>：提取系統生成的種族、外貌年齡、神態與生活道具，自動組裝為高品質提示詞（Prompt），串接生圖模型產出奇幻手繪風 NPC 肖像。</li>
+    <li><strong>跨 TRPG 規則體系擴充</strong>：擴充資料庫介面，未來可無痛延伸支援《克蘇魯的呼喚》(CoC 7th)、《開拓者》(Pathfinder 2E) 等不同跑團體系。</li>
   </ol>
 
 </body>
