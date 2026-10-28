@@ -465,56 +465,64 @@ ALIGNMENTS = [
 # 9. 趣味非典型武器庫 (Thematic & Unorthodox Weapons for NPCs)
 # 讓市井農夫、屠夫、老兵、工匠也能擁有合情合理且帶感的戰鬥工具
 # ==========================================
-THEMATIC_CUSTOM_WEAPONS = {
-    "草耙": {
+THEMATIC_CUSTOM_WEAPONS = [
+    {
+        "keywords": ["草耙", "長草耙", "麥耙", "鐵耙", "耙子", "耙", "rake"],
         "name": "鋼齒長草耙 (Steel-Toothed Farm Rake)",
         "type": "農具 / 改裝雙手長柄武器",
         "damage": "1d8 (雙手 1d10) 穿刺",
         "properties": "多用 (Versatile)、長柄武器、重擊時可嘗試進行推撞伏地"
     },
-    "草叉": {
+    {
+        "keywords": ["草叉", "乾草叉", "叉子", "草叉子", "pitchfork", "fork"],
         "name": "強化鐵製乾草叉 (Reinforced Pitchfork)",
         "type": "農具 / 近戰刺擊武器",
         "damage": "1d6 (雙手 1d8) 穿刺",
         "properties": "投擲 (射程 20/60)、多用"
     },
-    "鐵鎬": {
+    {
+        "keywords": ["鐵鎬", "鶴嘴鎬", "鎬子", "十字鎬", "鎬", "pick", "pickaxe"],
         "name": "厚重礦工鎬 (Heavy Mining Pick)",
         "type": "採礦工具 / 破甲武器",
         "damage": "1d8 穿刺",
         "properties": "多用 (雙手 1d10)、對厚重護甲具有破甲破壞感"
     },
-    "剁刀": {
+    {
+        "keywords": ["剁刀", "剁骨刀", "砍刀", "菜刀", "斬骨刀", "屠刀", "骨刀", "cleaver", "knife"],
         "name": "沈重剁骨刀 (Heavy Bone-Cleaver)",
         "type": "屠宰刀具 / 近戰劈砍武器",
-        "damage": "1d6 揮砍",
-        "properties": "輕型 (Light)、靈巧 (Finesse)"
+        "damage": "1d6 (雙手 1d8) 揮砍",
+        "properties": "輕型 (Light)、靈巧 (Finesse)、破骨重擊"
     },
-    "手杖": {
+    {
+        "keywords": ["手杖", "盲杖", "拐杖", "木杖", "長杖", "cane", "walking stick"],
         "name": "包鉛厚橡木手杖 (Lead-Weighted Walking Cane)",
         "type": "隨身手杖 / 隱蔽近戰武器",
         "damage": "1d6 (雙手 1d8) 鈍擊",
         "properties": "多用、外表極似日常拄行工具，不易被衛兵查扣"
     },
-    "鐵錘": {
+    {
+        "keywords": ["鐵錘", "大方錘", "鍛造大錘", "大鐵錘", "大錘", "鍛錘", "sledgehammer", "hammer"],
         "name": "鍛造大方錘 (Blacksmith's Sledgehammer)",
         "type": "鐵匠工具 / 近戰重鈍武器",
         "damage": "2d6 鈍擊",
         "properties": "重型、雙手、猛擊碎骨"
     },
-    "魚叉": {
+    {
+        "keywords": ["魚叉", "捕鯨矛", "捕鯨叉", "獵叉", "harpoon"],
         "name": "倒鉤捕鯨矛 (Barbed Whaling Harpoon)",
         "type": "漁民獵具 / 遠程投擲武器",
         "damage": "1d8 穿刺",
         "properties": "投擲 (射程 30/120)、帶細麻繩可將命中目標拉扯回身旁"
     },
-    "撬棍": {
+    {
+        "keywords": ["撬棍", "鐵撬", "重鐵撬", "crowbar"],
         "name": "染血生鏽鐵撬 (Bloodstained Heavy Crowbar)",
         "type": "破拆工具 / 即興近戰鈍器",
-        "damage": "1d4 鈍擊",
+        "damage": "1d4 (雙手 1d6) 鈍擊",
         "properties": "破拆門扉檢定優勢、實心硬生鐵"
     }
-}
+]
 
 # ==========================================
 # 10. 獨特非傳統施法法器庫 (Eccentric & Non-Traditional Arcane Focuses)

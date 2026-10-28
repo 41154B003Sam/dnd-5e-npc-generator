@@ -313,9 +313,14 @@ class NPCGenerator:
 
         # 1. 檢測是否有特殊非典型武器 (如草耙、草叉、手杖、鎬、剁刀、魚叉等)
         matched_weapon = None
-        for key, w_data in self.thematic_weapons.items():
-            if key in combined_text:
-                matched_weapon = w_data
+        for w_data in self.thematic_weapons:
+            if any(k in combined_text for k in w_data.get("keywords", [])):
+                matched_weapon = {
+                    "name": w_data["name"],
+                    "type": w_data["type"],
+                    "damage": w_data["damage"],
+                    "properties": w_data["properties"]
+                }
                 break
 
         if matched_weapon:
@@ -369,31 +374,39 @@ class NPCGenerator:
         """
         決定是否生成獨特非傳統特質：預設為 None（普通凡人/商人/農夫），僅在有明確意向時啟用
         """
-        combined = f"{keyword or ''} {story_context or ''}".strip().lower()
-        if not combined:
-            return None
-
-        if any(k in combined for k in ["無", "沒有", "none", "nothing", "普通", "常規"]):
-            return None
-
-        # 比對預設特質庫
-        for preset in self.unique_traits:
-            if any(k in combined for k in preset["keywords"]):
-                return {
-                    "name": preset["name"],
-                    "category": preset["category"],
-                    "description": preset["description"],
-                    "game_effect": preset["game_effect"]
-                }
-
-        # 若使用者有明確傳入自訂 keyword，動態生成該關鍵字的規則加成
-        if keyword and keyword.strip() not in ["無", "none"]:
+        # 1. 若有指定 keyword，優先精準匹配 keyword
+        if keyword and keyword.strip().lower() not in ["無", "沒有", "none", "nothing", "普通", "常規"]:
+            kw = keyword.strip().lower()
+            for preset in self.unique_traits:
+                if any(k in kw for k in preset["keywords"]) or kw in preset["keywords"]:
+                    return {
+                        "name": preset["name"],
+                        "category": preset["category"],
+                        "description": preset["description"],
+                        "game_effect": preset["game_effect"]
+                    }
+            # 自訂關鍵字
             return {
                 "name": f"{keyword}之印 (Mark of {keyword})",
                 "category": "自訂獨特異能",
                 "description": f"此角色在「{keyword}」領域具有不同尋常的超常適應力與特質。",
                 "game_effect": f"在進行與「{keyword}」相關之行動判定或豁免時具備優勢，並可在特定情境下自帶額外環境增益或 1d4 特殊效果。"
             }
+
+        # 2. 若無指定 keyword，檢查 story_context 是否要求
+        if story_context:
+            sc = story_context.strip().lower()
+            if any(k in sc for k in ["無", "沒有", "none", "nothing", "普通", "常規"]):
+                return None
+            for preset in self.unique_traits:
+                # 故事中需有特定元素特徵詞（避開單字火爆等形容詞，優先多字關鍵詞）
+                if any(k in sc for k in preset["keywords"] if len(k) > 1 or k in ["霜", "冰", "魂", "瞬"]):
+                    return {
+                        "name": preset["name"],
+                        "category": preset["category"],
+                        "description": preset["description"],
+                        "game_effect": preset["game_effect"]
+                    }
 
         return None
 
