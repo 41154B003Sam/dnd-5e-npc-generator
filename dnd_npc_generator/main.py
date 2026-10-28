@@ -10,6 +10,7 @@ import sys
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
+from dnd_npc_generator.ai_generator import AINPCGenerator
 from dnd_npc_generator.generator import NPCGenerator
 from dnd_npc_generator.exporter import format_vertical_preview_card, export_to_json, export_to_csv
 
@@ -23,11 +24,14 @@ def run_generator(
     importance="次要劇情 NPC (Supporting)",
     story_context=None,
     custom_trait=None,
+    api_key=None,
+    model="gemini-3.5-flash-lite",
+    force_ai=True,
     output_json=None,
     output_md=None,
     output_csv=None
 ):
-    gen = NPCGenerator()
+    gen = AINPCGenerator(api_key=api_key, model_name=model)
     npc = gen.generate(
         name=name,
         race_name=race,
@@ -36,7 +40,8 @@ def run_generator(
         level_input=level_input,
         importance=importance,
         story_context=story_context,
-        custom_trait_keyword=custom_trait
+        custom_trait_keyword=custom_trait,
+        force_ai=force_ai
     )
 
     card_text = format_vertical_preview_card(npc)
@@ -74,6 +79,9 @@ def main():
     parser.add_argument("--output-json", type=str, default=None, help="匯出 JSON 檔案路徑")
     parser.add_argument("--output-csv", type=str, default=None, help="匯出 CSV 試算表路徑")
     parser.add_argument("--output-md", type=str, default=None, help="匯出 Markdown 檔案路徑")
+    parser.add_argument("--api-key", type=str, default=None, help="Gemini API Key (若未指定則自動從 .env 或環境變數讀取)")
+    parser.add_argument("--model", type=str, default="gemini-3.5-flash-lite", help="使用的 Gemini 模型名稱")
+    parser.add_argument("--offline", action="store_true", help="強制使用離線後備規則生成，不調用 AI")
 
     args = parser.parse_args()
 
@@ -86,6 +94,9 @@ def main():
         importance=args.importance,
         story_context=args.story,
         custom_trait=args.trait,
+        api_key=args.api_key,
+        model=args.model,
+        force_ai=not args.offline,
         output_json=args.output_json,
         output_md=args.output_md,
         output_csv=args.output_csv

@@ -1,7 +1,9 @@
 """
 D&D 5E 劇情導向非典型 NPC 智慧生成系統 (TRPG Story-Driven Unorthodox NPC Generator)
+整合 Generative AI 深度背景敘事設計與 D&D 5E 規則引擎
 """
 
+from .ai_generator import AINPCGenerator
 from .generator import NPCGenerator
 from .roller import (
     roll_4d6_drop_lowest,
@@ -21,6 +23,7 @@ from .exporter import (
 )
 
 __all__ = [
+    "AINPCGenerator",
     "NPCGenerator",
     "roll_4d6_drop_lowest",
     "calculate_modifier",

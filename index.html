@@ -410,6 +410,22 @@
           <textarea id="npcStory" placeholder="輸入當前劇情或生活描述。例如：『表面是麥農，但真實身分是退隱禁衛長戰士，武器是一柄鋼齒長草耙』"></textarea>
         </div>
 
+        <!-- Gemini AI 智慧敘事設定 -->
+        <div class="form-group" style="background: rgba(15, 23, 42, 0.7); padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px;">
+          <label style="color: #38bdf8; font-weight: bold; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span>🤖 Gemini AI 智慧敘事核心</span>
+            <span id="aiStatusBadge" style="font-size: 11px; background: #065f46; color: #a7f3d0; padding: 2px 8px; border-radius: 4px;">🟢 AI 已就緒</span>
+          </label>
+          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px;">
+            <input type="password" id="npcApiKey" placeholder="Gemini API Key (選填，由後端環境自動載入)" style="flex: 1; font-size: 12px; margin-bottom: 0;">
+            <button type="button" onclick="toggleWebApiKey()" style="background: #334155; border: 1px solid #475569; color: white; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px;">👁️</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="enableAiCheckbox" checked style="width: auto; margin: 0; cursor: pointer;">
+            <label for="enableAiCheckbox" style="margin: 0; font-size: 12px; color: #cbd5e1; cursor: pointer;">啟用 AI 深度撰寫身世、小動作與 5E 生活武器規格</label>
+          </div>
+        </div>
+
         <button class="btn-generate" onclick="generateNPC()">
           <span>🎲 立即智慧生成 NPC 角色卡</span>
         </button>
@@ -545,28 +561,101 @@
       generateNPC();
     }
 
-    function generateNPC() {
+    let currentRawCardMarkdown = "";
+
+    function toggleWebApiKey() {
+      const inp = document.getElementById('npcApiKey');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    async function generateNPC() {
+      const btn = document.querySelector('.btn-generate');
+      const originalBtnText = btn.innerHTML;
+      const enableAI = document.getElementById('enableAiCheckbox') ? document.getElementById('enableAiCheckbox').checked : true;
+      const apiKey = document.getElementById('npcApiKey') ? document.getElementById('npcApiKey').value.trim() : '';
+
       let raceKey = document.getElementById('npcRace').value;
+      let classKey = document.getElementById('npcClass').value;
+      let bgKey = document.getElementById('npcBackground').value;
+      let name = document.getElementById('npcName').value.trim();
+      let levelVal = document.getElementById('npcLevel').value.trim() || '1';
+      let traitInput = document.getElementById('npcTrait').value.trim();
+      let story = document.getElementById('npcStory').value.trim();
+
+      // 如果啟用 AI，優先呼叫本地 /api/generate
+      if (enableAI) {
+        btn.innerHTML = '<span>⏳ 🤖 Gemini AI 創作中，請稍候...</span>';
+        btn.disabled = true;
+        document.getElementById('cardContent').innerHTML = `
+          <div style="padding: 40px 20px; text-align: center; color: #94a3b8;">
+            <div style="font-size: 38px; margin-bottom: 12px; animation: pulse 1.5s infinite;">🤖</div>
+            <h3 style="color: #38bdf8; margin-bottom: 8px;">Gemini AI 正在創作深度角色身世與裝備中...</h3>
+            <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1;">正在為角色規格化 D&D 5E 非典型生活武器/法器、撰寫反差個性細節小動作與 DM 伏筆線索...</p>
+            <p style="font-size: 12px; color: #64748b; margin-top: 8px;">⏳ 通常約需 3~8 秒，請稍候...</p>
+          </div>
+        `;
+
+        try {
+          const resp = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: name || undefined,
+              race: raceKey === 'RANDOM' ? undefined : raceKey,
+              class_name: classKey === 'RANDOM' ? undefined : classKey,
+              background: bgKey === 'RANDOM' ? undefined : bgKey,
+              level: levelVal,
+              story_context: story || undefined,
+              custom_trait: traitInput || undefined,
+              api_key: apiKey || undefined,
+              force_ai: true
+            })
+          });
+
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data.status === 'success' && data.npc) {
+              currentNPCData = data.npc;
+              currentRawCardMarkdown = data.card;
+              renderAICard(data.npc);
+              const badge = document.getElementById('aiStatusBadge');
+              if (badge) {
+                badge.innerText = '🟢 AI 生成完成';
+                badge.style.background = '#065f46';
+              }
+              btn.innerHTML = originalBtnText;
+              btn.disabled = false;
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn("後端 API 連線失敗，自動轉入離線規則生成:", e);
+          const badge = document.getElementById('aiStatusBadge');
+          if (badge) {
+            badge.innerText = '⚪ 離線備用模式';
+            badge.style.background = '#475569';
+          }
+        } finally {
+          btn.innerHTML = originalBtnText;
+          btn.disabled = false;
+        }
+      }
+
+      // 離線本地規則生成回退
       if (raceKey === 'RANDOM') {
         let keys = Object.keys(RACES);
         raceKey = keys[Math.floor(Math.random()*keys.length)];
       }
-
-      let classKey = document.getElementById('npcClass').value;
       if (classKey === 'RANDOM') {
         let keys = Object.keys(CLASSES);
         classKey = keys[Math.floor(Math.random()*keys.length)];
       }
-
-      let bgKey = document.getElementById('npcBackground').value;
       if (bgKey === 'RANDOM') {
         let bgs = ["民間英雄 (Folk Hero)", "士兵 (Soldier)", "侍祭 (Acolyte)", "行會工匠 (Guild Artisan)", "貴族 (Noble)", "流浪兒 (Urchin)", "學者 (Sage)"];
         bgKey = bgs[Math.floor(Math.random()*bgs.length)];
       }
-
-      let name = document.getElementById('npcName').value.trim();
       if (!name) {
-        let names = ["羅蘭", "達格瑪", "貝拉", "摩斯", "芬恩", "艾德加", "奧爾森", "莉莉安", "維克多", "賽蓮娜"];
+        let names = ["老丹恩", "達格瑪", "貝拉", "摩斯", "芬恩", "艾德加", "奧爾森", "莉莉安", "維克多", "賽蓮娜"];
         name = names[Math.floor(Math.random()*names.length)];
       }
 
@@ -575,16 +664,16 @@
       let levelNote = lvParsed.note;
       let pb = Math.floor((level - 1) / 4) + 2;
 
-      let story = document.getElementById('npcStory').value.trim();
-      let traitInput = document.getElementById('npcTrait').value.trim();
+      let storyText = document.getElementById('npcStory').value.trim();
+      let traitVal = document.getElementById('npcTrait').value.trim();
 
       // 骰出 6 組點數
       let rolls = [];
       for (let i = 0; i < 6; i++) rolls.push(roll4d6dl1().total);
       rolls.sort((a,b) => b-a);
 
-      let clsData = CLASSES[classKey];
-      let raceData = RACES[raceKey];
+      let clsData = CLASSES[classKey] || CLASSES["戰士 (Fighter)"];
+      let raceData = RACES[raceKey] || RACES["人類 (Human)"];
 
       let stats = {};
       clsData.primary.forEach((stat, idx) => {
@@ -592,7 +681,7 @@
       });
 
       // 武器與生活法器映射
-      let combined = (story + " " + traitInput).toLowerCase();
+      let combined = (storyText + " " + traitVal).toLowerCase();
       let weapon = { name: clsData.defaultWeapon, type: "標準軍用武器", damage: "正常", properties: "常規配置" };
       for (let w of THEMATIC_WEAPONS) {
         if (w.keywords.some(k => combined.includes(k))) {
@@ -611,21 +700,153 @@
 
       // 特質
       let trait = null;
-      if (traitInput && !["無", "沒有", "none", "nothing"].includes(traitInput.toLowerCase())) {
-        if (traitInput.includes("火")) trait = { name: "炎脈共鳴", cat: "元素異能", desc: "受火焰傷害減半，攻擊自帶 1d4 火焰傷害。" };
-        else if (traitInput.includes("霜") || traitInput.includes("冰")) trait = { name: "霜凍微光", cat: "元素異能", desc: "受寒冷傷害減半，受到暴擊時爆發冰霧使周遭敵人減速。" };
-        else if (traitInput.includes("魂") || traitInput.includes("靈")) trait = { name: "靈視眼眸", cat: "超感官知", desc: "可看見 30 呎內靈體殘影，對幻術豁免優勢。" };
-        else trait = { name: `${traitInput}之印`, cat: "自訂超常特質", desc: `在【${traitInput}】領域具備非凡天賦，檢定具優勢。` };
+      if (traitVal && !["無", "沒有", "none", "nothing"].includes(traitVal.toLowerCase())) {
+        if (traitVal.includes("火")) trait = { name: "炎脈共鳴", cat: "元素異能", desc: "受火焰傷害減半，攻擊自帶 1d4 火焰傷害。" };
+        else if (traitVal.includes("霜") || traitVal.includes("冰")) trait = { name: "霜凍微光", cat: "元素異能", desc: "受寒冷傷害減半，受到暴擊時爆發冰霧使周遭敵人減速。" };
+        else if (traitVal.includes("魂") || traitVal.includes("靈")) trait = { name: "靈視眼眸", cat: "超感官知", desc: "可看見 30 呎內靈體殘影，對幻術豁免優勢。" };
+        else trait = { name: `${traitVal}之印`, cat: "自訂超常特質", desc: `在【${traitVal}】領域具備非凡天賦，檢定具優勢。` };
       }
 
       let hp = clsData.hpBase + (level - 1) * clsData.hpPer;
 
       currentNPCData = {
         name, raceKey, classKey, bgKey, level, levelNote, pb, hp, hd: `${level}${clsData.hd}`,
-        rolls, stats, weapon, focus, trait, story, raceData, clsData
+        rolls, stats, weapon, focus, trait, story: storyText, raceData, clsData
       };
+      currentRawCardMarkdown = "";
 
       renderCard();
+    }
+
+    function renderAICard(d) {
+      let rec = d.recommended_allocation || {};
+      let racialBonusNote = d.racial_bonus_options || "可自由選擇配置";
+      let equipList = d.ai_unorthodox_equipment || d.equipment || [];
+
+      let equipRows = "";
+      if (equipList.length > 0) {
+        equipList.forEach(eq => {
+          let dmg = eq.damage || eq.ac || "—";
+          let lore = eq.story_lore ? ` ； <em>${eq.story_lore}</em>` : "";
+          equipRows += `
+            <tr>
+              <td><strong>${eq.name}</strong></td>
+              <td>${eq.type || '道具'}</td>
+              <td style="color: #38bdf8; font-weight: bold;">${dmg}</td>
+              <td>${eq.properties || ''}${lore}</td>
+            </tr>
+          `;
+        });
+      } else {
+        equipRows = `<tr><td colspan="4">常規隨身衣物與行囊</td></tr>`;
+      }
+
+      let unlockedHtml = "";
+      if (d.unlocked_features && d.unlocked_features.length > 0) {
+        unlockedHtml = d.unlocked_features.map(f => `<li>${f}</li>`).join("");
+      } else {
+        unlockedHtml = "<li>常規基礎戰鬥能力</li>";
+      }
+
+      let traitHtml = "";
+      if (d.unique_trait) {
+        traitHtml = `
+          <div class="trait-alert">
+            <strong>🌟 【${d.unique_trait.name}】（${d.unique_trait.category || '特長'}）</strong><br>
+            ${d.unique_trait.game_effect || d.unique_trait.description || ''}
+          </div>
+        `;
+      } else {
+        traitHtml = `<p style="color: #10b981;">🌿 <strong>常規市井人物/普通冒險者</strong>：無超常神異特質，完全依循常規 D&D 5E 規則。</p>`;
+      }
+
+      let html = `
+        <h2>📜 D&D 5E 劇情向 NPC 角色卡：${d.name}</h2>
+        <div class="meta-strip">
+          定位：${d.importance || '次要劇情 NPC'} | 等級：Lv.${d.level} ${d.level_note ? `(${d.level_note})` : ''} | 預估 CR：${d.cr || '1/4'} | 熟練加值 (PB)：${d.proficiency_bonus || '+2'} | 生命值約：${d.hp} HP | 速度：${d.speed || '30 呎'} | 感官：${d.darkvision || '常規視力'}
+          ${d.ai_crafted ? `<br><span style="color: #38bdf8; font-weight: bold;">🤖 生成模式：【Gemini AI 原創深度敘事版】</span>` : ''}
+        </div>
+
+        <div class="section-h3">👤 基礎身分與背景歷練</div>
+        <p>• <strong>種族</strong>：${d.race} ｜ <strong>職業</strong>：${d.class || d.class_name}</p>
+        <p>• <strong>性別與年齡</strong>：${d.gender || '未知'}，${(d.age && d.age.display) ? d.age.display : (d.age || '中年')}</p>
+        <p>• <strong>陣營與信仰</strong>：${d.alignment} ｜ 信仰：${d.deity || '萬物有靈'}</p>
+        <p>• <strong>背景歷練</strong>：${d.background || '平民民兵'}（${d.bg_feature || '市井歷練'}）</p>
+        <p>• <strong>熟練與語言</strong>：${d.bg_proficiencies || '市井熟練'} ｜ 已知語言：${(d.racial_languages || []).join(", ")}</p>
+
+        <div class="section-h3">🎲 靈活屬性面板 (4d6 drop lowest 1 實擲)</div>
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 6px;">原始擲骰池：${d.raw_ability_rolls || JSON.stringify(d.raw_scores || [])} ｜ 依職業推薦基礎點數配置：</p>
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>屬性 (Stat)</th>
+              <th>建議基礎點數</th>
+              <th>調整值</th>
+              <th>適用種族加值清單</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${["STR", "DEX", "CON", "INT", "WIS", "CHA"].map(st => {
+              let item = rec[st] || { recommended_base: 10, base_mod_str: "+0" };
+              let labelMap = { STR: "力量 STR", DEX: "敏捷 DEX", CON: "體魄 CON", INT: "智力 INT", WIS: "感知 WIS", CHA: "魅力 CHA" };
+              return `
+                <tr>
+                  <td><strong>${labelMap[st]}</strong></td>
+                  <td class="stat-val">${item.recommended_base}</td>
+                  <td class="stat-mod">${item.base_mod_str}</td>
+                  <td>可自由選用：${racialBonusNote}</td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+
+        <div class="section-h3">🎒 隨身裝備、生活武器與故事道具</div>
+        <table class="equip-table">
+          <thead>
+            <tr>
+              <th>道具 / 武器名稱</th>
+              <th>類型</th>
+              <th>傷害骰 / 防護</th>
+              <th>故事特性與規則備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${equipRows}
+          </tbody>
+        </table>
+
+        <div class="section-h3">⚔️ 職業等級晉升特長 (Lv.${d.level} 已解鎖)</div>
+        <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; color: #cbd5e1;">
+          ${unlockedHtml}
+        </ul>
+
+        <div class="section-h3">✨ 獨特非傳統特質</div>
+        ${traitHtml}
+
+        ${d.ai_backstory ? `
+          <div class="section-h3">📖 【AI 原創深度劇情身世 (Backstory)】</div>
+          <div class="hook-alert" style="background: rgba(15, 23, 42, 0.7); border-left: 4px solid #38bdf8; color: #f1f5f9; line-height: 1.7;">
+            ${d.ai_backstory}
+          </div>
+        ` : ''}
+
+        ${d.ai_personality_quirks ? `
+          <div class="section-h3">🎭 【個性、言行舉止與生活細節小動作 (Personality & Quirks)】</div>
+          <div class="hook-alert" style="background: rgba(15, 23, 42, 0.7); border-left: 4px solid #a855f7; color: #f1f5f9; line-height: 1.7; white-space: pre-line;">
+            ${d.ai_personality_quirks}
+          </div>
+        ` : ''}
+
+        ${d.ai_quest_hook ? `
+          <div class="section-h3">🎯 【DM 跑團互動與推進伏筆 (Quest Hook)】</div>
+          <div class="hook-alert" style="background: rgba(30, 27, 75, 0.6); border-left: 4px solid #f59e0b; color: #fef3c7; line-height: 1.7;">
+            ${d.ai_quest_hook}
+          </div>
+        ` : ''}
+      `;
+
+      document.getElementById('cardContent').innerHTML = html;
     }
 
     function renderCard() {
@@ -722,6 +943,12 @@
     }
 
     function copyCardMarkdown() {
+      if (currentRawCardMarkdown) {
+        navigator.clipboard.writeText(currentRawCardMarkdown).then(() => {
+          alert("✅ 直式角色卡 Markdown 全文已成功複製至剪貼簿！");
+        });
+        return;
+      }
       if (!currentNPCData) return;
       let d = currentNPCData;
       let md = `# 📜 D&D 5E 劇情向 NPC 角色卡：${d.name}\n` +
@@ -755,24 +982,30 @@
     function exportCSV() {
       if (!currentNPCData) return;
       let d = currentNPCData;
+      let rec = d.recommended_allocation || {};
       let rows = [
         ["欄位名稱", "數值內容"],
-        ["角色姓名", d.name],
-        ["等級", `Lv.${d.level}`],
-        ["熟練加值", `+${d.pb}`],
-        ["種族", d.raceKey],
-        ["職業", d.classKey],
-        ["背景", d.bgKey],
-        ["生命值_HP", `${d.hp}`],
-        ["4d6dl1原始點數池", d.rolls.join(", ")],
-        ["建議力量_STR", `${d.stats.STR.score} (${d.stats.STR.mod})`],
-        ["建議敏捷_DEX", `${d.stats.DEX.score} (${d.stats.DEX.mod})`],
-        ["建議體魄_CON", `${d.stats.CON.score} (${d.stats.CON.mod})`],
-        ["建議智力_INT", `${d.stats.INT.score} (${d.stats.INT.mod})`],
-        ["建議感知_WIS", `${d.stats.WIS.score} (${d.stats.WIS.mod})`],
-        ["建議魅力_CHA", `${d.stats.CHA.score} (${d.stats.CHA.mod})`],
-        ["武器與裝備", `${d.weapon.name} (${d.weapon.damage})`],
-        ["劇本關聯線索", d.story]
+        ["角色姓名", d.name || ""],
+        ["等級", `Lv.${d.level || 1}`],
+        ["等級備註", d.level_note || d.levelNote || ""],
+        ["預估挑戰等級CR", d.cr || "1/4"],
+        ["陣營", d.alignment || ""],
+        ["熟練加值", d.proficiency_bonus || `+${d.pb || 2}`],
+        ["生命值_HP", `${d.hp || 10}`],
+        ["種族", d.race || d.raceKey || ""],
+        ["職業", d.class || d.class_name || d.classKey || ""],
+        ["背景歷練", d.background || d.bgKey || ""],
+        ["信仰神祇", d.deity || ""],
+        ["4d6dl1原始點數池", d.raw_ability_rolls || (d.rolls ? d.rolls.join(", ") : "")],
+        ["建議力量_STR", rec.STR ? `${rec.STR.recommended_base} (${rec.STR.base_mod_str})` : (d.stats ? `${d.stats.STR.score} (${d.stats.STR.mod})` : "")],
+        ["建議敏捷_DEX", rec.DEX ? `${rec.DEX.recommended_base} (${rec.DEX.base_mod_str})` : (d.stats ? `${d.stats.DEX.score} (${d.stats.DEX.mod})` : "")],
+        ["建議體魄_CON", rec.CON ? `${rec.CON.recommended_base} (${rec.CON.base_mod_str})` : (d.stats ? `${d.stats.CON.score} (${d.stats.CON.mod})` : "")],
+        ["建議智力_INT", rec.INT ? `${rec.INT.recommended_base} (${rec.INT.base_mod_str})` : (d.stats ? `${d.stats.INT.score} (${d.stats.INT.mod})` : "")],
+        ["建議感知_WIS", rec.WIS ? `${rec.WIS.recommended_base} (${rec.WIS.base_mod_str})` : (d.stats ? `${d.stats.WIS.score} (${d.stats.WIS.mod})` : "")],
+        ["建議魅力_CHA", rec.CHA ? `${rec.CHA.recommended_base} (${rec.CHA.base_mod_str})` : (d.stats ? `${d.stats.CHA.score} (${d.stats.CHA.mod})` : "")],
+        ["AI原創身世背景", d.ai_backstory || d.story || ""],
+        ["AI言行舉止小動作", d.ai_personality_quirks || ""],
+        ["DM跑團互動伏筆", d.ai_quest_hook || ""]
       ];
 
       let csvContent = "\uFEFF" + rows.map(e => e.map(x => `"${(x||'').toString().replace(/"/g, '""')}"`).join(",")).join("\n");

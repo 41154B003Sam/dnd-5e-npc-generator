@@ -1,3 +1,5 @@
-# D&D 5E NPC 智慧生成系統 (TRPG Story-Driven Unorthodox NPC Generator)
-# 本專案採用 Python 內建標準函式庫 (tkinter, http.server, json, csv, urllib) 打造，
-# 完全無需額外安裝任何第三方套件即可離線執行！
+# D&D 5E 劇情導向非典型 NPC 智慧生成系統 (TRPG Story-Driven Unorthodox NPC Generator)
+# 基礎規則生成支援以 Python 內建函式庫離線運作。
+# 若啟用 Gemini AI 旗艦級大語言模型進行深度故事背景身世與生活武器 5E 規格化撰寫，需安裝以下套件：
+google-genai>=1.0.0
+python-dotenv>=1.0.0

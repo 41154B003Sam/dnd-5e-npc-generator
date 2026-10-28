@@ -6,24 +6,26 @@ D&D 5E 劇情導向非典型 NPC 智慧生成系統 - 視窗圖形化介面 (Des
 
 import os
 import sys
+import threading
 import webbrowser
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
 # 導入核心生成模組
-from dnd_npc_generator.generator import NPCGenerator
+from dnd_npc_generator.ai_generator import AINPCGenerator
 from dnd_npc_generator.exporter import format_vertical_preview_card, export_to_json, export_to_csv
 
 
 class DndNpcApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("🎲 D&D 5E 劇情導向非典型 NPC 智慧生成系統 (DM 專用直式角色卡)")
-        self.root.geometry("1100x780")
-        self.root.minsize(880, 620)
+        self.root.title("🎲 D&D 5E 劇情導向非典型 NPC 智慧生成系統 (Gemini AI 原創敘事版)")
+        self.root.geometry("1120x800")
+        self.root.minsize(900, 640)
 
-        self.generator = NPCGenerator()
+        self.generator = AINPCGenerator()
         self.current_npc = None
+        self.is_generating = False
 
         self._apply_style()
         self._build_ui()
@@ -75,6 +77,81 @@ class DndNpcApp:
         lbl_title = ttk.Label(left_frame, text="⚙️ NPC 劇情與規則客製控制台", style="Header.TLabel")
         lbl_title.pack(anchor="w", pady=(0, 6))
 
+        # ==========================================
+        # AI 智慧敘事核心設定區 (Gemini AI Engine)
+        # ==========================================
+        ai_box = tk.LabelFrame(
+            left_frame,
+            text=" 🤖 Gemini AI 智慧敘事設定 ",
+            bg=self.panel_bg,
+            fg="#38bdf8",
+            font=("Microsoft JhengHei", 9, "bold"),
+            padx=8,
+            pady=6
+        )
+        ai_box.pack(fill=tk.X, pady=(0, 8))
+
+        self.var_enable_ai = tk.BooleanVar(value=True)
+        cb_ai = tk.Checkbutton(
+            ai_box,
+            text="啟用 Gemini AI 深度背景與裝備撰寫",
+            variable=self.var_enable_ai,
+            bg=self.panel_bg,
+            fg="#f8fafc",
+            selectcolor="#0f172a",
+            activebackground=self.panel_bg,
+            activeforeground="#38bdf8",
+            font=("Microsoft JhengHei", 9, "bold")
+        )
+        cb_ai.pack(anchor="w", pady=(0, 4))
+
+        key_row = tk.Frame(ai_box, bg=self.panel_bg)
+        key_row.pack(fill=tk.X, pady=2)
+        lbl_key = ttk.Label(key_row, text="Gemini API Key：", font=("Microsoft JhengHei", 8))
+        lbl_key.pack(side=tk.LEFT)
+
+        self.entry_api_key = tk.Entry(
+            key_row,
+            show="•",
+            bg="#080c14",
+            fg="#f8fafc",
+            insertbackground="white",
+            font=("Microsoft JhengHei", 8),
+            relief=tk.SOLID,
+            bd=1
+        )
+        # 嘗試填入環境已有的 API Key
+        default_key = os.getenv("GEMINI_API_KEY", "")
+        if default_key:
+            self.entry_api_key.insert(0, default_key)
+        self.entry_api_key.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(2, 4))
+
+        self.btn_toggle_key = tk.Button(
+            key_row,
+            text="👁️",
+            command=self._toggle_key_visibility,
+            bg="#334155",
+            fg="white",
+            font=("Microsoft JhengHei", 7),
+            relief=tk.FLAT,
+            padx=4,
+            pady=1
+        )
+        self.btn_toggle_key.pack(side=tk.RIGHT)
+
+        model_row = tk.Frame(ai_box, bg=self.panel_bg)
+        model_row.pack(fill=tk.X, pady=2)
+        lbl_model = ttk.Label(model_row, text="AI 模型：", font=("Microsoft JhengHei", 8))
+        lbl_model.pack(side=tk.LEFT)
+        self.combo_model = ttk.Combobox(
+            model_row,
+            values=["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"],
+            state="readonly",
+            font=("Microsoft JhengHei", 8)
+        )
+        self.combo_model.current(0)
+        self.combo_model.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(2, 0))
+
         # 快速範本預設集 (Presets)
         lbl_presets = ttk.Label(left_frame, text="快速載入非典型劇情範本：", style="Subheader.TLabel")
         lbl_presets.pack(anchor="w", pady=(4, 2))
@@ -119,7 +196,7 @@ class DndNpcApp:
         self.txt_story.pack(fill=tk.X, pady=(0, 6))
 
         # 核心按鈕：立即生成
-        btn_gen = tk.Button(
+        self.btn_gen = tk.Button(
             left_frame,
             text="🎲 立即生成非典型 NPC (Generate)",
             command=self.generate_npc,
@@ -130,7 +207,7 @@ class DndNpcApp:
             pady=8,
             cursor="hand2"
         )
-        btn_gen.pack(fill=tk.X, pady=(4, 8))
+        self.btn_gen.pack(fill=tk.X, pady=(4, 8))
 
         # 快捷功能按鈕區
         action_box = tk.LabelFrame(left_frame, text=" 匯出與分享選項 ", bg=self.panel_bg, fg="#94a3b8", font=("Microsoft JhengHei", 9, "bold"), padx=8, pady=8)
@@ -291,7 +368,18 @@ class DndNpcApp:
             self.txt_story.insert("1.0", "老守墓人摩斯，平日在鎮郊墓園挖土埋棺，看似駝背衰老，實則是隱退的死靈法師。他不帶法杖魔杖，施法時總是捧著一只裂紋的占卜茶杯喝冷茶；遇到盜墓賊時，便抄起隨身那把挖墳用的沉重鐵鎬砸向對方。")
         self.generate_npc()
 
+    def _toggle_key_visibility(self):
+        if self.entry_api_key.cget("show") == "":
+            self.entry_api_key.config(show="•")
+            self.btn_toggle_key.config(text="👁️")
+        else:
+            self.entry_api_key.config(show="")
+            self.btn_toggle_key.config(text="🔒")
+
     def generate_npc(self):
+        if self.is_generating:
+            return
+
         name = self.entry_name.get().strip() or None
         race = self.combo_race.get()
         race = None if "隨機" in race else race
@@ -306,19 +394,74 @@ class DndNpcApp:
         trait = self.entry_trait.get().strip() or None
         story = self.txt_story.get("1.0", tk.END).strip() or None
 
-        self.current_npc = self.generator.generate(
-            name=name,
-            race_name=race,
-            class_name=cls,
-            background_name=bg,
-            level_input=level_input,
-            story_context=story,
-            custom_trait_keyword=trait
+        enable_ai = self.var_enable_ai.get()
+        api_key = self.entry_api_key.get().strip() or None
+        model = self.combo_model.get()
+
+        self.is_generating = True
+        self.btn_gen.config(text="⏳ 🤖 AI 正在創作身世與裝備規格中...", state=tk.DISABLED, bg="#475569")
+        
+        self.txt_card.delete("1.0", tk.END)
+        self.txt_card.insert(
+            "1.0",
+            "# 🤖 【Gemini AI 智慧敘事核心運算中】\n\n"
+            f"> 正在為角色【{name or '隨機市井人物'}】創作具有生活反差的身世短史...\n"
+            "> 正在將日常生活物品規格化為符合 D&D 5E 平衡的非典型武器/法器...\n"
+            "> 正在整理 4d6dl1 靈活屬性推薦面板與 DM 跑團互動伏筆...\n\n"
+            "⏳ 請稍候約 3~10 秒..."
         )
 
-        card_text = format_vertical_preview_card(self.current_npc)
-        self.txt_card.delete("1.0", tk.END)
-        self.txt_card.insert("1.0", card_text)
+        def worker():
+            try:
+                gen = AINPCGenerator(api_key=api_key, model_name=model)
+                npc = gen.generate(
+                    name=name,
+                    race_name=race,
+                    class_name=cls,
+                    background_name=bg,
+                    level_input=level_input,
+                    story_context=story,
+                    custom_trait_keyword=trait,
+                    force_ai=enable_ai
+                )
+                card_text = format_vertical_preview_card(npc)
+
+                def on_done():
+                    self.current_npc = npc
+                    self.txt_card.delete("1.0", tk.END)
+                    self.txt_card.insert("1.0", card_text)
+                    self.btn_gen.config(text="🎲 立即生成非典型 NPC (Generate)", state=tk.NORMAL, bg=self.accent_color)
+                    self.is_generating = False
+
+                self.root.after(0, on_done)
+            except Exception as e:
+                def on_err():
+                    try:
+                        gen = AINPCGenerator()
+                        npc = gen.generate(
+                            name=name,
+                            race_name=race,
+                            class_name=cls,
+                            background_name=bg,
+                            level_input=level_input,
+                            story_context=story,
+                            custom_trait_keyword=trait,
+                            force_ai=False
+                        )
+                        self.current_npc = npc
+                        card_text = format_vertical_preview_card(npc)
+                        self.txt_card.delete("1.0", tk.END)
+                        self.txt_card.insert("1.0", card_text)
+                    except Exception as fallback_err:
+                        self.txt_card.delete("1.0", tk.END)
+                        self.txt_card.insert("1.0", f"❌ 生成失敗: {e}\n後備生成失敗: {fallback_err}")
+                    
+                    self.btn_gen.config(text="🎲 立即生成非典型 NPC (Generate)", state=tk.NORMAL, bg=self.accent_color)
+                    self.is_generating = False
+
+                self.root.after(0, on_err)
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def copy_card(self):
         card_text = self.txt_card.get("1.0", tk.END)
