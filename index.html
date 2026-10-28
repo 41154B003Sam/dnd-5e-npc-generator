@@ -528,6 +528,7 @@
     }
 
     function applyPreset(type) {
+      let presetTitle = "";
       if (type === 'farmer') {
         document.getElementById('npcName').value = "老丹恩";
         document.getElementById('npcClass').value = "戰士 (Fighter)";
@@ -535,12 +536,14 @@
         document.getElementById('npcLevel').value = "1";
         document.getElementById('npcTrait').value = "無";
         document.getElementById('npcStory').value = "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙。";
+        presetTitle = "老農戰士 (鋼草耙)";
       } else if (type === 'wizard') {
         document.getElementById('npcName').value = "布倫希爾德學者";
         document.getElementById('npcClass').value = "法師 (Wizard)";
         document.getElementById('npcLevel').value = "大魔導師";
         document.getElementById('npcTrait').value = "無";
         document.getElementById('npcStory').value = "隱居在迷霧森林邊界的神秘老學者，不使用常規魔杖，施法時總是抽著一支刻印符文的石楠木老煙斗，透過吞吐青煙引導奧術。";
+        presetTitle = "封印老法師 (符文煙斗)";
       } else if (type === 'undertaker') {
         document.getElementById('npcName').value = "守墓人摩斯";
         document.getElementById('npcRace').value = "提夫林 (Tiefling)";
@@ -548,6 +551,7 @@
         document.getElementById('npcLevel').value = "6";
         document.getElementById('npcTrait').value = "靈魂";
         document.getElementById('npcStory').value = "老守墓人摩斯，平日在鎮郊墓園挖土埋棺，看似駝背衰老，實則是隱退的死靈法師。他不帶法杖魔杖，施法時總是捧著一只裂紋的占卜茶杯喝冷茶；遇到盜墓賊時，便抄起隨身那把挖墳用的沉重鐵鎬砸向對方。";
+        presetTitle = "守墓人摩斯 (挖墳鐵鎬)";
       } else if (type === 'chef') {
         document.getElementById('npcName').value = "大廚高登";
         document.getElementById('npcRace').value = "半獸人 (Half-Orc)";
@@ -555,8 +559,18 @@
         document.getElementById('npcLevel').value = "4";
         document.getElementById('npcTrait').value = "霜凍";
         document.getElementById('npcStory').value = "鯨骨酒館的脾氣火爆主廚，看似天天在後廚燉湯，實際上是狂暴圖騰戰士。打架時抄起浸透油漬的沉重厚背剁骨刀，體表生來散發著冰霜寒氣。";
+        presetTitle = "狂暴大廚高登 (剁骨刀)";
       }
-      generateNPC();
+
+      // 僅載入範本設定，絕不自動呼叫 API 消耗額度
+      document.getElementById('cardContent').innerHTML = `
+        <div style="padding: 40px 20px; text-align: center; color: #94a3b8;">
+          <div style="font-size: 38px; margin-bottom: 12px;">📋</div>
+          <h3 style="color: #38bdf8; margin-bottom: 8px;">已載入範本：【${presetTitle}】</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1;">左側已自動填寫相關身分與情境描述。確認無誤後，請點擊上方【🎲 立即智慧生成 NPC 角色卡】發動 AI 創作。</p>
+          <p style="font-size: 12px; color: #34d399; margin-top: 10px;">💡 系統遵循「非主動不請求」原則，目前尚未消耗任何 API 額度。</p>
+        </div>
+      `;
     }
 
     let currentRawCardMarkdown = "";
@@ -835,6 +849,16 @@
             ${d.ai_quest_hook}
           </div>
         ` : ''}
+
+        ${d.token_usage ? `
+          <div class="section-h3">📊 【Gemini API 額度與 Token 消耗統計】</div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #94a3b8; line-height: 1.7;">
+            <p style="margin: 0;">• <strong>呼叫模型</strong>：<code style="color: #38bdf8;">${d.token_usage.model || 'gemini-3.5-flash-lite'}</code></p>
+            <p style="margin: 0;">• <strong>輸入提示詞</strong>：${d.token_usage.prompt_tokens || 0} Tokens ｜ <strong>創作輸出</strong>：${d.token_usage.candidates_tokens || 0} Tokens</p>
+            <p style="margin: 0;">• <strong>本次總消耗</strong>：<strong style="color: #f8fafc;">${d.token_usage.total_tokens || 0} Tokens</strong> ｜ 預估費用：約 <strong style="color: #34d399;">${d.token_usage.estimated_cost_usd || '$0.00015'} USD</strong>（換算新台幣約 0.004 元）</p>
+            <p style="margin: 0; color: #34d399;">• <strong>Google 免費額度</strong>：${d.token_usage.free_tier_status || 'Google AI Studio 免費額度內 (0 元 / 每日 1,500 次上限)'}</p>
+          </div>
+        ` : ''}
       `;
 
       document.getElementById('cardContent').innerHTML = html;
@@ -1008,9 +1032,27 @@
       a.click();
     }
 
-    // 初始載入自動生成一個示範角色
+    // 初始載入僅填寫表單範本，絕不自動呼叫 API 消耗額度
     window.onload = function() {
-      applyPreset('farmer');
+      document.getElementById('npcName').value = "老丹恩";
+      document.getElementById('npcClass').value = "戰士 (Fighter)";
+      document.getElementById('npcBackground').value = "民間英雄 (Folk Hero)";
+      document.getElementById('npcLevel').value = "1";
+      document.getElementById('npcTrait').value = "無";
+      document.getElementById('npcStory').value = "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙。";
+
+      document.getElementById('cardContent').innerHTML = `
+        <div style="padding: 40px 20px; text-align: center; color: #94a3b8;">
+          <div style="font-size: 40px; margin-bottom: 12px;">🎲</div>
+          <h3 style="color: #38bdf8; margin-bottom: 8px;">D&D 5E 劇情向 NPC 智慧生成系統</h3>
+          <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1;">請在左側調整角色設定或劇情描述，點擊上方【🎲 立即智慧生成 NPC 角色卡】發動 AI 創作。</p>
+          <div style="margin-top: 16px; display: inline-block; text-align: left; background: rgba(15, 23, 42, 0.6); padding: 12px 18px; border-radius: 6px; border: 1px solid #334155; font-size: 12px; color: #94a3b8;">
+            <strong style="color: #34d399;">🛡️ API 額度與資安保障：</strong><br>
+            • 網頁開啟與範本切換<strong>絕不自動消耗 API 額度</strong>，只有點擊生成按鈕才會發送請求。<br>
+            • 單次生成約 800 ~ 1,100 Tokens，在 Google 免費額度內為 <strong>0 元</strong>（每日提供 1,500 次上限）。
+          </div>
+        </div>
+      `;
     };
   </script>
 </body>

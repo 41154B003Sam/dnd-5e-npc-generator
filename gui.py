@@ -30,8 +30,8 @@ class DndNpcApp:
         self._apply_style()
         self._build_ui()
 
-        # 啟動時自動生成預設角色
-        self.generate_npc()
+        # 啟動時預設顯示待命引導畫面（絕不自動呼叫 API 消耗額度）
+        self._show_welcome_screen()
 
     def _apply_style(self):
         style = ttk.Style()
@@ -310,7 +310,27 @@ class DndNpcApp:
         combo.pack(fill=tk.X, pady=(0, 4))
         return combo
 
+    def _show_welcome_screen(self):
+        welcome_md = (
+            "# 📜 D&D 5E 劇情導向非典型 NPC 智慧生成系統 (DM 備戰神器)\n\n"
+            "> **歡迎使用！本系統支援桌面原生視窗與免安裝 Web 雙介面。**\n"
+            "> 系統已就緒，請在左側輸入或調整劇情設定，點擊【🎲 立即生成非典型 NPC】開始生成。\n\n"
+            "## 🛡️ 【API 額度與資安保障政策】\n"
+            "1. **零自動呼叫**：系統啟動或切換範本時**絕不自動發送 API 請求**，只有在您主動點擊生成按鈕時才會發起調用，嚴格保護您的 API 額度。\n"
+            "2. **極致輕量消耗**：單次生成包含 4d6dl1 實擲、深度身世短史、言行小動作與非典型武器 5E 規格化，平均僅消耗約 **800 ~ 1,100 Tokens**（在 Google AI Studio 免費額度下為 **0 元**；即使用付費方案，單次費用亦僅約 **$0.00015 USD**，折合新台幣不到 0.005 元）。\n"
+            "3. **金鑰後端隔離**：前端介面完全不顯示、不儲存任何金鑰字串，杜絕錄影或報告時洩漏的風險。\n\n"
+            "## 💡 【快速上手指南】\n"
+            "- **步驟 1**：點擊上方快速範本（🌾 老農戰士 / 📜 封印老法師 / ⛏️ 守墓人）或在左側自訂情境。\n"
+            "- **步驟 2**：若角色素質為常規凡人，特質欄輸入「無」；若故事涉及生活道具（鋼草耙、老煙斗），AI 將自動將其規格化為 5E 武器/法器。\n"
+            "- **步驟 3**：點擊【🎲 立即生成非典型 NPC】，右側將呈現專為跑團主持打造的直式掃視角色卡。\n\n"
+            "---\n"
+            "*請在左側調整設定後，點擊下方生成按鈕以開始！*"
+        )
+        self.txt_card.delete("1.0", tk.END)
+        self.txt_card.insert("1.0", welcome_md)
+
     def apply_preset(self, ptype):
+        preset_title = ""
         if ptype == "farmer":
             self.entry_name.delete(0, tk.END)
             self.entry_name.insert(0, "老丹恩")
@@ -323,6 +343,7 @@ class DndNpcApp:
             self.entry_trait.insert(0, "無")
             self.txt_story.delete("1.0", tk.END)
             self.txt_story.insert("1.0", "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙。")
+            preset_title = "老農戰士 (鋼草耙)"
         elif ptype == "wizard":
             self.entry_name.delete(0, tk.END)
             self.entry_name.insert(0, "布倫希爾德學者")
@@ -335,6 +356,7 @@ class DndNpcApp:
             self.entry_trait.insert(0, "無")
             self.txt_story.delete("1.0", tk.END)
             self.txt_story.insert("1.0", "隱居在迷霧森林邊界的神秘老學者，不使用常規魔杖，施法時總是抽著一支刻印符文的石楠木老煙斗，透過吞吐青煙引導奧術。")
+            preset_title = "封印老法師 (符文煙斗)"
         elif ptype == "undertaker":
             self.entry_name.delete(0, tk.END)
             self.entry_name.insert(0, "守墓人摩斯")
@@ -347,7 +369,17 @@ class DndNpcApp:
             self.entry_trait.insert(0, "靈魂")
             self.txt_story.delete("1.0", tk.END)
             self.txt_story.insert("1.0", "老守墓人摩斯，平日在鎮郊墓園挖土埋棺，看似駝背衰老，實則是隱退的死靈法師。他不帶法杖魔杖，施法時總是捧著一只裂紋的占卜茶杯喝冷茶；遇到盜墓賊時，便抄起隨身那把挖墳用的沉重鐵鎬砸向對方。")
-        self.generate_npc()
+            preset_title = "守墓人摩斯 (挖墳鐵鎬)"
+
+        # 僅載入範本參數，不自動呼叫 API 消耗額度；提示使用者點擊生成
+        self.txt_card.delete("1.0", tk.END)
+        self.txt_card.insert(
+            "1.0",
+            f"# 📋 已載入劇情範本：【{preset_title}】\n\n"
+            f"> 左側表單已自動填妥相應的種族、職業、身分情境與武器描述。\n"
+            f"> 您可自由在左側修改細節，或直接點擊下方【🎲 立即生成非典型 NPC】開始調用 AI 創作！\n\n"
+            f"💡 系統遵循「非主動不請求」原則，目前尚未消耗任何 API 額度。"
+        )
 
     def generate_npc(self):
         if self.is_generating:

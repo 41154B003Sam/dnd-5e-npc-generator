@@ -229,7 +229,8 @@ class AINPCGenerator:
             "ai_unorthodox_equipment": ai_narrative.get("unorthodox_equipment", []),
             "ai_quest_hook": ai_narrative.get("quest_hook", ""),
             "unique_trait": ai_narrative.get("trait_obj"),
-            "equipment": ai_narrative.get("unorthodox_equipment", [])
+            "equipment": ai_narrative.get("unorthodox_equipment", []),
+            "token_usage": ai_narrative.get("token_usage")
         }
 
         return npc
@@ -311,6 +312,12 @@ class AINPCGenerator:
                 )
                 text = response.text.strip()
                 # 解析 JSON
+                # 解析 Token 消耗量與費用
+                p_tokens = getattr(response.usage_metadata, "prompt_token_count", 0) if hasattr(response, "usage_metadata") else 0
+                c_tokens = getattr(response.usage_metadata, "candidates_token_count", 0) if hasattr(response, "usage_metadata") else 0
+                t_tokens = getattr(response.usage_metadata, "total_token_count", 0) if hasattr(response, "usage_metadata") else (p_tokens + c_tokens)
+                est_cost = (p_tokens * 0.000000075) + (c_tokens * 0.00000030)
+
                 data = json.loads(text)
                 return {
                     "backstory": data.get("backstory", ""),
@@ -321,7 +328,15 @@ class AINPCGenerator:
                         "name": data.get("trait_name", "常規市井人物"),
                         "category": "AI 劇情設計特質",
                         "game_effect": data.get("trait_effect", "依循常規規則")
-                    } if data.get("trait_name") and "常規" not in data.get("trait_name") else None
+                    } if data.get("trait_name") and "常規" not in data.get("trait_name") else None,
+                    "token_usage": {
+                        "prompt_tokens": p_tokens,
+                        "candidates_tokens": c_tokens,
+                        "total_tokens": t_tokens,
+                        "estimated_cost_usd": f"${est_cost:.6f}",
+                        "model": m,
+                        "free_tier_status": "Google AI Studio 免費額度內 (0 元 / 每日 1,500 次免費生成)"
+                    }
                 }
             except Exception as e:
                 last_err = e
