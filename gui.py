@@ -105,39 +105,20 @@ class DndNpcApp:
         )
         cb_ai.pack(anchor="w", pady=(0, 4))
 
-        key_row = tk.Frame(ai_box, bg=self.panel_bg)
-        key_row.pack(fill=tk.X, pady=2)
-        lbl_key = ttk.Label(key_row, text="Gemini API Key：", font=("Microsoft JhengHei", 8))
-        lbl_key.pack(side=tk.LEFT)
-
-        self.entry_api_key = tk.Entry(
-            key_row,
-            show="•",
-            bg="#080c14",
-            fg="#f8fafc",
-            insertbackground="white",
-            font=("Microsoft JhengHei", 8),
-            relief=tk.SOLID,
-            bd=1
+        # 資安安全保障：介面完全不顯示亦不留存任何金鑰字串，由後端環境安全讀取
+        key_status_row = tk.Frame(ai_box, bg=self.panel_bg)
+        key_status_row.pack(fill=tk.X, pady=2)
+        has_env_key = bool(os.getenv("GEMINI_API_KEY"))
+        status_txt = "🟢 AI 雲端引擎：金鑰安全載入中 (後端隔離)" if has_env_key else "⚪ 離線規則模式 (無外部金鑰)"
+        status_col = "#34d399" if has_env_key else "#94a3b8"
+        lbl_key_status = tk.Label(
+            key_status_row,
+            text=status_txt,
+            bg=self.panel_bg,
+            fg=status_col,
+            font=("Microsoft JhengHei", 8)
         )
-        # 嘗試填入環境已有的 API Key
-        default_key = os.getenv("GEMINI_API_KEY", "")
-        if default_key:
-            self.entry_api_key.insert(0, default_key)
-        self.entry_api_key.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(2, 4))
-
-        self.btn_toggle_key = tk.Button(
-            key_row,
-            text="👁️",
-            command=self._toggle_key_visibility,
-            bg="#334155",
-            fg="white",
-            font=("Microsoft JhengHei", 7),
-            relief=tk.FLAT,
-            padx=4,
-            pady=1
-        )
-        self.btn_toggle_key.pack(side=tk.RIGHT)
+        lbl_key_status.pack(side=tk.LEFT)
 
         model_row = tk.Frame(ai_box, bg=self.panel_bg)
         model_row.pack(fill=tk.X, pady=2)
@@ -368,14 +349,6 @@ class DndNpcApp:
             self.txt_story.insert("1.0", "老守墓人摩斯，平日在鎮郊墓園挖土埋棺，看似駝背衰老，實則是隱退的死靈法師。他不帶法杖魔杖，施法時總是捧著一只裂紋的占卜茶杯喝冷茶；遇到盜墓賊時，便抄起隨身那把挖墳用的沉重鐵鎬砸向對方。")
         self.generate_npc()
 
-    def _toggle_key_visibility(self):
-        if self.entry_api_key.cget("show") == "":
-            self.entry_api_key.config(show="•")
-            self.btn_toggle_key.config(text="👁️")
-        else:
-            self.entry_api_key.config(show="")
-            self.btn_toggle_key.config(text="🔒")
-
     def generate_npc(self):
         if self.is_generating:
             return
@@ -395,7 +368,6 @@ class DndNpcApp:
         story = self.txt_story.get("1.0", tk.END).strip() or None
 
         enable_ai = self.var_enable_ai.get()
-        api_key = self.entry_api_key.get().strip() or None
         model = self.combo_model.get()
 
         self.is_generating = True
@@ -413,7 +385,7 @@ class DndNpcApp:
 
         def worker():
             try:
-                gen = AINPCGenerator(api_key=api_key, model_name=model)
+                gen = AINPCGenerator(model_name=model)
                 npc = gen.generate(
                     name=name,
                     race_name=race,

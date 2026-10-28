@@ -410,15 +410,13 @@
           <textarea id="npcStory" placeholder="輸入當前劇情或生活描述。例如：『表面是麥農，但真實身分是退隱禁衛長戰士，武器是一柄鋼齒長草耙』"></textarea>
         </div>
 
-        <!-- Gemini AI 智慧敘事設定 -->
-        <div class="form-group" style="background: rgba(15, 23, 42, 0.7); padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px;">
-          <label style="color: #38bdf8; font-weight: bold; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span>🤖 Gemini AI 智慧敘事核心</span>
-            <span id="aiStatusBadge" style="font-size: 11px; background: #065f46; color: #a7f3d0; padding: 2px 8px; border-radius: 4px;">🟢 AI 已就緒</span>
-          </label>
-          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px;">
-            <input type="password" id="npcApiKey" placeholder="Gemini API Key (選填，由後端環境自動載入)" style="flex: 1; font-size: 12px; margin-bottom: 0;">
-            <button type="button" onclick="toggleWebApiKey()" style="background: #334155; border: 1px solid #475569; color: white; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 11px;">👁️</button>
+        <!-- Gemini AI 智慧敘事設定 (金鑰由後端安全隔離環境載入，前端完全不顯示亦無洩漏風險) -->
+        <div class="form-group" style="background: rgba(15, 23, 42, 0.7); padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <label style="color: #38bdf8; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 6px;">
+              <span>🤖 Gemini AI 智慧敘事核心</span>
+            </label>
+            <span id="aiStatusBadge" style="font-size: 11px; background: #065f46; color: #a7f3d0; padding: 2px 8px; border-radius: 4px;">🟢 雲端引擎連線</span>
           </div>
           <div style="display: flex; align-items: center; gap: 6px;">
             <input type="checkbox" id="enableAiCheckbox" checked style="width: auto; margin: 0; cursor: pointer;">
@@ -563,16 +561,10 @@
 
     let currentRawCardMarkdown = "";
 
-    function toggleWebApiKey() {
-      const inp = document.getElementById('npcApiKey');
-      inp.type = inp.type === 'password' ? 'text' : 'password';
-    }
-
     async function generateNPC() {
       const btn = document.querySelector('.btn-generate');
       const originalBtnText = btn.innerHTML;
       const enableAI = document.getElementById('enableAiCheckbox') ? document.getElementById('enableAiCheckbox').checked : true;
-      const apiKey = document.getElementById('npcApiKey') ? document.getElementById('npcApiKey').value.trim() : '';
 
       let raceKey = document.getElementById('npcRace').value;
       let classKey = document.getElementById('npcClass').value;
@@ -607,7 +599,6 @@
               level: levelVal,
               story_context: story || undefined,
               custom_trait: traitInput || undefined,
-              api_key: apiKey || undefined,
               force_ai: true
             })
           });
