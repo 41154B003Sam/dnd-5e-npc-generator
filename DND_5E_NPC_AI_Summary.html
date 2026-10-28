@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>AI 協同開發歷程摘要 - D&D 5E 劇情導向非典型 NPC 智慧生成系統</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      color: #1e293b;
+      line-height: 1.8;
+      background: #ffffff;
+      padding: 50px 70px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 { font-family: 'Noto Serif TC', serif; color: #0f172a; }
+    h1 {
+      font-size: 28px;
+      border-bottom: 3px solid #6366f1;
+      padding-bottom: 14px;
+      margin-bottom: 24px;
+    }
+    .meta-box {
+      background: #f8fafc;
+      border-left: 4px solid #6366f1;
+      padding: 16px 20px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      color: #475569;
+    }
+    h2 {
+      font-size: 20px;
+      margin-top: 32px;
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4338ca;
+    }
+    h3 { font-size: 16px; margin-top: 20px; margin-bottom: 10px; color: #1e293b; }
+    p { margin-bottom: 12px; text-align: justify; }
+    ul, ol { margin-left: 24px; margin-bottom: 14px; }
+    li { margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th, td { border: 1px solid #cbd5e1; padding: 9px 12px; text-align: left; }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #4f46e5;
+    }
+    .callout {
+      background: #f5f3ff;
+      border-left: 4px solid #8b5cf6;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    @media print {
+      body { padding: 30px 40px; max-width: 100%; }
+      table { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🤖 AI 協同開發歷程摘要 (AI Collaboration Summary)</h1>
+
+  <div class="meta-box">
+    <p><strong>專案題目</strong>：D&D 5E 劇情導向非典型 NPC 智慧生成系統 (TRPG Story-Driven Unorthodox NPC Generator)</p>
+    <p><strong>協同模式</strong>：人類領域專家 (User / DM) × Google DeepMind Antigravity AI 助理</p>
+    <p><strong>環境架構</strong>：Python 3.12 純標準函式庫 (零外部相依、跨平台 Windows UTF-8 相容)</p>
+  </div>
+
+  <h2>📌 一、 專案緣起與核心痛點定位</h2>
+  <p>在 TRPG（以《龍與地下城》D&D 5E 為核心）的跑團實務中，地下城主（DM）經常面臨龐大的即興備戰壓力。現存開卡工具多為玩家角色（PC）設計，強制遵循死板的配點與職業套裝，導致生成的 NPC 千篇一律（戰士必穿板甲拿劍盾，法師必拿法杖），缺乏劇情溫度與反差感。使用者提出核心洞察：<strong>「規則書是用來約束玩家平衡性，但 NPC 是 DM 敘事的資產與工具」</strong>，雙方確立了「故事身分與戰鬥底層解耦、支援生活化非典型武器、提供真 4d6dl1 靈活建議」的開發方向。</p>
+
+  <h2>🔄 二、 深度對話互動與四大設計轉折</h2>
+  <div class="callout">
+    <strong>轉折 1：屬性點數不強制寫死，改為提供「建議配置」與「種族加值候選清單」</strong><br>
+    使用者明確指正不應把點數釘死在卡片上。AI 實作真隨機 4d6dl1 實擲池，並根據職業優先權提供「最優建議分配」，另獨立附帶種族加值清單，保留 DM 自主決定權。
+  </div>
+
+  <div class="callout">
+    <strong>轉折 2：獨特超常異能預設為「無」，僅在指定關鍵字時注入</strong><br>
+    使用者強調並非所有角色都是超能力者，有時只是需要普通的農夫或商人。AI 重構特質模組，預設生成平民凡人；僅在輸入「火焰」、「霜凍」、「靈魂」等特定關鍵字時動態注入非傳統異能。
+  </div>
+
+  <div class="callout">
+    <strong>轉折 3：等級關鍵字自然語言解析與能力封印警示</strong><br>
+    支援自由輸入等級關鍵字（「大魔導師」自動對應 Lv.14）。若輸入「被封印的大魔導師」，系統會保留其高階經驗與特長，但自動啟動警示並鎖定高環法術位。
+  </div>
+
+  <div class="callout">
+    <strong>轉折 4：非典型生活武器與故事法器動態映射</strong><br>
+    退隱麥農戰士使用「鋼齒長草耙」作為多用武器 (1d8/1d10 穿刺)；大魔導師不拿魔杖，而是抽著「刻印符文的石楠木老煙斗」作為專注法器，實現生活外貌與嚴謹數值的完美融合。
+  </div>
+
+  <h2>🛠️ 三、 技術實作、除錯與架構驗證</h2>
+  <ul>
+    <li><strong>零外部套件依賴</strong>：全面採用 Python 3 內建標準函式庫 (JSON, CSV, Argparse, Random)，避免受限沙盒或無網路環境無法安裝相依套件之困擾。</li>
+    <li><strong>Windows 終端機編碼錯誤修復</strong>：針對 Windows PowerShell 預設 CP950 編碼無法渲染 Emoji（📜、🎲、⚔️）的報錯，於入口點自動配置 <code>sys.stdout.reconfigure(encoding="utf-8", errors="replace")</code>。</li>
+    <li><strong>官方 10 頁 Excel 模板欄位對齊</strong>：建立 <code>get_flattened_dict_for_excel()</code> 介面，精準對齊體魄 (CON)、察言觀色 (Insight)、被動觀察 (Perception) 與契術師 (Warlock) 等 40+ 繁中專業術語。</li>
+  </ul>
+
+  <h2>💡 四、 協同成果與反思總結</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th>人類開發者 (User / DM)</th>
+        <th>AI 協同助理 (Antigravity)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>領域洞察</strong></td>
+        <td>提出跑團實務痛點、非典型生活裝備、等級封印設定、Excel 模板審查</td>
+        <td>深度解析 D&D 5E 規則體系、傷害骰規格化、法術位公式、陣營機制</td>
+      </tr>
+      <tr>
+        <td><strong>功能架構</strong></td>
+        <td>指引架構方向（解耦數值、拒絕硬編碼、預設凡人特質）</td>
+        <td>設計 5 大核心模組、撰寫 4d6dl1 演算法、封裝 CLI 命令列介面</td>
+      </tr>
+      <tr>
+        <td><strong>除錯與驗收</strong></td>
+        <td>實測案例檢驗、上傳模板資料、制定 90 秒上課發表策略</td>
+        <td>修復 Windows CP950 編碼問題、完成扁平化介面、產出完整報告與投影片</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>結論</strong>：人類專注於高層次的故事創意與跑團體驗，AI 專注於底層規則實作與跨平台工程容錯，體現了高效流暢的人機協作典範。</p>
+
+</body>
+</html>

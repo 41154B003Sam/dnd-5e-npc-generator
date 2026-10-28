@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>D&D 5E 劇情導向非典型 NPC 智慧生成系統 - 90秒專題簡報</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .slide {
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 80px;
+      page-break-after: always;
+      position: relative;
+      background: radial-gradient(circle at 15% 20%, #1e293b 0%, #0f172a 100%);
+    }
+
+    .slide-badge {
+      position: absolute;
+      top: 40px;
+      left: 80px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(129, 140, 248, 0.4);
+      color: #818cf8;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .slide-time {
+      position: absolute;
+      top: 40px;
+      right: 80px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      color: #fbbf24;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .slide-number {
+      position: absolute;
+      bottom: 30px;
+      right: 80px;
+      font-size: 16px;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1.25;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 38px;
+      font-weight: 800;
+      margin-bottom: 30px;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .subtitle {
+      font-size: 22px;
+      color: #94a3b8;
+      max-width: 900px;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .content-box {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .grid-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 12px;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card p, .card li {
+      font-size: 16px;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    .card ul {
+      list-style-type: none;
+    }
+
+    .card li::before {
+      content: "▹ ";
+      color: #818cf8;
+      font-weight: bold;
+    }
+
+    .highlight-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+    }
+
+    .highlight-card h3 {
+      color: #c084fc;
+    }
+
+    /* 90秒展示三部曲專用卡片 */
+    .demo-step {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-top: 4px solid #6366f1;
+    }
+
+    .step-tag {
+      font-size: 14px;
+      font-weight: 700;
+      color: #6366f1;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .step-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .code-snippet {
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #38bdf8;
+      overflow-x: auto;
+      margin: 10px 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .result-badge {
+      display: inline-block;
+      background: #10b981;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    /* 列印與 PDF 最佳化 */
+    @media print {
+      body {
+        background-color: #0f172a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .slide {
+        page-break-after: always !important;
+        break-after: page !important;
+        min-height: 100vh !important;
+        height: 100vh !important;
+        padding: 40px 60px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 投影片 1：封面與問題痛點 -->
+  <div class="slide">
+    <div class="slide-badge">TRPG 創新專題</div>
+    <div class="slide-time">⏱️ 0:00 - 0:15 (15 秒)</div>
+    <h1>D&D 5E 劇情導向非典型 NPC 智慧生成系統</h1>
+    <div class="subtitle">讓每一個路人角色，都擁有令人過目不忘的故事靈魂與嚴謹戰力數據</div>
+    
+    <div class="content-box grid-2">
+      <div class="card">
+        <h3>❌ 現有工具三大致命痛點</h3>
+        <ul>
+          <li><strong>為 PC 設計而非 NPC</strong>：強制綁定死板冒險者規則，缺乏劇情靈活度。</li>
+          <li><strong>千篇一律的刻板印象</strong>：戰士必拿劍盾、法師必握法杖，毫無故事驚喜。</li>
+          <li><strong>數值寫死缺乏彈性</strong>：無法即時配合地下城主 (DM) 現場劇本動態調整。</li>
+        </ul>
+      </div>
+
+      <div class="card highlight-card">
+        <h3>💡 我們的核心破局思維</h3>
+        <ul>
+          <li><strong>故事與規則徹底解耦</strong>：市井身分（農夫）＋ 戰鬥底層（戰士模板）。</li>
+          <li><strong>非典型武器與生活法器</strong>：長草耙能當武器 (1d8/1d10)、老煙斗能施法。</li>
+          <li><strong>真隨機 4d6dl1 建議池</strong>：原始骰面透明展示，保留 DM 自由調配權。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-number">01 / 05</div>
+  </div>
+
+  <!-- 投影片 2：系統核心架構與創新機制 -->
+  <div class="slide">
+    <div class="slide-badge">技術與設計亮點</div>
+    <div class="slide-time">⏱️ 0:15 - 0:35 (20 秒)</div>
+    <h2>⚡ 四大突破性機制：為劇本敘事量身打造</h2>
+    
+    <div class="content-box grid-2">
+      <div class="card">
+        <h3>🎲 1. 4d6dl1 實擲池 ＋ 優先權建議</h3>
+        <p>真實擲出 4 顆骰子捨去最低點數，保留 6 組原始點數池，並依職業（戰士重視力量、法師重視智力）提供最佳化配置建議與種族加值清單，<strong>絕不硬編碼寫死數值</strong>。</p>
+      </div>
+
+      <div class="card">
+        <h3>🌾 2. 非典型生活武器與故事道具</h3>
+        <p>自動語意辨識劇本生活物品：<br>
+        • <strong>鋼齒長草耙</strong> ➜ 1d8 (雙手 1d10) 多用穿刺武器<br>
+        • <strong>符文老煙斗 / 算盤 / 懷錶</strong> ➜ 奧術施法道具</p>
+      </div>
+
+      <div class="card">
+        <h3>📜 3. 語意等級解析與狀態封印</h3>
+        <p>支援關鍵字等級映射（「老兵」➜ Lv.5，「大魔導師」➜ Lv.14）；輸入「封印狀態」自動啟動警告標籤並鎖定高階法術環位，完美符合被貶或負傷的強者設定。</p>
+      </div>
+
+      <div class="card highlight-card">
+        <h3>🛡️ 4. 零外部依賴 ＋ 離線極致安全</h3>
+        <p>採用 Python 3.12 純標準庫（JSON/CSV/Argparse）開發，無需安裝龐大第三方套件，<strong>0.08 秒極速生成</strong>，並針對 Windows 終端機 UTF-8 與 Emoji 做了完美編碼容錯。</p>
+      </div>
+    </div>
+    <div class="slide-number">02 / 05</div>
+  </div>
+
+  <!-- 投影片 3：90秒現場展示核心（打開什麼、做什麼、看到什麼） -->
+  <div class="slide">
+    <div class="slide-badge">現場展示核心</div>
+    <div class="slide-time">⏱️ 0:35 - 1:10 (35 秒)</div>
+    <h2>🔥 90 秒 Live 實測：打開什麼、做什麼、看到什麼</h2>
+    
+    <div class="content-box grid-3">
+      <!-- 第一步 -->
+      <div class="card demo-step" style="border-top-color: #38bdf8;">
+        <div>
+          <div class="step-tag" style="color: #38bdf8;">STEP 1</div>
+          <div class="step-title">打開什麼？</div>
+          <p><strong>打開終端機 (Terminal / PowerShell)</strong></p>
+          <p style="margin-top: 10px; font-size: 14px; color: #94a3b8;">無需開啟肥大網站或安裝複雜套件，直接在熟悉的終端機中秒級啟動。</p>
+        </div>
+        <div class="result-badge" style="background: #0284c7;">環境就緒</div>
+      </div>
+
+      <!-- 第二步 -->
+      <div class="card demo-step" style="border-top-color: #a855f7;">
+        <div>
+          <div class="step-tag" style="color: #a855f7;">STEP 2</div>
+          <div class="step-title">做什麼？</div>
+          <p><strong>輸入一行靈感故事指令</strong></p>
+          <div class="code-snippet">python -m dnd_npc_generator.main \
+  --class-name "戰士 (Fighter)" \
+  --story "退隱王國禁衛長，表面是麥農，武器是鋼齒草耙"</div>
+        </div>
+        <div class="result-badge" style="background: #9333ea;">單行觸發</div>
+      </div>
+
+      <!-- 第三步 -->
+      <div class="card demo-step highlight-card" style="border-top-color: #10b981;">
+        <div>
+          <div class="step-tag" style="color: #34d399;">STEP 3</div>
+          <div class="step-title">看到什麼？</div>
+          <p><strong>0.08 秒瞬間看到直向角色卡：</strong></p>
+          <ul style="font-size: 14px; margin-top: 8px;">
+            <li>✅ <strong>身分</strong>：矮人麥農達格瑪，神態沉穩警戒</li>
+            <li>✅ <strong>武器</strong>：鋼齒長草耙 (1d8/1d10 穿刺)</li>
+            <li>✅ <strong>骰點</strong>：4d6dl1 [16,14,12,11,8,8] 建議配置</li>
+            <li>✅ <strong>劇情</strong>：直接嵌入劇本推動線索與個性</li>
+          </ul>
+        </div>
+        <div class="result-badge">完成生成</div>
+      </div>
+    </div>
+    <div class="slide-number">03 / 05</div>
+  </div>
+
+  <!-- 投影片 4：實測成果與直向卡片展示 -->
+  <div class="slide">
+    <div class="slide-badge">實測與資料整合</div>
+    <div class="slide-time">⏱️ 1:10 - 1:20 (10 秒)</div>
+    <h2>📊 直向快速掃視角色卡 ＋ Excel 模板相容</h2>
+    
+    <div class="content-box grid-2">
+      <div class="card">
+        <h3>📜 DM 專屬直向預覽卡 (Vertical Card)</h3>
+        <p>告別在多個分頁來回切換的惡夢！本系統將「身分外貌 ➜ 骰點建議 ➜ 非典型武器 ➜ 特長與法術位 ➜ 劇本線索」濃縮為垂直條列，<strong>DM 只要 3 秒就能掌握全貌</strong>。</p>
+      </div>
+
+      <div class="card">
+        <h3>📑 官方 10 頁 Excel 模板無縫相容</h3>
+        <p>系統內建 <code>get_flattened_dict_for_excel()</code> 轉換模組，嚴格對齊專業術語（體魄 CON、察言觀色 Insight、被動觀察 Perception、契術師 Warlock），支援一鍵輸出 CSV / 結構化資料。</p>
+      </div>
+    </div>
+    <div class="slide-number">04 / 05</div>
+  </div>
+
+  <!-- 投影片 5：總結與未來展望 -->
+  <div class="slide">
+    <div class="slide-badge">總結與展望</div>
+    <div class="slide-time">⏱️ 1:20 - 1:30 (10 秒)</div>
+    <h2>🚀 專題總結與未來演進藍圖</h2>
+    
+    <div class="content-box grid-3">
+      <div class="card">
+        <h3>🏆 核心成果效益</h3>
+        <p>跑團即興備戰時間<strong>縮短 90%</strong>。徹底破除千篇一律的 NPC 套路，帶給玩家深度沉浸的跑團驚喜。</p>
+      </div>
+
+      <div class="card">
+        <h3>🤖 下一步：跑團 Bot 串接</h3>
+        <p>整合至 Discord 與 LINE 機器人，支援 <code>/npc generate</code> 聊天頻道隨機召喚，並支援 Excel 儲存格雙向自動回填。</p>
+      </div>
+
+      <div class="card highlight-card">
+        <h3>🎨 下一步：AI 肖像繪製</h3>
+        <p>將生成的非典型武器（長草耙）、外貌與神態自動組裝為 Prompt，即時產出高品質奇幻風手繪肖像。</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px; text-align: center; color: #94a3b8; font-size: 15px;">
+      開源倉儲：<a href="https://github.com/41154B003Sam/dnd-5e-npc-generator" style="color: #818cf8; text-decoration: none;">https://github.com/41154B003Sam/dnd-5e-npc-generator</a> | 報告、投影片與程式碼皆遵循嚴格資安規範
+    </div>
+    <div class="slide-number">05 / 05</div>
+  </div>
+
+</body>
+</html>
