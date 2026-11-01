@@ -139,19 +139,22 @@ def format_vertical_preview_card(npc: Dict) -> str:
         if "story_hook" in bg: lines.append(f"- **🎯 劇本引子**：{bg['story_hook']}")
         lines.append("")
 
-    if npc.get("token_usage"):
-        u = npc["token_usage"]
-        lines.append("## 📊 【Gemini API 額度與 Token 消耗統計】")
-        lines.append(f"- **呼叫模型**：`{u.get('model', 'gemini-3.5-flash-lite')}`")
-        lines.append(f"- **輸入提示詞**：{u.get('prompt_tokens', 0)} Tokens（包含 5E 規則規格與劇情提示）")
-        lines.append(f"- **創作輸出**：{u.get('candidates_tokens', 0)} Tokens（包含身世、言行舉止與裝備）")
-        lines.append(f"- **本次總消耗 Token**：**{u.get('total_tokens', 0)} Tokens**")
-        lines.append(f"- **單次預估費用**：約 **{u.get('estimated_cost_usd', '$0.00015')} USD**（換算新台幣約 0.004 元）")
-        lines.append(f"- **Google 免費額度**：**{u.get('free_tier_status', 'Google AI Studio 免費額度內 (0 元 / 每日 1,500 次上限)')}**")
-        lines.append("")
-
     lines.append("---")
     return "\n".join(lines)
+
+
+def format_token_usage_summary(npc: Dict) -> Optional[str]:
+    """
+    獨立格式化 Gemini API 消耗診斷資訊（僅供系統狀態欄或遙測使用，絕不混入角色卡本體）
+    """
+    if not npc.get("token_usage"):
+        return None
+    u = npc["token_usage"]
+    return (
+        f"📊 Gemini API 遙測：{u.get('total_tokens', 0)} Tokens "
+        f"(提示詞 {u.get('prompt_tokens', 0)} / 輸出 {u.get('candidates_tokens', 0)}) ｜ "
+        f"預估費用：{u.get('estimated_cost_usd', '$0.00015')} USD ｜ 模型：{u.get('model', 'gemini-3.5-flash-lite')}"
+    )
 
 
 def get_flattened_dict_for_excel(npc: Dict) -> Dict[str, str]:

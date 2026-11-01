@@ -301,6 +301,16 @@ class DndNpcApp:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.txt_card.config(yscrollcommand=scrollbar.set)
 
+        self.lbl_token_info = tk.Label(
+            right_frame,
+            text="",
+            bg=self.panel_bg,
+            fg="#94a3b8",
+            font=("Microsoft JhengHei", 8),
+            anchor="w"
+        )
+        self.lbl_token_info.pack(fill=tk.X, pady=(4, 0))
+
     def _add_entry(self, parent, label_text, default_val=""):
         lbl = ttk.Label(parent, text=label_text)
         lbl.pack(anchor="w", pady=(4, 2))
@@ -482,6 +492,13 @@ class DndNpcApp:
                     self.current_npc = npc
                     self.txt_card.delete("1.0", tk.END)
                     self.txt_card.insert("1.0", card_text)
+                    if npc.get("token_usage"):
+                        u = npc["token_usage"]
+                        self.lbl_token_info.config(
+                            text=f"📊 Gemini API 遙測：{u.get('total_tokens', 0)} Tokens ｜ 預估費用：{u.get('estimated_cost_usd', '$0.00015')} USD ｜ 模型：{u.get('model', 'gemini-3.5-flash-lite')}"
+                        )
+                    else:
+                        self.lbl_token_info.config(text="")
                     self.btn_gen.config(text="🎲 立即生成非典型 NPC (Generate)", state=tk.NORMAL, bg=self.accent_color)
                     self.is_generating = False
 
@@ -504,6 +521,7 @@ class DndNpcApp:
                         card_text = format_vertical_preview_card(npc)
                         self.txt_card.delete("1.0", tk.END)
                         self.txt_card.insert("1.0", card_text)
+                        self.lbl_token_info.config(text="⚪ 離線規則生成模式 (未消耗 API 額度)")
                     except Exception as fallback_err:
                         self.txt_card.delete("1.0", tk.END)
                         self.txt_card.insert("1.0", f"❌ 生成失敗: {e}\n後備生成失敗: {fallback_err}")
