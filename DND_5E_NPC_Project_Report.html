@@ -13,7 +13,7 @@
       line-height: 1.8;
       background: #ffffff;
       padding: 50px 70px;
-      max-width: 900px;
+      max-width: 920px;
       margin: 0 auto;
     }
     h1, h2, h3, h4 { font-family: 'Noto Serif TC', serif; color: #0f172a; }
@@ -60,7 +60,7 @@
       padding: 14px 18px;
       border-radius: 6px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12.5px;
+      font-size: 12px;
       line-height: 1.5;
       overflow-x: auto;
       margin: 14px 0;
@@ -79,7 +79,7 @@
       h2 { font-size: 16px; margin-top: 22px; page-break-after: avoid; }
       h3 { font-size: 14px; }
       table { font-size: 12px; page-break-inside: avoid; }
-      pre { font-size: 11px; padding: 10px; }
+      pre { font-size: 10.5px; padding: 10px; }
     }
   </style>
 </head>
@@ -91,65 +91,70 @@
     <strong>專案名稱</strong>：TRPG Story-Driven Unorthodox NPC Generator<br>
     <strong>繳交日期</strong>：2026 年 11 月 02 日<br>
     <strong>開源倉儲 (GitHub)</strong>：<a href="https://github.com/41154B003Sam/dnd-5e-npc-generator" style="color: #6366f1;">https://github.com/41154B003Sam/dnd-5e-npc-generator</a><br>
-    <em>(註：本專案程式碼、測試截圖、報告內皆無包含任何私密金鑰、通行碼或 Web App 執行網址；專案倉儲名稱未包含個人姓名學號，完全符合資安規範。)</em>
+    <em>(註：本專案程式碼、測試截圖、報告內皆無包含任何私密金鑰或通行碼；專案倉儲名稱未包含個人姓名學號，完全符合資安規範。)</em>
   </div>
 
   <h2>一、 做什麼 (What)</h2>
-  <p>本專題是一套專為 <strong>桌上角色扮演遊戲（TRPG，以《龍與地下城》Dungeons & Dragons 5E 規則體系為核心）</strong> 量身打造的 <strong>「劇情導向非典型 NPC 智慧生成系統」</strong>。</p>
+  <p>本專題是一套專為 <strong>桌上角色扮演遊戲（TRPG，以《龍與地下城》Dungeons & Dragons 5E 規則體系為核心）</strong> 量身打造的 <strong>「劇情導向非典型 NPC 智慧生成系統」</strong>。系統結合 Gemini AI 大語言模型與嚴謹的 D&D 5E 規則引擎，實現從生活細節到戰鬥流派的深度角色創作。</p>
 
   <h3>1. 核心背景與要解決的問題</h3>
   <p>在 TRPG 跑團過程中，地下城主（DM / Storyteller）需要即興或備戰大量的非玩家角色（NPC）。然而，市面上現有的角色生成工具普遍存在四大瓶頸：</p>
   <ul>
     <li><strong>為玩家 (PC) 設計而非為故事 (NPC) 服務</strong>：傳統開卡工具強制套用死板的冒險者初始套裝與制式配點，無法靈活對應劇本情境。</li>
     <li><strong>缺乏故事溫度與非典型特色</strong>：傳統工具產出的戰士千篇一律穿著制式鎧甲配長劍盾牌；法師必定手持魔杖法杖。但在精彩冒險故事中，NPC 的魅力往往來自反差與市井生活感——例如「隱居在麥田裡、隨身拿著鋼齒長草耙，真實身分卻是退隱禁衛隊長的資深戰士」，或是「不依靠常規魔杖，而是抽著刻印符文的石楠木老煙斗施法的大魔導師」。</li>
-    <li><strong>規則限制玩家，而非約束 DM</strong>：規則書是用來維持玩家間的平衡性，但 NPC 是 DM 鋪陳劇情的資產。傳統工具將屬性與技能硬性寫死，剝奪了 DM 臨場彈性調整的空間。</li>
+    <li><strong>子職業範型與背景過度匱乏</strong>：傳統工具往往只有單一職業，忽略了 D&D 角色在 1~3 等必須選擇核心範型流派（如戰士武藝範型、法師奧術傳承、牧師神聖領域），且背景選項稀少。</li>
     <li><strong>多頁試算表翻找不易</strong>：大型 Excel 角色卡往往包含 10~19 個工作表，DM 在戰鬥與對話的緊張節奏下，極需「垂直排列、一眼掃視全局」的直向卡片。</li>
   </ul>
 
-  <h3>2. 系統核心功能</h3>
+  <h3>2. 系統核心功能矩陣</h3>
   <ul>
-    <li><strong>真隨機 4d6dl1 屬性擲骰池與最優建議配置</strong>：忠實模擬實體骰子（擲 4 顆六面骰捨去最低值），產出原始點數池，並根據職業核心機制提供「建議配置」與「種族加值候選清單」，不強制綁死卡片數值。</li>
-    <li><strong>故事身分與戰鬥規格徹底解耦</strong>：生活外貌可以是農夫、學者、工匠或商人，但戰鬥本領完全可以套用高等戰士或法師的數值模板。</li>
+    <li><strong>13 大全職業與完整子職業範型流派 (Subclasses)</strong>：收錄戰士、法師、遊盪者、牧師、德魯伊、野蠻人、聖騎士、遊俠、吟遊詩人、武僧、術士、契術師、奇械師全 13 職業，嚴格依據 5E 規則實現 <strong>等級階梯解鎖判定 (Lv.1/Lv.2/Lv.3)</strong>，未達等級標註「尚未解鎖」，達標時自動開放對應範型並注入專屬特長。</li>
+    <li><strong>51 種繁體中文全背景庫</strong>：完整收錄官方中文全資料庫背景（含行會工匠、修院學士、城市巡邏隊、部族成員、水手、角鬥士、間諜等），均附帶專屬技能熟練與獨特背景特長。</li>
+    <li><strong>Gemini AI 智慧敘事引擎</strong>：調用 Google Gemini 大模型，將選定之子職業戰鬥哲學與生活身分深度融合成連貫背景短史、反差言行小動作、DM 跑團伏筆線索與非典型生活裝備。</li>
     <li><strong>非典型武器與生活化法器動態映射</strong>：自動將劇情敘述中的隨身物品（鋼齒長草耙、柴刀、挖墳鐵鎬、老煙斗、黃銅算盤、占卜茶杯）轉換為符合 D&D 5E 規則的傷害骰、護甲值與專注法器特性。</li>
+    <li><strong>真隨機 4d6dl1 屬性擲骰池與最優建議配置</strong>：忠實模擬實體骰子（擲 4 顆六面骰捨去最低值），產出原始點數池，並根據職業核心機制提供「建議配置」與「種族加值候選清單」，不強制綁死卡片數值。</li>
     <li><strong>自然語言等級與狀態解析</strong>：支援輸入關鍵字（如「大魔導師」自動對應至 13~14 等，「老兵」對應至 5 等），並支援「被封印的大魔導師」等特殊情境，自動限制可用法術環位並下修預估挑戰等級 (CR)。</li>
-    <li><strong>支援常規凡人</strong>：關鍵字輸入支援「無」，隨心所欲生成完全無超常異能的普通市井百姓與小販。</li>
-    <li><strong>直向快速掃視角色卡 (Vertical Quick-Scan Card)</strong>：輸出符合跑團習慣的直向排版預覽，DM 僅需 3 秒即可掌握 NPC 身分、數值、武器傷害骰、已解鎖特長與劇本推進線索。</li>
-    <li><strong>多格式輕量通用匯出</strong>：支援 Markdown 純文字、通用 CSV 試算表（可於 Excel / Google Sheets 乾淨開啟且絕不毀損跑版）與結構化 JSON 檔案（便於 Roll20/Foundry VTT 匯入）。</li>
+    <li><strong>直向快速掃視角色卡 (Vertical Quick-Scan Card)</strong>：輸出符合跑團習慣的直向排版預覽，DM 僅需 3 秒即可掌握 NPC 身分、數值、範型流派徽章、武器傷害骰、已解鎖特長與劇本推進線索。</li>
+    <li><strong>資安防護與 0 消耗原則</strong>：開機與範本切換絕不主動請求 API，即時透明統計 Prompt/Candidate Tokens 消耗與費用。</li>
   </ul>
 
   <h2>二、 給誰用 (Who)</h2>
   <ol>
-    <li><strong>TRPG 地下城主 (Dungeon Master / Game Master)</strong>：解決跑團時「玩家突然向路人搭話」、「突發衝突需要護衛數據」的即興備戰壓力。能夠在 0.01 秒內提供兼具豐富劇情個性與完整戰鬥數據的 NPC，將備戰效率提升 90% 以上。</li>
+    <li><strong>TRPG 地下城主 (Dungeon Master / Game Master)</strong>：解決跑團時「玩家突然向路人搭話」、「突發衝突需要護衛數據」的即興備戰壓力。能夠在瞬間提供兼具豐富劇情個性、子職業戰力與完整戰鬥數據的 NPC，將備戰效率提升 90% 以上。</li>
     <li><strong>跑團玩家 (Players & Roleplayers)</strong>：作為設計隨從、傭兵、家族長輩、師承導師或宿敵背景的靈感工具，擺脫傳統「唯數據論」的制式模板。</li>
     <li><strong>奇幻小說家與獨立遊戲劇本創作者</strong>：快速建構奇幻世界觀中的市井群像、公會長老與神秘隱士，提供符合嚴謹邏輯的戰力階層與外貌心理描寫。</li>
   </ol>
 
   <h2>三、 怎麼做 (How)</h2>
-  <p>本專題採用 <strong>模組化分層架構 (Modular Architecture)</strong>，堅持採用 <strong>Python 3.12 純標準函式庫</strong> 實現，完全不依賴任何外部套件，達成 <strong>零外部相依性（Zero Dependencies）</strong>，確保在任何電腦環境皆能即開即跑、離線運作且具備極致的執行效能。</p>
+  <p>本專題採用 <strong>雙引擎架構 (Dual-Engine Architecture)</strong>，前端提供桌面原生視窗與免安裝 Web 版，核心層深度結合 AI 敘事與規則判定：</p>
 
   <pre>
 ┌─────────────────────────────────────────────────────────────┐
 │                       雙重圖形化介面層                      │
 │   ┌───────────────────────────┐ ┌───────────────────────┐   │
 │   │ 原生桌面視窗 (gui.py)     │ │ 免安裝網頁版 (index)  │   │
-│   │ - Tkinter 現代深色高對比   │ │ - 純前端離線即開即用 │   │
-│   │ - 一鍵範本 (老農/老法師)   │ │ - 專屬列印/存PDF樣式  │   │
+│   │ - Tkinter 現代深色高對比   │ │ - 動態範型等級連動  │   │
+│   │ - 動態範型等級解鎖連動    │ │ - 專屬列印/存PDF樣式  │   │
 │   │ - 支援一鍵複製與匯出      │ │ - 本地伺服器 (server) │   │
 │   └───────────────────────────┘ └───────────────────────┘   │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                 核心引擎層 (dnd_npc_generator)              │
-│   - 4d6dl1 擲骰引擎 (roller.py)                             │
-│   - 繁體中文 5E 規則字典資料庫 (database.py)                │
-│   - 語意與規則解析器 (generator.py)                         │
+│                 核心雙引擎層 (dnd_npc_generator)            │
+│   ┌───────────────────────────┐ ┌───────────────────────┐   │
+│   │ Gemini AI 智慧敘事引擎    │ │ 純本地離線備用規則引擎│   │
+│   │ - 融入子職業戰鬥哲學      │ │ - 4d6dl1 實擲 (roller)│   │
+│   │ - 生活武器 5E 規格化適配  │ │ - 13職業+百範型(db)   │   │
+│   │ - 反差小動作與 DM 任務線索│ │ - 51 種繁中全背景 (db)│   │
+│   │ - 即時 Token 消耗透明化   │ │ - 語意解析 (generator)│   │
+│   └───────────────────────────┘ └───────────────────────┘   │
 └──────────────────────────────┬──────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                 資料匯出與展示層 (exporter.py)              │
-│  - 📜 直向快速掃視角色卡 (Vertical Quick-Scan Markdown)      │
+│  - 📜 直向快速掃視角色卡 (含職業與範型流派徽章、武器傷害)    │
 │  - 📑 通用 CSV 試算表 (可在 Excel / Google Sheets 乾淨開啟)  │
 │  - 💾 結構化 JSON 檔案 (供 Roll20/Foundry VTT 數位跑團匯入) │
 └─────────────────────────────────────────────────────────────┘
@@ -157,16 +162,16 @@
 
   <h2>四、 怎麼測 (How it's tested)</h2>
 
-  <h3>測試案例一：非典型生活化戰士（退隱禁衛長老農夫）</h3>
-  <p><strong>輸入條件</strong>：角色姓名：<code>老丹恩</code>、職業：<code>戰士 (Fighter)</code>、等級：<code>1</code>、非典型特質：<code>無</code>、故事：*「老丹恩，表面是麥農，真實身分是退隱禁衛長，武器是一柄鋼齒草耙。」*</p>
-  <p><strong>測試結果</strong>：武器精確匹配為 <strong>【鋼齒農用長草耙】</strong>，傷害骰為 <strong>1d8 (雙手 1d10) 穿刺</strong>；4d6dl1 實擲池智慧推薦力量 16 (+3)、體魄 14 (+2)；特質為常規市井人物，無超常異變。</p>
+  <h3>測試案例一：非典型生活化戰士（退隱禁衛長老農夫 ＋ 戰鬥大師範型）</h3>
+  <p><strong>輸入條件</strong>：角色姓名：<code>老丹恩</code>、職業：<code>戰士 (Fighter)</code>、等級：<code>5</code>、子職業：<code>戰鬥大師 (Battle Master)</code>、背景：<code>平民英雄 (Folk Hero)</code>、故事：*「老丹恩，表面是麥農，真實身分是退隱禁衛長，戰鬥定位是戰士，武器是一柄鋼齒草耙。」*</p>
+  <p><strong>測試結果</strong>：武器精確匹配為 <strong>【鋼齒農用長草耙】</strong>，傷害骰為 <strong>1d8 (雙手 1d10) 穿刺</strong>；子職業正確識別為「武藝範型：戰鬥大師」，自動解鎖「卓越會戰」特長；4d6dl1 實擲池智慧推薦力量 16 (+3)、體魄 14 (+2)。</p>
 
-  <h3>測試案例二：非典型施法者（以石楠木老煙斗施法之十四環大魔導師）</h3>
-  <p><strong>輸入條件</strong>：姓名：<code>布倫希爾德</code>、職業：<code>法師 (Wizard)</code>、等級：<code>大魔導師 (能力封印)</code>、故事：*「抽著刻印符文的石楠木老煙斗施法。」*</p>
-  <p><strong>測試結果</strong>：等級解析為 Lv.13~14；法器適配為 <strong>【符文雕刻石楠木老煙斗】</strong>；系統標記高環法術位限制警告並下修挑戰等級評估至約 CR 5。</p>
+  <h3>測試案例二：非典型施法者（以石楠木老煙斗施法之死靈學派法師）</h3>
+  <p><strong>輸入條件</strong>：姓名：<code>守墓人摩斯</code>、職業：<code>法師 (Wizard)</code>、等級：<code>6</code>、子職業：<code>死靈學派 (School of Necromancy)</code>、背景：<code>流浪兒 / 孤兒 (Urchin)</code>、故事：*「平日在鎮郊墓園挖墳埋棺，施法時總是捧著占卜茶杯，武器是挖墳鐵鎬。」*</p>
+  <p><strong>測試結果</strong>：子職業標註為「奧術傳承：死靈學派」，自動注入「死靈術博學者」與「嚴酷收割」特長；法器適配為 <strong>【裂紋占卜茶杯】</strong>，近戰武器適配為 <strong>【挖墳鐵鎬 (1d6 穿刺)】</strong>。</p>
 
-  <h3>測試案例三：Windows 本機雙擊執行與批次檔自適應驗證</h3>
-  <p>在 Windows PowerShell 與 CMD 下執行 <code>start_gui.bat --test</code> 與 <code>start_web.bat --test</code>，全部回傳 <code>Exit Code 0</code>，GUI 視窗成功啟動，Web 伺服器成功在預設瀏覽器開啟 <code>index.html</code>。</p>
+  <h3>測試案例三：等級階梯解鎖測試 (Level-Gating Verification)</h3>
+  <p>設定戰士等級為 <code>1</code> 時，範型選單自動切換為 <code>🔒 尚未解鎖範型 (Lv.3 解鎖)</code>；切換為等級 <code>3</code> 以上時，立即開放 10 大武藝範型。切換牧師時，於 <code>Lv.1</code> 即可自由選擇 10 大神聖領域。</p>
 
   <h2>五、 下一步 (Next steps)</h2>
   <ol>

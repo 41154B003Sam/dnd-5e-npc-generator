@@ -63,9 +63,9 @@
       position: absolute;
       bottom: 30px;
       right: 80px;
-      font-size: 16px;
-      color: #64748b;
       font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #64748b;
     }
 
     h1 {
@@ -236,7 +236,7 @@
         <ul>
           <li><strong>為 PC 設計而非為故事服務</strong>：強制套用死板冒險者規則，缺乏劇本靈活度。</li>
           <li><strong>千篇一律的刻板套路</strong>：戰士必穿板甲拿劍盾、法師必握魔杖，毫無故事驚喜。</li>
-          <li><strong>數值寫死缺乏彈性</strong>：無法即時配合地下城主 (DM) 現場劇本動態調整。</li>
+          <li><strong>單一職業匱乏與背景受限</strong>：缺乏關鍵的子職業範型 (Subclasses) 與豐富背景。</li>
           <li><strong>多頁試算表翻找不易</strong>：多達 10~19 頁工作表，跑團緊急查閱極易混亂。</li>
         </ul>
       </div>
@@ -246,8 +246,8 @@
         <ul>
           <li><strong>故事與規則徹底解耦</strong>：市井生活身分（老農夫）＋ 專業戰鬥底層（資深戰士）。</li>
           <li><strong>非典型生活武器法器</strong>：鋼齒長草耙能當武器 (1d8/1d10)、老煙斗吞吐青煙施法。</li>
-          <li><strong>真隨機 4d6dl1 靈活建議池</strong>：原始骰面透明展示，保留 DM 自主配置權。</li>
-          <li><strong>直向快速掃視角色卡</strong>：3 秒一覽戰鬥數值、特長與劇本線索，專為跑團主持打造。</li>
+          <li><strong>13職業百種範型 ＋ 51種全背景</strong>：官方 5E 繁中全庫整合，支援等級階梯解鎖。</li>
+          <li><strong>Gemini AI 敘事 ＋ 直向快速卡</strong>：深度融合戰鬥哲學與生活小動作，3秒掌握全局。</li>
         </ul>
       </div>
     </div>
@@ -279,64 +279,66 @@
     <div class="slide-number">02 / 09</div>
   </div>
 
-  <!-- 投影片 3：系統總體架構與分層設計 -->
+  <!-- 投影片 3：系統總體架構與雙引擎設計 -->
   <div class="slide">
-    <div class="slide-badge">🛠️ 模組分層架構</div>
+    <div class="slide-badge">🛠️ 雙引擎分層架構</div>
     <div class="slide-tag">系統工程</div>
-    <h2>🏗️ 模組化分層架構 ＋ 零外部套件相依</h2>
+    <h2>🏗️ Gemini AI 智慧敘事 ＋ 5E 嚴謹離線規則雙引擎</h2>
     
     <div class="content-box grid-2">
       <div class="card">
-        <h3>🧩 系統三層架構</h3>
+        <h3>🧩 雙引擎分工協同</h3>
         <ul>
-          <li><strong>雙平台使用者介面層</strong>：
-            <br>• 原生桌面視窗 (<code>gui.py</code>)：Tkinter 深色高對比，免開黑窗。
-            <br>• 免安裝網頁版 (<code>index.html</code>)：純前端自包含，離線雙擊即開。</li>
-          <li><strong>核心推論生成層 (<code>dnd_npc_generator</code>)</strong>：
-            <br>• 4d6dl1 實擲引擎 (<code>roller.py</code>)
-            <br>• 繁體中文 5E 規則字典庫 (<code>database.py</code>)
-            <br>• 語意與規則解析器 (<code>generator.py</code>)</li>
-          <li><strong>多格式資料匯出層 (<code>exporter.py</code>)</strong>：
-            <br>• 直向 Markdown 角色卡 ｜ 通用 CSV ｜ 標準 JSON</li>
+          <li><strong>Gemini AI 智慧敘事引擎</strong>：
+            <br>• 深度創作富含生活溫度的背景短史 (Backstory)
+            <br>• 編織反差言行小動作 (Personality & Quirks)
+            <br>• 提煉專為 DM 跑團設計的任務線索伏筆 (Quest Hook)
+            <br>• 融合子職業武藝與魔法哲學</li>
+          <li><strong>5E 本地離線規則引擎</strong>：
+            <br>• 4d6dl1 真隨機實擲建議配置 (roller.py)
+            <br>• 13 大職業與百種子職業範型矩陣 (database.py)
+            <br>• 51 種全資料庫繁體中文背景庫
+            <br>• 傷害骰、HP、AC 與挑戰等級 CR 精準規格化</li>
         </ul>
       </div>
 
       <div class="card highlight-card">
-        <h3>🛡️ 純標準庫零相依（Zero Dependency）</h3>
+        <h3>🛡️ 資安防護與 0 消耗原則</h3>
         <ul>
-          <li><strong>極致純淨</strong>：全系統採用 Python 3.12 內建標準庫（<code>tkinter</code>, <code>json</code>, <code>csv</code>, <code>http.server</code>, <code>random</code>）開發。</li>
-          <li><strong>免安裝任何套件</strong>：無需 <code>pip install</code> 任何第三方模組，隨處開箱即用。</li>
-          <li><strong>極速生成</strong>：平均生成時間僅需 <strong>0.01 ~ 0.08 秒</strong>，瞬間響應跑團需求。</li>
-          <li><strong>絕對資安合規</strong>：零 API Key、零通行碼、零敏感網址，完全離線運作。</li>
+          <li><strong>非主動不請求</strong>：開機與範本切換維持 <strong>0 Token 消耗</strong>。</li>
+          <li><strong>前端金鑰零洩漏</strong>：徹底自 UI 移除 API Key，安全讀取本地 <code>.env</code>。</li>
+          <li><strong>額度透明化追蹤</strong>：即時統計 Prompt/Candidate Tokens 與預估成本。</li>
+          <li><strong>無縫離線備用</strong>：無網路或無金鑰時自動無縫降級為本地純 Python 規則生成。</li>
         </ul>
       </div>
     </div>
     <div class="slide-number">03 / 09</div>
   </div>
 
-  <!-- 投影片 4：關鍵機制與演算法實現 -->
+  <!-- 投影片 4：官方 5E 職業範型與背景庫 -->
   <div class="slide">
-    <div class="slide-badge">⚙️ 演算法與規則機制</div>
-    <div class="slide-tag">核心演算法</div>
-    <h2>⚡ 三大關鍵演算法：嚴謹體系與敘事彈性並存</h2>
+    <div class="slide-badge">⚙️ 官方 5E 規則庫</div>
+    <div class="slide-tag">資料庫與機制</div>
+    <h2>⚡ 13 大全職業、百種子職業範型 ＋ 51 種繁中全背景</h2>
     
     <div class="content-box grid-3">
       <div class="card">
-        <h3>🎲 1. 4d6dl1 實擲建議演算法</h3>
-        <p>以 <code>[random.randint(1, 6) for _ in range(4)]</code> 擲骰並取前 3 高總和，產出 6 組原始點數池；依據職業核心機制（如戰士重力量體質、法師重智力）提供<strong>最優優先權建議</strong>與<strong>種族加值候選清單</strong>，不硬編碼。</p>
+        <h3>⚔️ 1. 13 職業與百種範型流派</h3>
+        <p>收錄戰士 (武藝範型)、法師 (奧術傳承)、牧師 (神聖領域)、野蠻人 (原初本道)、聖騎士 (神聖之誓)、德魯伊 (結社)...等 13 職業與超過 100 款子職業流派。</p>
       </div>
 
       <div class="card">
-        <h3>📜 2. 語意等級解析與狀態封印</h3>
-        <p>自然語言等級解析器支援輸入「大魔導師」自動對應 Lv.13~14、「老兵」對應 Lv.5；當識別出「封印 / 詛咒」時，自動標記高環法術位鎖定警示，並將<strong>預估挑戰等級 (CR) 精準下修</strong>。</p>
+        <h3>🔓 2. 等級階梯動態解鎖機制</h3>
+        <p>嚴格遵循 5E 規範：<br>
+        • <strong>Lv.1 解鎖</strong>：牧師、術士、契術師<br>
+        • <strong>Lv.2 解鎖</strong>：法師、德魯伊<br>
+        • <strong>Lv.3 解鎖</strong>：戰士、遊盪者、野蠻人、聖騎士、遊俠、吟遊詩人、武僧、奇械師<br>
+        未達等級自動顯示「尚未解鎖」，達標後開放選單並注入專屬特長！</p>
       </div>
 
       <div class="card highlight-card">
-        <h3>⚔️ 3. 語意生活裝備映射矩陣</h3>
-        <p>以正則比對自動識別劇本文字：<br>
-        • 提及「草耙、耙」➜ <strong>鋼齒長草耙 (1d8/1d10 穿刺)</strong><br>
-        • 提及「煙斗、茶杯、算盤」➜ <strong>奧術專注法器</strong><br>
-        • 提及「鐵鎬、鏟」➜ <strong>重型挖墳武器 (1d8 穿刺)</strong></p>
+        <h3>📜 3. 51 種繁體中文全背景庫</h3>
+        <p>收錄官方中文全背景：修院學士、城市巡邏隊、部族成員、水手、行會工匠、角鬥士、間諜、考古學家...，每種均配置專屬技能熟練與獨特背景特長。</p>
       </div>
     </div>
     <div class="slide-number">04 / 09</div>
@@ -353,8 +355,8 @@
         <h3>💻 桌面原生視窗版 (Tkinter GUI)</h3>
         <ul>
           <li><strong>免終端機指令</strong>：雙擊 <code>點我啟動桌面程式.bat</code> 立即彈出原生桌面視窗。</li>
+          <li><strong>動態範型選單</strong>：選擇職業與等級時，子職業選單自動連動更新可選流派。</li>
           <li><strong>一鍵劇情範本</strong>：內建「🌾 老農戰士」、「📜 封印老法師」、「⛏️ 守墓人」快捷載入。</li>
-          <li><strong>直觀參數控制</strong>：種族、職業、背景自由下拉，自由輸入等級與劇情關鍵字。</li>
           <li><strong>高對比暗黑排版</strong>：左側靈活輸入，右側即時渲染直向掃視角色卡。</li>
         </ul>
       </div>
@@ -363,7 +365,7 @@
         <h3>🌐 免安裝網頁版 (Web UI)</h3>
         <ul>
           <li><strong>純前端極致體驗</strong>：直接以瀏覽器點開 <code>index.html</code> 即可在離線環境完整運作。</li>
-          <li><strong>本地伺服器支援</strong>：提供 <code>點我開啟網頁版.bat</code>，自動開啟預設瀏覽器。</li>
+          <li><strong>本地伺服器支援</strong>：提供 <code>點我開啟網頁版.bat</code>，自動開啟預設瀏覽器並串接 AI。</li>
           <li><strong>多樣匯出選項</strong>：一鍵複製卡片、匯出通用 CSV、匯出 JSON 結構資料。</li>
           <li><strong>專屬跑團列印樣式</strong>：點擊「🖨️ 列印/存PDF」，自動隱藏按鈕呈現高對比跑團紙本排版。</li>
         </ul>
@@ -385,7 +387,7 @@
           <div class="step-tag" style="color: #38bdf8;">00 ~ 15 秒</div>
           <div class="step-title">1. 打開什麼？</div>
           <p><strong>雙擊開啟網頁版或桌面視窗</strong></p>
-          <p style="margin-top: 8px; font-size: 14px; color: #94a3b8;">無需開啟終端機打指令！在資料夾直接雙擊 <code>點我開啟網頁版.bat</code> 或 <code>點我啟動桌面程式.bat</code>，<strong>0.1 秒瞬間啟動</strong>現代奇幻操作面板！</p>
+          <p style="margin-top: 8px; font-size: 14px; color: #94a3b8;">無需開啟終端機打指令！在資料夾直接雙擊 <code>點我開啟網頁版.bat</code> 或 <code>點我啟動桌面程式.bat</code>，<strong>0.1 秒瞬間啟動</strong>現代奇幻操作面板！此時 API 消耗嚴格為 0。</p>
         </div>
         <div class="result-badge" style="background: #0284c7;">零黑窗 0.1秒啟動</div>
       </div>
@@ -395,10 +397,11 @@
         <div>
           <div class="step-tag" style="color: #a855f7;">15 ~ 45 秒</div>
           <div class="step-title">2. 做什麼？</div>
-          <p><strong>輸入生活情境與武器故事</strong></p>
-          <div class="code-snippet">職業：戰士 (Fighter)
-故事：老丹恩，表面是麥農，真實身分是退隱禁衛長戰士，武器是一柄鋼齒長草耙。</div>
-          <p style="font-size: 13px; color: #c084fc; margin-top: 6px;">👉 點擊按鈕【🎲 立即智慧生成 NPC】</p>
+          <p><strong>動態解鎖範型、51背景與生活故事</strong></p>
+          <div class="code-snippet">職業：法師 (Wizard) ｜ 等級：5 (解鎖奧術傳承)
+子職業：死靈學派 ｜ 背景：修院學士
+故事：老守墓人摩斯，挖墳埋棺，手拿占卜茶杯施法，遇到盜墓賊時抄起挖墳鐵鎬砸向對方。</div>
+          <p style="font-size: 13px; color: #c084fc; margin-top: 6px;">👉 點擊按鈕【🎲 立即智慧生成 NPC 角色卡】</p>
         </div>
         <div class="result-badge" style="background: #9333ea;">一鍵點擊觸發</div>
       </div>
@@ -408,12 +411,14 @@
         <div>
           <div class="step-tag" style="color: #34d399;">45 ~ 90 秒</div>
           <div class="step-title">3. 看到什麼？</div>
-          <p><strong>0.01 秒瞬間渲染出直向角色卡：</strong></p>
+          <p><strong>瞬間渲染出直向角色卡與 AI 故事：</strong></p>
           <ul style="font-size: 13.5px; margin-top: 6px;">
-            <li>✅ <strong>生活武器自動映射</strong>：鋼齒長草耙 (1d8/1d10 穿刺)</li>
-            <li>✅ <strong>4d6dl1 實擲建議池</strong>：力量 16 (+3)、體質 14 (+2)</li>
-            <li>✅ <strong>完整戰鬥規格</strong>：AC 18、HP 12、戰鬥風格、回氣特長</li>
-            <li>✅ <strong>故事與劇本線索</strong>：個性牽絆與伏筆，一鍵複製與匯出！</li>
+            <li>✅ <strong>流派徽章</strong>：法師（奧術傳承：死靈學派）</li>
+            <li>✅ <strong>生活裝備</strong>：挖墳鐵鎬 (1d6 穿刺) ＋ 占卜茶杯 (法器)</li>
+            <li>✅ <strong>特長注入</strong>：死靈術博學者、嚴酷收割</li>
+            <li>✅ <strong>4d6dl1 實擲</strong>：智力 16 (+3)、體質 14 (+2)</li>
+            <li>✅ <strong>AI 小動作與伏筆</strong>：輕敲茶杯邊緣、守墓伏筆</li>
+            <li>✅ <strong>Token 透明度</strong>：顯示消耗與費用，一鍵複製匯出！</li>
           </ul>
         </div>
         <div class="result-badge">完成生成</div>
@@ -431,7 +436,7 @@
     <div class="content-box grid-3">
       <div class="card">
         <h3>📜 1. 直向快速掃視卡</h3>
-        <p><strong>專門解決多頁試算表翻找痛點</strong>：垂直排版依序呈現基本身分 ➜ 4d6dl1 屬性建議 ➜ 非典型武器庫 ➜ 職業已解鎖特長 ➜ 劇本推進線索，<strong>DM 只要 3 秒就能掌握全局</strong>。</p>
+        <p><strong>專門解決多頁試算表翻找痛點</strong>：垂直排版依序呈現基本身分 ➜ 範型流派 ➜ 4d6dl1 屬性建議 ➜ 非典型生活裝備 ➜ 已解鎖特長 ➜ 劇本推進線索，<strong>DM 只要 3 秒就能掌握全局</strong>。</p>
       </div>
 
       <div class="card">
@@ -455,21 +460,21 @@
     
     <div class="content-box grid-3">
       <div class="card">
-        <h3>🌾 測試一：老農戰士 (鋼草耙)</h3>
-        <p><strong>驗證重點</strong>：身分與戰力解耦。<br>
-        成功產出【鋼齒長草耙 (1d8/1d10 穿刺)】，推薦力量 16 (+3)、體質 14 (+2)，輸入「無」特質正確判定為常規凡人，無超常異變。</p>
+        <h3>🌾 測試一：老農戰士 (戰鬥大師 ＋ 鋼草耙)</h3>
+        <p><strong>驗證重點</strong>：身分與戰力解耦、武藝範型注入。<br>
+        成功產出【鋼齒長草耙 (1d8/1d10 穿刺)】，自動解鎖戰鬥大師特性，推薦力量 16 (+3)、體質 14 (+2)。</p>
       </div>
 
       <div class="card">
-        <h3>📜 測試二：封印大魔導師 (老煙斗)</h3>
-        <p><strong>驗證重點</strong>：語意等級與狀態封印。<br>
-        精準映射為 Lv.13~14，常規法杖替換為【符文老煙斗 (施法專注)】，成功觸發法術位限制警告並將預估戰力下修至 CR 5。</p>
+        <h3>📜 測試二：守墓人法師 (死靈學派 ＋ 鐵鎬)</h3>
+        <p><strong>驗證重點</strong>：奧術傳承解鎖與 AI 生活反差。<br>
+        精準映射為 Lv.5 死靈學派，適配【挖墳鐵鎬】與【占卜茶杯】，AI 深度描寫輕敲茶杯邊緣小動作與地下城伏筆。</p>
       </div>
 
       <div class="card highlight-card">
-        <h3>⚙️ 測試三：Windows 批次檔除錯</h3>
-        <p><strong>驗證重點</strong>：本機雙擊執行相容性。<br>
-        修復 Windows cmd CP950 下 LF 換行導致之「命令語法不正確」閃退問題，全批次檔採用 CRLF 與 <code>D^&D 5E</code> 轉義，Exit Code 0 通過。</p>
+        <h3>⚙️ 測試三：階梯解鎖與 0 消耗驗證</h3>
+        <p><strong>驗證重點</strong>：5E 等級解鎖門檻與資安。<br>
+        Lv.1 戰士鎖定範型、Lv.3 戰士解鎖；牧師 Lv.1 即可選領域；開機與載入範本 0 API 消耗，Token 計數精確統計。</p>
       </div>
     </div>
     <div class="slide-number">08 / 09</div>
@@ -484,7 +489,7 @@
     <div class="content-box grid-3">
       <div class="card">
         <h3>🏆 核心成果效益</h3>
-        <p>彻底打破制式 NPC 範本，平均 0.01 秒即可產出兼具生活反差魅力與完整戰鬥數據的直向卡片，極大解放 DM 即興備戰壓力。</p>
+        <p>彻底打破制式 NPC 範本，結合 Gemini AI 敘事與嚴謹 5E 規則，產出兼具生活反差魅力與完整戰鬥數據的直向卡片，極大解放 DM 即興備戰壓力。</p>
       </div>
 
       <div class="card">

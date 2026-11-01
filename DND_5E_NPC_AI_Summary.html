@@ -13,7 +13,7 @@
       line-height: 1.8;
       background: #ffffff;
       padding: 50px 70px;
-      max-width: 900px;
+      max-width: 920px;
       margin: 0 auto;
     }
     h1, h2, h3 { font-family: 'Noto Serif TC', serif; color: #0f172a; }
@@ -77,7 +77,7 @@
 
   <div class="meta-box">
     <strong>專題題目</strong>：D&D 5E 劇情導向非典型 NPC 智慧生成系統 (TRPG Story-Driven Unorthodox NPC Generator)<br>
-    <strong>開發環境</strong>：Python 3.12（純標準函式庫，零外部依賴，支援跨平台與 Windows UTF-8）<br>
+    <strong>開發環境</strong>：Python 3.12 / Google Gemini 3.5 API / Web (HTML5/CSS3/Vanilla JS)<br>
     <strong>協同對象</strong>：人類開發者 (User / DM) × Google DeepMind Antigravity AI 系統<br>
     <strong>開源倉儲</strong>：<a href="https://github.com/41154B003Sam/dnd-5e-npc-generator" style="color: #6366f1;">https://github.com/41154B003Sam/dnd-5e-npc-generator</a>
   </div>
@@ -87,11 +87,11 @@
   <ul>
     <li><strong>傳統開卡工具僵化</strong>：現有工具（如 D&D Beyond）多為玩家角色（PC）設計，強制遵循嚴格的配點限制、負重與技能套路，無法靈活對應劇本情境。</li>
     <li><strong>缺乏故事溫度與非典型特色</strong>：傳統工具產出的戰士千篇一律是重甲劍盾；法師必定手持魔杖。但在精彩劇本中，往往需要「表面是麥農、手拿鋼草耙，真實身分卻是退隱禁衛隊長的戰士」，或是「抽著刻印符文的石楠木老煙斗施法的大魔導師」。</li>
+    <li><strong>單一職業匱乏與背景受限</strong>：傳統生成器往往只有 9~10 種基本身分，缺乏 D&D 角色關鍵的「子職業範型流派（Subclasses）」與豐富多樣的背景設定。</li>
     <li><strong>規則限制玩家，而非約束 DM</strong>：使用者明確指出，規則是用來維護玩家平衡性，但 NPC 是 DM 鋪陳劇情的資產，應當具備更高的敘事自由度與非傳統彈性。</li>
-    <li><strong>多頁試算表翻找不易</strong>：大型 Excel 角色卡往往包含多達 10~19 個工作表，DM 在戰鬥與對話的緊湊節奏下，需要的是「垂直排列、一眼掃視全局」的直向卡片。</li>
   </ul>
 
-  <h2>🔄 二、 人機深度對話與架構演進歷程 (六大關鍵轉折)</h2>
+  <h2>🔄 二、 人機深度對話與架構演進歷程 (八大關鍵轉折)</h2>
 
   <h3>1. 轉折點 A：屬性點數不應硬編碼，改為「建議配置」與「種族加值候選清單」</h3>
   <div class="highlight-card">
@@ -117,80 +117,32 @@
   </div>
   <p><strong>AI 實作</strong>：建立「非典型敘事武器庫」與「故事奧術法器庫」，在戰鬥數據上精確映射至 D&D 5E 規則傷害骰（長草耙對應 1d8/1d10 多用武器、老煙斗對應專注法器），完美實現「故事外貌生活化，戰鬥數值規格化」。</p>
 
-  <h3>5. 轉折點 E：從命令列進化到雙重零門檻圖形介面 (GUI & Web) 與 Windows 批次檔除錯</h3>
+  <h3>5. 轉折點 E：雙重零門檻圖形介面 (GUI & Web) 與開箱即用啟動器</h3>
   <div class="highlight-card">
-    <strong>使用者提出</strong>：「要開終端機執行對我不夠友善... 另外點了 .bat 檔會閃退並出現『命令語法不正確』。」
+    <strong>使用者回饋</strong>：「需要開終端機對我而言很不友善，而且我不懂技術的使用者怎麼辦？」
   </div>
-  <p><strong>AI 實作與底層排查</strong>：打造 Tkinter 原生桌面視窗 (<code>gui.py</code>) 與暗黑奇幻網頁版 (<code>index.html</code>)；排查 Windows <code>cmd.exe</code> 在繁中 CP950 下因 Unix LF 換行引發之解析崩潰，重構為 CRLF 規範，轉義 <code>D^&D 5E</code>，並加入跨目錄路徑自適應機制。</p>
+  <p><strong>AI 實作</strong>：開發基於 Tkinter 的原生桌面視窗 (`gui.py`) 與免安裝現代網頁介面 (`index.html`)，並編寫全自動偵測 Python 環境與路徑的中文 Windows 批次檔 (`.bat`) 與靜默啟動器 (`.vbs`)，達成雙擊即開。</p>
 
-  <h3>6. 轉折點 F：Excel 模板回填實驗、架構反思與最終回歸核心</h3>
+  <h3>6. 轉折點 F：真 AI 智慧敘事核心升級（Gemini AI 深度創作）</h3>
   <div class="highlight-card">
-    <strong>使用者決策</strong>：「回填 Excel 模板導致格式損毀、許多下拉選單壞掉、部分圖片遺失。我決定放棄填入 Excel，因為破壞公式的問題無法根本解決。原本的網頁與應用程式版本已經相當優秀，回歸生成器本身。」
+    <strong>使用者糾正</strong>：「我真正想設計的是一個 AI 工具，能把背景故事和生活細節融合設計，而非單純 Python 本地資料庫，這不符合我的需求。」
   </div>
-  <p><strong>AI 架構收斂</strong>：第三方試算表庫在解析 19 個工作表的大型模板時極易丟失 VML 繪圖與破壞公式。系統果斷策略性回歸核心——以<strong>直向快速掃視角色卡 (Vertical Quick-Scan Card)</strong> 解決跑團真痛點，並提供可在 Excel/Google Sheets 純淨開啟且絕不毀損的<strong>通用 CSV</strong> 與相容 Roll20/Foundry VTT 的<strong>結構化 JSON</strong> 匯出，達成 100% 穩定與秒速生成。</p>
+  <p><strong>AI 實作</strong>：重構核心生成模組，引進 Google Gemini 旗艦大模型。設計高階 Prompt 系統，讓 AI 深入撰寫帶有生活溫度與反差魅力的背景短史 (Backstory)、性格言行與小動作 (Personality & Quirks)、DM 推進劇情的任務線索伏筆 (Quest Hook)，並自動組裝為 5E 規格化非典型生活裝備。</p>
 
-  <h2>🛠️ 三、 技術實作亮點與除錯彙整</h2>
-  <table>
-    <thead>
-      <tr>
-        <th style="width: 25%;">工程挑戰</th>
-        <th style="width: 35%;">根本原因</th>
-        <th style="width: 40%;">具體解決方案</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong>Windows 終端 Emoji 編碼錯誤</strong></td>
-        <td>Windows 預設 CP950 編碼無法輸出 UTF-8 Emoji (📜, 🎲)</td>
-        <td>在 CLI 入口加入 <code>sys.stdout.reconfigure(encoding="utf-8", errors="replace")</code>。</td>
-      </tr>
-      <tr>
-        <td><strong>批次檔閃退與語法錯誤</strong></td>
-        <td>Unix LF 換行破壞 cmd 解析器；<code>&</code> 符號未轉義</td>
-        <td>批次檔強制使用 CRLF 換行，轉義 <code>D^&D 5E</code>，並加入 <code>pause</code> 與路徑回退機制。</td>
-      </tr>
-      <tr>
-        <td><strong>零相依性離線環境</strong></td>
-        <td>大型套件於無外網受限環境容易缺失</td>
-        <td>捨棄非必要第三方套件，全系統純以 Python 3 標準函式庫開發。</td>
-      </tr>
-      <tr>
-        <td><strong>跑團主持資訊過載</strong></td>
-        <td>傳統試算表橫向維度過大、翻頁繁瑣</td>
-        <td>設計 Markdown 直向排版，以高對比卡片在 3 秒內提供戰鬥與社交關鍵情報。</td>
-      </tr>
-    </tbody>
-  </table>
+  <h3>7. 轉折點 G：API 金鑰安全隔離與 0 消耗透明追蹤</h3>
+  <div class="highlight-card">
+    <strong>使用者警示</strong>：「每次開機或點開介面都在後台自動呼叫 API 消耗額度，而且 API Key 寫在前端很危險，這要上傳 GitHub 的！連消耗了多少額度都沒告訴我。」
+  </div>
+  <p><strong>AI 實作</strong>：全面落實「非主動不請求」原則，啟動與範本載入時維持 0 Token 消耗；徹底從前端移除 API Key 輸入框，改由本地 `.env` 與系統環境變數安全讀取；在介面即時透明顯示 Prompt Tokens、Candidate Tokens 與預估消耗費用。</p>
 
-  <h2>💡 四、 協同開發成果與核心反思</h2>
-  <table>
-    <thead>
-      <tr>
-        <th style="width: 15%;">維度</th>
-        <th style="width: 42%;">人類開發者 (User / DM)</th>
-        <th style="width: 43%;">AI 協同助理 (Antigravity)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong>領域洞察</strong></td>
-        <td>洞悉 TRPG 跑團痛點、提出非典型生活裝備、等級封印設定、直向掃視卡價值</td>
-        <td>熟稔 D&D 5E SRD 規則體系、傷害骰規格、挑戰等級估算、陣營哲學</td>
-      </tr>
-      <tr>
-        <td><strong>架構決策</strong></td>
-        <td>關鍵批判（解耦數值、拒絕硬編碼、果斷放棄脆弱 Excel 模板，回歸核心）</td>
-        <td>模組化設計（5 大核心模組）、雙平台圖形介面 (Tkinter/Web)、多格式匯出 (CSV/JSON)</td>
-      </tr>
-      <tr>
-        <td><strong>驗收與除錯</strong></td>
-        <td>本機實測、回報批次檔執行錯誤、指導 90 秒發表核心策略</td>
-        <td>深入 Windows 底層排查 CRLF/CP950、實作路徑自適應、產出完整專案報告與簡報</td>
-      </tr>
-    </tbody>
-  </table>
+  <h3>8. 轉折點 H：官方 5E 全 13 職業子職業範型與 51 種全背景庫動態解鎖</h3>
+  <div class="highlight-card">
+    <strong>使用者提出</strong>：「角色背景選項太少，沒有涵蓋網頁的所有背景；而且 D&D 角色不是單一職業，多數角色在等級提升後會選擇範型繼續發展。」
+  </div>
+  <p><strong>AI 實作</strong>：深度解析官方繁體中文 5E 資料庫，全面擴充至 13 大全職業與上百種子職業範型（武藝範型、奧術傳承、神聖領域、原初本道、德魯伊結社等），並收錄 51 種全背景庫。實作 Lv.1~3 階梯解鎖機制，並在 Web 與 GUI 介面實現動態聯動。</p>
 
-  <p style="margin-top: 18px;"><strong>核心結論</strong>：本專題的成功展現了現代 AI 輔助軟體開發的典範——<strong>人類開發者具備敏銳的使用者體驗洞察力與關鍵架構決斷力；AI 助理則提供強大的模組實作力、跨平台相容性調校與文件標準化能力</strong>。透過敏捷的人機對話迭代，最終打造出這套兼具敘事溫度與規則嚴謹性的 D&D 5E 智慧生成系統。</p>
+  <h2>💡 三、 結語與心得</h2>
+  <p>本專題的演進過程充分體現了「以人為本、以故事為核心」的設計精神。透過與 AI 的多輪深度對話，系統從最早期的資料庫工具，逐步蛻變為一套具備深厚奇幻敘事底蘊、嚴謹 5E 規則判定、兼顧資安防護與零門檻體驗的專業級 TRPG 智慧輔助創作系統。</p>
 
 </body>
 </html>
