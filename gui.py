@@ -14,6 +14,7 @@ from tkinter import ttk, messagebox, filedialog
 # 導入核心生成模組
 from dnd_npc_generator.ai_generator import AINPCGenerator
 from dnd_npc_generator.exporter import format_vertical_preview_card, export_to_json, export_to_csv
+from dnd_npc_generator.database import RACES, CLASSES, SUBCLASSES, BACKGROUNDS
 
 
 class DndNpcApp:
@@ -153,19 +154,26 @@ class DndNpcApp:
         self.entry_name = self._add_entry(left_frame, "角色名稱 (留空則隨機生成)：", "")
 
         # 2. 種族下拉選單
-        races = ["🎲 隨機決定", "人類 (Human)", "高等精靈 (High Elf)", "矮人 (Dwarf)", "半身人 (Halfling)", "提夫林 (Tiefling)", "龍裔 (Dragonborn)", "半獸人 (Half-Orc)", "侏儒 (Gnome)"]
-        self.combo_race = self._add_combobox(left_frame, "種族：", races)
+        race_list = ["🎲 隨機決定"] + list(RACES.keys())
+        self.combo_race = self._add_combobox(left_frame, "種族：", race_list)
 
         # 3. 職業下拉選單
-        classes = ["🎲 隨機決定", "戰士 (Fighter)", "法師 (Wizard)", "盜賊 (Rogue)", "野蠻人 (Barbarian)", "聖騎士 (Paladin)", "牧師 (Cleric)", "遊俠 (Ranger)", "武僧 (Monk)", "吟遊詩人 (Bard)", "德魯伊 (Druid)", "術士 (Sorcerer)", "契術師 (Warlock)", "平民百姓 (Commoner)"]
-        self.combo_class = self._add_combobox(left_frame, "職業定位：", classes)
+        class_list = ["🎲 隨機決定"] + list(CLASSES.keys())
+        self.combo_class = self._add_combobox(left_frame, "核心職業 (Class)：", class_list)
 
-        # 4. 背景下拉選單
-        backgrounds = ["🎲 隨機決定", "平民民兵 (Folk Hero)", "侍祭 (Acolyte)", "騙徒 (Charlatan)", "罪犯 (Criminal)", "藝人 (Entertainer)", "公會工匠 (Guild Artisan)", "隱士 (Hermit)", "貴族 (Noble)", "流浪兒 (Urchin)", "水手 (Sailor)", "士兵 (Soldier)"]
-        self.combo_bg = self._add_combobox(left_frame, "背景歷練：", backgrounds)
-
-        # 5. 等級自由輸入 (支援關鍵字如「大魔導師」、「Lv.14 (封印)」)
+        # 4. 等級自由輸入 (支援關鍵字如「大魔導師」、「Lv.14 (封印)」)
         self.entry_level = self._add_entry(left_frame, "等級或位階關鍵字 (如：1、大魔導師、6)：", "1")
+
+        # 5. 子職業 / 範型流派下拉選單 (依等級與職業動態解鎖)
+        self.combo_subclass = self._add_combobox(left_frame, "子職業 / 範型流派 (Subclass / Archetype)：", ["🎲 隨機決定範型 (Auto)"])
+
+        # 綁定事件以動態更新子職業選單
+        self.combo_class.bind("<<ComboboxSelected>>", self._on_class_or_level_changed)
+        self.entry_level.bind("<KeyRelease>", self._on_class_or_level_changed)
+
+        # 6. 背景下拉選單 (涵蓋完整 Compendium 背景)
+        bg_list = ["🎲 隨機決定"] + list(BACKGROUNDS.keys())
+        self.combo_bg = self._add_combobox(left_frame, "背景歷練 (Background)：", bg_list)
 
         # 6. 非典型特質關鍵字 (支援「無」、「煙斗」、「鋼草耙」)
         self.entry_trait = self._add_entry(left_frame, "非典型特質關鍵字 (輸入「無」為常規凡人)：", "")
@@ -310,6 +318,42 @@ class DndNpcApp:
         combo.pack(fill=tk.X, pady=(0, 4))
         return combo
 
+    def _on_class_or_level_changed(self, event=None):
+        cls_key = self.combo_class.get()
+        lvl_str = self.entry_level.get().strip()
+        
+        # 解析等級
+        lvl, _ = self.generator._parse_level_and_state(lvl_str)
+        
+        # 尋找對應職業範型資料
+        matched_cls = None
+        for k in SUBCLASSES.keys():
+            if k == cls_key or k.split(" ")[0] in cls_key or cls_key in k:
+                matched_cls = k
+                break
+                
+        if not matched_cls:
+            self.combo_subclass["values"] = ["🎲 隨機決定範型 (Auto)"]
+            self.combo_subclass.current(0)
+            return
+            
+        sub_info = SUBCLASSES[matched_cls]
+        unlock_lv = sub_info.get("unlock_level", 3)
+        cat = sub_info.get("category", "範型流派")
+        options = list(sub_info.get("options", {}).keys())
+        
+        if lvl < unlock_lv:
+            self.combo_subclass["values"] = [f"尚未解鎖{cat} (Lv.{unlock_lv} 解鎖)"]
+            self.combo_subclass.current(0)
+        else:
+            current_sel = self.combo_subclass.get()
+            vals = ["🎲 隨機決定範型 (Auto)"] + options
+            self.combo_subclass["values"] = vals
+            if current_sel in vals:
+                self.combo_subclass.set(current_sel)
+            else:
+                self.combo_subclass.current(0)
+
     def _show_welcome_screen(self):
         welcome_md = (
             "# 📜 D&D 5E 劇情導向非典型 NPC 智慧生成系統 (DM 備戰神器)\n\n"
@@ -391,6 +435,10 @@ class DndNpcApp:
 
         cls = self.combo_class.get()
         cls = None if "隨機" in cls else cls
+
+        subclass_input = self.combo_subclass.get()
+        if "隨機" in subclass_input or "尚未" in subclass_input:
+            subclass_input = None
 
         bg = self.combo_bg.get()
         bg = None if "隨機" in bg else bg

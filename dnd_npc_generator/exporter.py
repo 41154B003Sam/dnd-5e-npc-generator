@@ -24,6 +24,10 @@ def format_vertical_preview_card(npc: Dict) -> str:
     level_str = f"Lv.{npc.get('level', 1)}"
     if npc.get("level_note"):
         level_str += f" ({npc['level_note']})"
+    sub_disp = npc.get('subclass_display', '')
+    if sub_disp and "尚未" not in sub_disp:
+        short_sub = sub_disp.split("：")[-1].split(" ")[0]
+        level_str += f" [{short_sub}]"
         
     lines.append(f"> **定位**：{npc.get('importance', '次要劇情 NPC')} | **等級**：{level_str} | **預估挑戰等級**：{npc.get('cr', 'CR 1/4')}")
     lines.append(f"> **陣營**：{npc.get('alignment', '中立')} | **熟練加值 (PB)**：{npc.get('proficiency_bonus', '+2')}")
@@ -35,7 +39,12 @@ def format_vertical_preview_card(npc: Dict) -> str:
     # 1. 生理外貌與視覺神態
     lines.append("## 👤 基礎身分與外貌特徵")
     lines.append(f"- **種族**：{npc.get('race', '人類')}")
-    lines.append(f"- **職業**：{npc.get('class', npc.get('class_name', '戰士'))}")
+    cls_str = npc.get('class', npc.get('class_name', '戰士'))
+    sub_disp = npc.get('subclass_display', '')
+    if sub_disp:
+        lines.append(f"- **職業與範型流派**：{cls_str}（{sub_disp}）")
+    else:
+        lines.append(f"- **職業**：{cls_str}")
     lines.append(f"- **性別與年齡**：{npc.get('gender', '未知')}，{npc.get('age', {}).get('display', '中年')}")
     if app:
         lines.append(f"- **體型與體魄**：{app.get('size', '中型')}，身高約 {app.get('height', '—')}，體重約 {app.get('weight', '—')}")
@@ -152,6 +161,7 @@ def get_flattened_dict_for_excel(npc: Dict) -> Dict[str, str]:
         "角色姓名": npc.get("name", ""),
         "種族": npc.get("race", ""),
         "職業": npc.get("class", npc.get("class_name", "")),
+        "子職業範型": npc.get("subclass_display", ""),
         "等級": str(npc.get("level", 1)),
         "等級備註": npc.get("level_note", ""),
         "挑戰等級CR": npc.get("cr", "1/4"),

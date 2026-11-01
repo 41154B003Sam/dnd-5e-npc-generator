@@ -1,7 +1,7 @@
 """
 D&D 5E 劇情導向非典型 NPC 智慧生成系統 - AI 核心生成器 (AI Narrative Engine)
 整合 Google Gemini 旗艦大語言模型與 D&D 5E 規則體系，
-真正實現由 AI 深度設計背景身世、非典型生活裝備映射、言行小動作與跑團伏筆線索。
+真正實現由 AI 深度設計背景身世、非典型生活裝備映射、言行小動作、子職業範型流派與跑團伏筆線索。
 """
 
 import os
@@ -13,7 +13,7 @@ from typing import Dict, Optional, Tuple
 # 導入規則與擲骰模組
 from .roller import generate_ability_rolls, build_recommended_allocation
 from .database import (
-    RACES, CLASSES, BACKGROUNDS, ALIGNMENTS, DEITIES,
+    RACES, CLASSES, SUBCLASSES, BACKGROUNDS, ALIGNMENTS, DEITIES,
     UNIQUE_TRAITS_PRESETS, THEMATIC_CUSTOM_WEAPONS, THEMATIC_ARCANE_FOCUSES
 )
 
@@ -55,11 +55,12 @@ class AINPCGenerator:
     """
     真正的 AI 智慧 NPC 角色生成器
     1. 實擲 4d6dl1 屬性點數池，並計算主副屬性建議配置與種族加值候選清單 (不硬編碼)
-    2. 隨機或指定基礎種族、職業、背景、年齡、信仰與語言
+    2. 隨機或指定基礎種族、職業、子職業範型流派、背景、年齡、信仰與語言
     3. 呼叫 Gemini AI 模型深度撰寫：
        - 融入 DM 劇情的情境背景短史 (Backstory)
        - 富有生活感與反差魅力的言行舉止、口吻與細節小動作 (Personality & Quirks)
        - 符合 5E 傷害骰與規則規格的非典型武器/法器/特殊能力 (Unorthodox Equipment)
+       - 深度結合子職業範型（如戰鬥大師、死靈學派、生命領域、復仇之誓）的戰鬥習慣與哲學
        - 專為 DM 設計的跑團推進伏筆與任務線索 (Quest Hook)
     """
 
@@ -85,11 +86,145 @@ class AINPCGenerator:
                 self._client = None
                 raise e
 
+    def _resolve_choice(self, user_choice: Optional[str], db_dict: Dict) -> Tuple[str, Dict]:
+        import random
+        if not user_choice or "隨機" in user_choice or user_choice == "RANDOM":
+            k = random.choice(list(db_dict.keys()))
+            return k, db_dict[k]
+        for k, v in db_dict.items():
+            if k in user_choice or user_choice in k:
+                return k, v
+        # 找不到直接回傳首個
+        return user_choice, list(db_dict.values())[0]
+
+    def _parse_level_and_state(self, level_input: Optional[str]) -> Tuple[int, Optional[str]]:
+        """解析使用者輸入的等級，支援自然語言關鍵字如『大魔導師』、『老兵』等"""
+        if not level_input:
+            return 1, None
+        txt = str(level_input).strip()
+        
+        # 特殊情境關鍵字判定
+        note = None
+        level = 1
+        if any(w in txt for w in ["大魔導師", "大魔導", "傳奇法師", "大法師", "archmage"]):
+            level = 14
+            note = "大魔導師階級 (Lv.14)"
+        elif any(w in txt for w in ["精銳老兵", "老兵", "退役禁衛", "veteran"]):
+            level = 5
+            note = "精銳老兵階級 (Lv.5)"
+        elif any(w in txt for w in ["學徒", "初學者", "apprentice", "novice"]):
+            level = 2
+            note = "見習學徒 (Lv.2)"
+        elif any(w in txt for w in ["傳奇", "半神", "英雄", "legend"]):
+            level = 17
+            note = "傳奇英雄階級 (Lv.17)"
+        else:
+            match = re.search(r"\d+", txt)
+            if match:
+                val = int(match.group(0))
+                level = max(1, min(20, val))
+            else:
+                level = 1
+
+        if any(w in txt for w in ["封印", "衰老", "重傷", "詛咒", "受限", "力量盡失"]):
+            tag = "部分法術環位已遭封印/實力受限"
+            note = f"{note}；{tag}" if note else tag
+
+        return level, note
+
+    def _estimate_cr(self, level: int, class_name: str, level_note: Optional[str]) -> str:
+        """估算挑戰等級 CR"""
+        if level_note and "封印" in level_note:
+            return f"CR {max(1, level // 3)} (受限評級)"
+        if level <= 1:
+            return "CR 1/4"
+        elif level == 2:
+            return "CR 1/2"
+        elif level == 3:
+            return "CR 1"
+        elif level == 4:
+            return "CR 2"
+        else:
+            cr_val = max(1, int(level * 0.65))
+            return f"CR {cr_val}"
+
+    def _generate_npc_name(self, race: str, gender: str) -> str:
+        import random
+        first_names_human = ["丹恩", "艾德加", "奧爾森", "貝拉", "達格瑪", "芬恩", "莉莉安", "維克多", "賽蓮娜", "諾亞"]
+        first_names_elf = ["瑟蘭迪爾", "凱蘭崔爾", "法蘭德", "艾洛伊", "阿爾溫", "伊利安", "辛達", "席薇雅"]
+        first_names_dwarf = ["托林", "巴林", "葛羅姆", "布洛克", "黛拉", "希爾達", "莫格林", "杜瓦林"]
+        first_names_tiefling = ["摩斯", "阿扎澤爾", "卡莉達", "瓦沙克", "妮克絲", "墨菲斯托", "雷文"]
+
+        if "精靈" in race:
+            fn = random.choice(first_names_elf)
+        elif "矮人" in race:
+            fn = random.choice(first_names_dwarf)
+        elif "提夫林" in race:
+            fn = random.choice(first_names_tiefling)
+        else:
+            fn = random.choice(first_names_human)
+
+        epithets = ["老", "鐵腕", "沉默的", "赤發", "灰瞳", "破曉", "獨眼", "笑面"]
+        if random.random() < 0.4:
+            return f"{random.choice(epithets)}{fn}"
+        return fn
+
+    def _resolve_subclass(self, class_key: str, level: int, user_subclass: Optional[str] = None) -> Tuple[Optional[str], Optional[Dict], str, str]:
+        """
+        解析子職業 / 範型流派
+        返回: (chosen_subclass, subclass_data, subclass_category, subclass_display)
+        """
+        import random
+        sub_info = SUBCLASSES.get(class_key)
+        if not sub_info:
+            return None, None, "", ""
+        
+        category = sub_info.get("category", "範型流派")
+        unlock_lv = sub_info.get("unlock_level", 3)
+        options = sub_info.get("options", {})
+
+        if level < unlock_lv:
+            return None, None, category, f"尚未解鎖範型 (Lv.{unlock_lv} 解鎖)"
+
+        # 等級達到解鎖標準
+        if not user_subclass or "隨機" in user_subclass or user_subclass == "RANDOM":
+            choice_key = random.choice(list(options.keys()))
+            return choice_key, options[choice_key], category, f"{category}：{choice_key}"
+
+        # 嘗試比對使用者指定
+        for k, v in options.items():
+            if k == user_subclass or k in user_subclass or user_subclass in k or k.split(" ")[0] in user_subclass:
+                return k, v, category, f"{category}：{k}"
+
+        # 若未精確匹配，則隨機選擇
+        choice_key = random.choice(list(options.keys()))
+        return choice_key, options[choice_key], category, f"{category}：{choice_key}"
+
+    def _get_unlocked_features(self, class_data: Dict, level: int, subclass_data: Optional[Dict] = None, subclass_name: Optional[str] = None) -> list:
+        features = []
+        saves = class_data.get("saves") or class_data.get("saving_throws", [])
+        if saves:
+            features.append(f"豁免判定熟練：{', '.join(saves)}")
+        prog = class_data.get("features_by_level") or class_data.get("progression", {})
+        for lvl in range(1, level + 1):
+            if lvl in prog:
+                for feat in prog[lvl]:
+                    features.append(f"[Lv.{lvl}] {feat}")
+            # 檢查子職業特性
+            if subclass_data and "features_by_level" in subclass_data:
+                sub_prog = subclass_data["features_by_level"]
+                if lvl in sub_prog:
+                    tag = f" ({subclass_name.split(' ')[0]})" if subclass_name else ""
+                    for sub_feat in sub_prog[lvl]:
+                        features.append(f"[Lv.{lvl} 範型{tag}] {sub_feat}")
+        return features
+
     def generate(
         self,
         name: Optional[str] = None,
         race_name: Optional[str] = None,
         class_name: Optional[str] = None,
+        subclass_name: Optional[str] = None,
         background_name: Optional[str] = None,
         level_input: Optional[str] = "1",
         importance: str = "次要劇情 NPC (Supporting)",
@@ -98,7 +233,7 @@ class AINPCGenerator:
         force_ai: bool = True
     ) -> Dict:
         """
-        生成完整的非典型 NPC 物件
+        生成完整的非典型 NPC 物件 (包含子職業範型流派)
         """
         # 1. 基礎身分隨機與對齊
         race_key, race_data = self._resolve_choice(race_name, RACES)
@@ -108,7 +243,12 @@ class AINPCGenerator:
         # 2. 解析等級與特殊狀態
         level, level_note = self._parse_level_and_state(level_input)
 
-        # 3. 擲骰 4d6dl1
+        # 3. 解析子職業 / 範型流派 (Subclass / Paradigm)
+        chosen_subclass, subclass_data, subclass_category, subclass_display = self._resolve_subclass(
+            class_key, level, subclass_name
+        )
+
+        # 4. 擲骰 4d6dl1
         rolls = generate_ability_rolls()
         raw_scores = [r["score"] for r in rolls]
         raw_rolls_desc = ", ".join([f"{r['score']} (骰值 {r['dice']} 扣除 {r['dropped']})" for r in rolls])
@@ -123,7 +263,7 @@ class AINPCGenerator:
                 "modifier": mod
             }
 
-        # 4. 年齡、性別與名稱
+        # 5. 年齡、性別與名稱
         import random
         gender = random.choice(["男性 (Male)", "女性 (Female)"])
         if not name:
@@ -140,7 +280,7 @@ class AINPCGenerator:
         else:
             deity = str(deity_item)
 
-        # 5. 生命值與熟練加值
+        # 6. 生命值與熟練加值
         hd_str = class_data.get("hit_die", "d8")
         hd_match = re.search(r"\d+", str(hd_str))
         hd = int(hd_match.group(0)) if hd_match else 8
@@ -148,10 +288,10 @@ class AINPCGenerator:
         hp = hd + con_mod + max(1, (hd // 2 + 1 + con_mod)) * (level - 1)
         pb = 2 + (level - 1) // 4
 
-        # 6. 估算挑戰等級 CR
+        # 7. 估算挑戰等級 CR
         cr = self._estimate_cr(level, class_key, level_note)
 
-        # 7. 呼叫 AI 生成深度背景、個性小動作與非典型武器故事
+        # 8. 呼叫 AI 生成深度背景、個性小動作、非典型武器故事與子職業哲學融入
         ai_narrative = None
         if self._client and force_ai:
             try:
@@ -159,6 +299,10 @@ class AINPCGenerator:
                     name=name,
                     race=race_key,
                     class_name=class_key,
+                    subclass_name=chosen_subclass,
+                    subclass_category=subclass_category,
+                    subclass_display=subclass_display,
+                    subclass_data=subclass_data,
                     level=level,
                     level_note=level_note,
                     background=bg_key,
@@ -170,19 +314,20 @@ class AINPCGenerator:
             except Exception as e:
                 print(f"[AI 呼叫失敗，切換為後備規則生成]: {e}", file=sys.stderr)
 
-        # 8. 若無 AI 或呼叫失敗，使用基礎規則生成做為後備
+        # 9. 若無 AI 或呼叫失敗，使用基礎規則生成做為後備
         if not ai_narrative:
             ai_narrative = self._fallback_narrative(
                 name=name,
                 race=race_key,
                 class_name=class_key,
+                subclass_display=subclass_display,
                 level=level,
                 background=bg_key,
                 story_context=story_context,
                 custom_trait=custom_trait_keyword
             )
 
-        # 9. 組裝完整 NPC 字典
+        # 10. 組裝完整 NPC 字典
         darkv = race_data.get("darkvision", 0)
         darkv_str = f"{darkv} 呎" if isinstance(darkv, int) and darkv > 0 else ("無 (常規視力)" if darkv == 0 else str(darkv))
         speed_val = race_data.get("speed", 30)
@@ -193,11 +338,18 @@ class AINPCGenerator:
         else:
             bg_skills_str = str(bg_skills)
 
+        unlocked_feats = self._get_unlocked_features(class_data, level, subclass_data, chosen_subclass)
+
         npc = {
             "name": name,
             "race": race_key,
             "class": class_key,
             "class_name": class_key,
+            "subclass": chosen_subclass,
+            "subclass_category": subclass_category,
+            "subclass_display": subclass_display,
+            "subclass_desc": subclass_data.get("desc", "") if subclass_data else "",
+            "background": bg_key,
             "level": level,
             "level_note": level_note,
             "importance": importance,
@@ -220,7 +372,7 @@ class AINPCGenerator:
             "racial_bonus_options": race_data.get("bonus_options", "可自由配置加值"),
             "bg_feature": bg_data.get("feature", "市井歷練"),
             "bg_proficiencies": bg_skills_str,
-            "unlocked_features": self._get_unlocked_features(class_data, level),
+            "unlocked_features": unlocked_feats,
             "cr": cr,
             # AI 設計的深度內容
             "ai_crafted": True if self._client and force_ai else False,
@@ -240,6 +392,10 @@ class AINPCGenerator:
         name: str,
         race: str,
         class_name: str,
+        subclass_name: Optional[str],
+        subclass_category: str,
+        subclass_display: str,
+        subclass_data: Optional[Dict],
         level: int,
         level_note: Optional[str],
         background: str,
@@ -249,7 +405,7 @@ class AINPCGenerator:
         custom_trait: Optional[str]
     ) -> Dict:
         """
-        向 Gemini 發送 Prompt，取得由 AI 深度撰寫的繁體中文背景、個性小動作與非典型武器
+        向 Gemini 發送 Prompt，取得由 AI 深度撰寫的繁體中文背景、個性小動作、非典型武器與範型哲學融入
         """
         system_instruction = (
             "你是一位頂尖的《龍與地下城》(D&D 5E) 地下城主 (DM) 與奇幻敘事小說家。"
@@ -257,13 +413,19 @@ class AINPCGenerator:
             "請嚴格以繁體中文 (zh-TW) 輸出，且必須返回合法的 JSON 格式。"
         )
 
+        sub_desc = subclass_data.get("desc", "") if subclass_data else ""
+        subclass_prompt_line = f"- 子職業/範型流派：{subclass_display}"
+        if sub_desc:
+            subclass_prompt_line += f"（範型背景：{sub_desc}）"
+
         prompt = f"""
-請為以下 D&D 5E NPC 角色設計深度的故事背景與非典型生活裝備：
+請為以下 D&D 5E NPC 角色設計深度的故事背景、非典型生活裝備與範型風格：
 
 【基本設定】
 - 角色姓名：{name}
 - 種族：{race}
 - 職業：{class_name} (等級: Lv.{level}{f'，特殊狀態: {level_note}' if level_note else ''})
+{subclass_prompt_line}
 - 性別與年齡：{gender}，{age} 歲
 - 背景歷練：{background}
 - DM 提供的情境故事：{story_context or "無特定情境，請根據種族職業自由發揮市井生活身分"}
@@ -271,14 +433,15 @@ class AINPCGenerator:
 
 【設計規範】
 1. **身分與戰力徹底解耦**：如果 DM 提到農夫、守墓人、商人、廚師或學者，請讓他表面上完全融入市井生活，但戰鬥底層是該職業的實力。
-2. **非典型武器/法器**：如果故事提及日常物品（如鋼齒草耙、剁刀、鐵鎬、刻印符文石楠木老煙斗、黃銅算盤），請將其規格化為 D&D 5E 的武器或專注法器（寫明名稱、傷害骰如 1d8/1d10、特性如多用/長柄/偽裝農具、背後的來歷故事）。
-3. **常規凡人原則**：若關鍵字包含「無」或未要求超常神力，絕不強加超自然變異，展現純粹的凡人歷練與人情味；若關鍵字提及特殊特質（如火焰、靈魂、封印），則設計符合 5E 規則的獨特特性。
-4. **DM 跑團伏筆**：給予地下城主可以直接在跑團當天使用的劇情引入線索 (Quest Hook)。
+2. **範型流派深度融會**：角色具備【{subclass_display}】。請將該範型的專屬戰技風格、奧術傳統、神聖誓約、神聖領域、德魯伊結社或原初本道本能，深刻融入角色的日常言行、戰鬥本能、生活小動作與武器故事中！
+3. **非典型武器/法器**：如果故事提及日常物品（如鋼齒草耙、剁刀、鐵鎬、刻印符文石楠木老煙斗、黃銅算盤），請將其規格化為 D&D 5E 的武器或專注法器（寫明名稱、傷害骰如 1d8/1d10、特性如多用/長柄/偽裝農具、背後的來歷故事）。
+4. **常規凡人原則**：若關鍵字包含「無」或未要求超常神力，絕不強加超自然變異，展現純粹的凡人歷練與人情味；若關鍵字提及特殊特質（如火焰、靈魂、封印），則設計符合 5E 規則的獨特特性。
+5. **DM 跑團伏筆**：給予地下城主可以直接在跑團當天使用的劇情引入線索 (Quest Hook)。
 
 請嚴格輸出以下 JSON 結構：
 {{
-  "backstory": "200~350 字的生動故事身世，描述其過去的經歷、隱退或當前的生活，以及為何擁有這身本領。",
-  "personality_quirks": "條列 2~3 項極具畫面感的個性特徵與生活細節小動作（例如抽煙斗的小習慣、撫摸草耙鋼齒的下意識動作、說話語調）。",
+  "backstory": "200~350 字的生動故事身世，描述其過去的經歷、隱退或當前的生活，以及為何擁有這身本領，並體現其子職業範型淵源。",
+  "personality_quirks": "條列 2~3 項極具畫面感的個性特徵與生活細節小動作（例如抽煙斗的小習慣、撫摸草耙鋼齒的下意識動作、說話語調或戰鬥起手式）。",
   "unorthodox_equipment": [
     {{
       "name": "武器或道具名稱 (含英文)",
@@ -311,7 +474,6 @@ class AINPCGenerator:
                     config=gen_config
                 )
                 text = response.text.strip()
-                # 解析 JSON
                 # 解析 Token 消耗量與費用
                 p_tokens = getattr(response.usage_metadata, "prompt_token_count", 0) if hasattr(response, "usage_metadata") else 0
                 c_tokens = getattr(response.usage_metadata, "candidates_token_count", 0) if hasattr(response, "usage_metadata") else 0
@@ -349,174 +511,97 @@ class AINPCGenerator:
         name: str,
         race: str,
         class_name: str,
+        subclass_display: str,
         level: int,
         background: str,
         story_context: Optional[str],
         custom_trait: Optional[str]
     ) -> Dict:
-        """離線或無 API Key 時的智慧後備生成"""
+        """離線無 API Key 時的規則備用生成"""
         is_normal = not custom_trait or "無" in custom_trait
-        is_farmer = story_context and any(w in story_context for w in ["農", "草耙", "田"])
+        is_farmer = story_context and any(w in story_context for w in ["農", "草耙", "麥"])
         is_wizard_pipe = story_context and any(w in story_context for w in ["煙斗", "法師", "學者"])
+
+        sub_note = f"身兼【{subclass_display}】之傳承，" if subclass_display and "尚未" not in subclass_display else ""
 
         if is_farmer:
             backstory = (
-                f"{name} 表面上只是個在邊陲村落耕作的老邁麥農，滿手厚繭，性情溫和寡言。"
-                f"然而村中無人知曉，他曾是王都禁衛部隊的資深士官長，在一場慘烈的政治肅清後卸甲歸田。"
-                f"他早已埋葬了騎士戰甲，唯獨將隨身那把農用鋼草耙淬火鍛打得堅韌無比。若有不長眼的盜匪膽敢破壞這份平靜，"
-                f"老人的槍術底子會讓他們明白，耙草與破甲在老兵手裡並無分別。"
+                f"{name} 表面上只是在田野間耕作的沉默麥農，手掌長滿厚繭，眼神沉穩而冷靜。"
+                f"然而鮮少有人知曉，他曾是名震一時的精銳老戰士，{sub_note}在經歷無數血戰後決定解甲歸田。"
+                f"他隱姓埋名，將長劍換成日常的鋼齒草耙；但若這座平靜的村莊遭遇土匪或異怪威脅，"
+                f"老人眼中的利芒將瞬間甦醒，以雷霆萬鈞的戰技守護這片土地。"
             )
-            quirks = "• 沉思或觀察陌生人時，習慣用老繭拇指輕撫草耙的鋼齒尖端。\n• 行走時略顯駝背衰老，但下盤穩如磐石，腳步踏出極難引起聲響。"
-            eq = [{
-                "name": "鋼齒農用長草耙 (Steel-Toothed Farm Rake)",
-                "type": "近戰武器 (長柄)",
-                "damage": "1d8 (雙手 1d10) 穿刺",
-                "properties": "多用 (Versatile)、長柄武器、平時偽裝為普通農具",
-                "story_lore": "以昔日軍用鋼槍頭重新回火鍛造為農用草耙，既是農活生計工具，亦是致命戰矛。"
-            }]
-            hook = "當冒險者來到小鎮打聽附近匪幫動向時，村長會推薦他們去酒館找老丹恩借農具，而眼尖的戰士玩家會立刻察覺老人雙手的握繭絕非單純農夫。"
+            quirks = (
+                "1. 休息時總會隨手抓起一把麥穗或泥土嗅聞，確認氣候與土壤濕度。\n"
+                "2. 談及過去的戰事時會下意識撫摸草耙鐵齒，語調低沉而簡潔。\n"
+                "3. 面對陌生冒險者時始終保持背靠實牆的站姿，警戒周遭任何突發異動。"
+            )
+            equipment = [
+                {
+                    "name": "鋼齒長草耙 (Steel-Toothed Farm Rake)",
+                    "type": "近戰武器 (偽裝農具)",
+                    "damage": "1d8 (雙手 1d10) 穿刺",
+                    "properties": "多用 (Versatile)、長柄、推撞擊倒判定優勢",
+                    "story_lore": "以百煉軍用熟鐵重新鍛造的重型草耙，平時用於梳理乾草，戰時揮舞撕裂敵陣。"
+                }
+            ]
+            hook = f"村中近來傳出地精狼騎兵襲擊哨站的傳聞，村民推舉老農 {name} 協調防務，玩家若能向他出示值得信賴的證物，他將引導隊伍前往一處隱蔽的地下軍火庫。"
         elif is_wizard_pipe:
             backstory = (
-                f"隱居在林間邊界的 {name}，是一位早已淡出奧術評議會的資深施法者。"
-                f"他早已厭棄了傳統魔杖與水晶球的造作繁複，而是將法術符文精雕於一支老舊的石楠木煙斗上。"
-                f"透過吞吐蘊含草藥清香的青煙，他能輕巧地引導以太之流。對他而言，生活的智慧遠比浮誇的法術更具力量。"
+                f"{name} 是一位隱居在古老林間的博學長者，長袍邊緣雖已磨損，但眼神深邃如星海。"
+                f"{sub_note}他不拘泥於死板的奧術魔杖，反而偏愛在吐納煙草之間引導魔網元素。"
+                f"村民們常看見他一邊吞吐青煙，一邊在石板上演算繁複的法陣幾何。"
             )
-            quirks = "• 施法或交談時，習慣緩慢點燃老煙斗，透過青煙飄動的方向判斷周遭微弱的魔法流向。\n• 對浮誇自大的年輕法師總會投以寬容而促狹的微笑。"
-            eq = [{
-                "name": "符文雕刻石楠木老煙斗 (Carved Briar Smoking Pipe)",
-                "type": "奧術專注法器 (Arcane Focus)",
-                "damage": "1d4 鈍擊 (敲擊用)",
-                "properties": "專注施法道具、內嵌草藥香氛可穩定心神",
-                "story_lore": "以千年石楠木根瘤手工雕刻，內壁刻有微縮奧術法印，深吸青煙即可凝神導引法術。"
-            }]
-            hook = "隊伍在迷霧中迷路時，循著一縷帶有薄荷與松針香氣的奇異青煙找到老人的林間木屋，老法師願意給予指引，前提是冒險者替他帶回一小袋罕見的菸草葉。"
+            quirks = (
+                "1. 說話前總會先敲一敲石楠木老煙斗，吐出一圈形如古代符文的淡藍色煙圈。\n"
+                "2. 對年輕施法者拙劣的發音不屑一顧，習慣用手指輕點桌面糾正對方的法術模型。\n"
+                "3. 翻閱古籍時會將老花眼鏡推到額頭上，隨手抓起羽毛筆在手背上推演算式。"
+            )
+            equipment = [
+                {
+                    "name": "刻印符文的石楠木老煙斗 (Carved Briar Smoking Pipe)",
+                    "type": "奧術專注法器",
+                    "damage": "—",
+                    "properties": "法術專注、吞吐青煙勾勒塑形",
+                    "story_lore": "老法師遊歷極北冰原時獲得的耐火石楠木，其煙氣帶有淨化心智的微光微粒。"
+                }
+            ]
+            hook = f"{name} 的書齋最近遺失了一張記錄著遠古封印解咒語的羊皮紙，他懷疑被當地的盜墓賊竊走，若玩家能尋回該卷軸，他願意無償為隊伍鑑定一件魔法遺物。"
         else:
             backstory = (
-                f"{name} 是一位生活在市井之中的 {race} {background}。多年來，他憑藉著身為 {class_name} 的真才實學立足，"
-                f"見證過城鎮的興衰與冒險者的來去。雖然平日顯得低調純樸，但每當危機降臨，他隨時能展現令人信服的堅毅本領。"
+                f"{name} 是一位歷經風霜的冒險者，出身於【{background}】，{sub_note}"
+                f"在無數次與危險的交鋒中磨練出一身過人本領。他外表樸素，舉止從容，"
+                f"懂得在市井小巷與險惡荒野間尋找平衡，是一位值得信賴的可靠盟友。"
             )
-            quirks = "• 說話語調平緩沉著，習慣在開口前先停頓兩秒打量對方的神情。\n• 隨身衣物打理得整潔俐落，對身邊使用的工具格外愛惜。"
-            eq = [{
-                "name": "慣用生活鐵器與隨身佩刀",
-                "type": "近戰武器",
-                "damage": "1d6 揮砍/穿刺",
-                "properties": "輕型、靈巧",
-                "story_lore": "多年日常生活中形影不離的隨身利器。"
-            }]
-            hook = "作為地方上的熟面孔，他熟知當地的街頭傳聞與地下勢力暗號，可作為冒險者打聽情報的第一站。"
+            quirks = (
+                "1. 習慣在思考時輕叩腰間的武器握柄或工具皮囊。\n"
+                "2. 說話語調平穩，習慣用銳利的眼神打量每個進出酒館的陌生人。\n"
+                "3. 對食物與烈酒極具講究，總能準確說出不同酒莊麥酒的年份。"
+            )
+            equipment = [
+                {
+                    "name": "隨身淬火短刀 (Well-Tempered Utility Knife)",
+                    "type": "近戰簡易武器",
+                    "damage": "1d4 穿刺",
+                    "properties": "輕型、靈巧",
+                    "story_lore": "陪伴他多年的隨身工具刀，刀身刻有一道代表平安歸來的微型守護盧恩符文。"
+                }
+            ]
+            hook = f"{name} 正在追查一批自黑市流出的走私違禁品，他希望能與值得信任的冒險小隊合作，共同探查城郊廢棄倉庫的動靜。"
+
+        trait_obj = None
+        if not is_normal:
+            trait_obj = {
+                "name": f"{custom_trait}之印",
+                "category": "規則備用特質",
+                "game_effect": f"在涉及【{custom_trait}】的情境中，檢定或應對具有優勢。"
+            }
 
         return {
             "backstory": backstory,
             "personality_quirks": quirks,
-            "unorthodox_equipment": eq,
+            "unorthodox_equipment": equipment,
             "quest_hook": hook,
-            "trait_obj": None if is_normal else {
-                "name": f"非傳統天賦：{custom_trait}",
-                "category": "故事生活特長",
-                "game_effect": "因特殊生活經驗或血脈特異，在特定情境獲得優勢判定。"
-            }
+            "trait_obj": trait_obj,
+            "token_usage": None
         }
-
-    def _resolve_choice(self, user_choice: Optional[str], db_dict: Dict) -> Tuple[str, Dict]:
-        import random
-        if not user_choice or "隨機" in user_choice or user_choice == "RANDOM":
-            k = random.choice(list(db_dict.keys()))
-            return k, db_dict[k]
-        for k, v in db_dict.items():
-            if k in user_choice or user_choice in k:
-                return k, v
-        return user_choice, list(db_dict.values())[0]
-
-    def _parse_level_and_state(self, level_input: Optional[str]) -> Tuple[int, Optional[str]]:
-        if not level_input:
-            return 1, None
-        s = str(level_input).strip()
-        num_match = re.search(r"\d+", s)
-        base_level = int(num_match.group(0)) if num_match else 1
-
-        level_note = None
-        if "大魔導師" in s:
-            base_level = max(base_level, 13)
-            level_note = "大魔導師階級"
-        elif "資深" in s or "老兵" in s or "隊長" in s:
-            base_level = max(base_level, 5)
-            level_note = "百戰老兵階級"
-
-        if any(w in s for w in ["封印", "詛咒", "受損", "壓制", "舊傷"]):
-            note_extra = "【能力封印/受限中】：此角色過往實力強大，但因受詛咒或封印，高階能力暫時受限。"
-            level_note = f"{level_note}；{note_extra}" if level_note else note_extra
-
-        return min(max(base_level, 1), 20), level_note
-
-    def _estimate_cr(self, level: int, class_name: str, level_note: Optional[str]) -> str:
-        if level <= 1:
-            cr_base = "1/4"
-        elif level <= 2:
-            cr_base = "1/2"
-        elif level <= 4:
-            cr_base = "1"
-        elif level <= 6:
-            cr_base = "2"
-        elif level <= 8:
-            cr_base = "3"
-        elif level <= 10:
-            cr_base = "4"
-        elif level <= 12:
-            cr_base = "5"
-        elif level <= 14:
-            cr_base = "6 ~ 8"
-        elif level <= 16:
-            cr_base = "9 ~ 11"
-        else:
-            cr_base = "12 ~ 14"
-
-        if level_note and any(w in level_note for w in ["封印", "受限", "詛咒"]):
-            return f"{cr_base} (受封印時實戰約 CR 2 ~ 3)"
-        return cr_base
-
-    def _get_unlocked_features(self, class_data: Dict, level: int) -> list:
-        features = []
-        saves = class_data.get("saves") or class_data.get("saving_throws", [])
-        if saves:
-            features.append(f"豁免檢定熟練：{', '.join(saves)}")
-        prog = class_data.get("features_by_level") or class_data.get("progression", {})
-        for lvl in range(1, level + 1):
-            if lvl in prog:
-                for feat in prog[lvl]:
-                    features.append(f"[Lv.{lvl}] {feat}")
-        return features
-
-    def _generate_npc_name(self, race_name: str, gender: str) -> str:
-        import random
-        is_female = "女" in gender
-
-        if is_female:
-            human_names = ["艾蓮娜 (Elena)", "席爾維亞 (Sylvia)", "瑪格麗特 (Margaret)", "克拉拉 (Clara)", "薇薇安 (Vivian)", "艾瑪 (Emma)"]
-            elf_names = ["希爾薇 (Silvya)", "希蘭妮 (Therani)", "莉蘭蒂 (Liranthi)", "艾拉 (Aela)", "賽拉菲娜 (Seraphina)"]
-            dwarf_names = ["海爾嘉 (Helga)", "達格瑪 (Dagmar)", "布倫希爾德 (Brunhilde)", "瓦爾達 (Varda)"]
-            halfling_names = ["羅絲 (Rosie)", "貝拉 (Bella)", "波比 (Poppy)", "瑪莉金 (Marigold)"]
-            tiefling_names = ["希望 (Hope)", "安息 (Rest)", "無垢 (Verity)", "凱莉絲 (Kallista)"]
-            dragonborn_names = ["蘇拉希 (Surina)", "米蘇拉 (Misla)", "朵拉希 (Doraxi)"]
-        else:
-            human_names = ["老丹恩 (Old Dan)", "羅蘭 (Roland)", "維克托 (Viktor)", "馬庫斯 (Marcus)", "蓋文 (Gavin)", "愛德華 (Edward)"]
-            elf_names = ["埃拉利恩 (Elalion)", "費拉米爾 (Faeramir)", "愛蘭迪爾 (Aelandir)", "索隆迪爾 (Thorondir)"]
-            dwarf_names = ["布魯諾 (Bruenor)", "托拉丁 (Thoradin)", "巴林 (Balin)", "達剛 (Dargun)", "格羅姆 (Grom)"]
-            halfling_names = ["米羅 (Milo)", "芬恩 (Finn)", "佩里格林 (Peregrin)", "阿爾菲 (Alfie)"]
-            tiefling_names = ["悲哀 (Sorrow)", "恐懼 (Dread)", "馬拉基 (Malachi)", "巴拉卡斯 (Barakas)"]
-            dragonborn_names = ["巴拉薩 (Balasar)", "阿爾漢 (Arjhan)", "朵納爾 (Donaar)"]
-
-        if "精靈" in race_name:
-            return random.choice(elf_names)
-        elif "矮人" in race_name:
-            return random.choice(dwarf_names)
-        elif "半身人" in race_name or "侏儒" in race_name:
-            return random.choice(halfling_names)
-        elif "提夫林" in race_name:
-            return random.choice(tiefling_names)
-        elif "龍裔" in race_name:
-            return random.choice(dragonborn_names)
-        elif "半獸人" in race_name or "獸人" in race_name:
-            return "格羅克 (Grok)" if not is_female else "烏爾卡 (Urka)"
-        else:
-            return random.choice(human_names)
-

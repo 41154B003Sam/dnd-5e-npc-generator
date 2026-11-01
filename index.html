@@ -342,36 +342,47 @@
           <div class="form-group">
             <label>種族：</label>
             <select id="npcRace">
-              <option value="RANDOM">🎲 隨機決定</option>
+<option value="RANDOM">🎲 隨機決定</option>
               <option value="人類 (Human)">人類 (Human)</option>
+              <option value="高等精靈 (High Elf)">高等精靈 (High Elf)</option>
+              <option value="木精靈 (Wood Elf)">木精靈 (Wood Elf)</option>
+              <option value="黑暗精靈 / 卓爾 (Drow)">黑暗精靈 / 卓爾 (Drow)</option>
               <option value="山地矮人 (Mountain Dwarf)">山地矮人 (Mountain Dwarf)</option>
               <option value="丘陵矮人 (Hill Dwarf)">丘陵矮人 (Hill Dwarf)</option>
-              <option value="高等精靈 (High Elf)">高等精靈 (High Elf)</option>
               <option value="輕足半身人 (Lightfoot Halfling)">輕足半身人 (Lightfoot Halfling)</option>
-              <option value="提夫林 (Tiefling)">提夫林 (Tiefling)</option>
-              <option value="半獸人 (Half-Orc)">半獸人 (Half-Orc)</option>
-              <option value="岩石侏儒 (Rock Gnome)">岩石侏儒 (Rock Gnome)</option>
+              <option value="頑強半身人 (Stout Halfling)">頑強半身人 (Stout Halfling)</option>
               <option value="龍裔 (Dragonborn)">龍裔 (Dragonborn)</option>
+              <option value="半獸人 (Half-Orc)">半獸人 (Half-Orc)</option>
+              <option value="提夫林 (Tiefling)">提夫林 (Tiefling)</option>
+              <option value="岩石侏儒 (Rock Gnome)">岩石侏儒 (Rock Gnome)</option>
               <option value="半精靈 (Half-Elf)">半精靈 (Half-Elf)</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>職業：</label>
-            <select id="npcClass">
-              <option value="RANDOM">🎲 隨機決定</option>
+            <label>職業 (Class)：</label>
+            <select id="npcClass" onchange="updateSubclassOptions()">
+<option value="RANDOM">🎲 隨機決定</option>
               <option value="戰士 (Fighter)">戰士 (Fighter)</option>
               <option value="法師 (Wizard)">法師 (Wizard)</option>
               <option value="遊盪者 (Rogue)">遊盪者 (Rogue)</option>
-              <option value="野蠻人 (Barbarian)">野蠻人 (Barbarian)</option>
               <option value="牧師 (Cleric)">牧師 (Cleric)</option>
+              <option value="野蠻人 (Barbarian)">野蠻人 (Barbarian)</option>
               <option value="聖騎士 (Paladin)">聖騎士 (Paladin)</option>
-              <option value="遊俠 (Ranger)">遊俠 (Ranger)</option>
-              <option value="吟遊詩人 (Bard)">吟遊詩人 (Bard)</option>
               <option value="德魯伊 (Druid)">德魯伊 (Druid)</option>
+              <option value="吟遊詩人 (Bard)">吟遊詩人 (Bard)</option>
               <option value="武僧 (Monk)">武僧 (Monk)</option>
-              <option value="契術師 (Warlock)">契術師 (Warlock)</option>
+              <option value="遊俠 (Ranger)">遊俠 (Ranger)</option>
               <option value="術士 (Sorcerer)">術士 (Sorcerer)</option>
+              <option value="契術師 (Warlock)">契術師 (Warlock)</option>
+              <option value="奇械師 (Artificer)">奇械師 (Artificer)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>子職業 / 範型流派 (Subclass / Paradigm)：</label>
+            <select id="npcSubclass">
+              <option value="RANDOM">🎲 隨機決定範型 (Auto)</option>
             </select>
           </div>
         </div>
@@ -380,23 +391,64 @@
           <div class="form-group">
             <label>背景歷練：</label>
             <select id="npcBackground">
-              <option value="RANDOM">🎲 隨機決定</option>
-              <option value="民間英雄 (Folk Hero)">民間英雄 (Folk Hero)</option>
+<option value="RANDOM">🎲 隨機決定</option>
+              <option value="侍僧 (Acolyte)">侍僧 (Acolyte)</option>
+              <option value="派系特工 (Faction Agent)">派系特工 (Faction Agent)</option>
+              <option value="公會工匠 (Guild Artisan)">公會工匠 (Guild Artisan)</option>
+              <option value="變體公會工匠 (公會商人) (Guild Merchant)">變體公會工匠 (公會商人) (Guild Merchant)</option>
+              <option value="氏族工匠 (Clan Crafter)">氏族工匠 (Clan Crafter)</option>
+              <option value="朝臣 (Courtier)">朝臣 (Courtier)</option>
+              <option value="化外之民 (Outlander)">化外之民 (Outlander)</option>
+              <option value="烏斯伽部落成員 (Uthgardt Tribe Member)">烏斯伽部落成員 (Uthgardt Tribe Member)</option>
               <option value="士兵 (Soldier)">士兵 (Soldier)</option>
-              <option value="侍祭 (Acolyte)">侍祭 (Acolyte)</option>
-              <option value="行會工匠 (Guild Artisan)">行會工匠 (Guild Artisan)</option>
-              <option value="貴族 (Noble)">貴族 (Noble)</option>
-              <option value="流浪兒 (Urchin)">流浪兒 (Urchin)</option>
+              <option value="教團騎士 (Knight of the Order)">教團騎士 (Knight of the Order)</option>
+              <option value="傭兵老將 (Mercenary Veteran)">傭兵老將 (Mercenary Veteran)</option>
+              <option value="城市守衛 (City Watch)">城市守衛 (City Watch)</option>
+              <option value="變體城市守衛 (調查員) (Investigator)">變體城市守衛 (調查員) (Investigator)</option>
+              <option value="流浪兒 / 孤兒 (Urchin)">流浪兒 / 孤兒 (Urchin)</option>
               <option value="學者 (Sage)">學者 (Sage)</option>
+              <option value="平民英雄 (Folk Hero)">平民英雄 (Folk Hero)</option>
+              <option value="繼承者 (Inheritor)">繼承者 (Inheritor)</option>
               <option value="水手 (Sailor)">水手 (Sailor)</option>
-              <option value="罪犯 (Criminal)">罪犯 (Criminal)</option>
+              <option value="變體水手 (海盜) (Pirate)">變體水手 (海盜) (Pirate)</option>
               <option value="隱士 (Hermit)">隱士 (Hermit)</option>
+              <option value="藝人 (Entertainer)">藝人 (Entertainer)</option>
+              <option value="變體藝人 (角鬥士) (Gladiator)">變體藝人 (角鬥士) (Gladiator)</option>
+              <option value="失敗商人 (Failed Merchant)">失敗商人 (Failed Merchant)</option>
+              <option value="賭徒 (Gambler)">賭徒 (Gambler)</option>
+              <option value="原告 (Plaintiff)">原告 (Plaintiff)</option>
+              <option value="競爭對手實習生 (Rival Intern)">競爭對手實習生 (Rival Intern)</option>
+              <option value="修院學士 (Cloistered Scholar)">修院學士 (Cloistered Scholar)</option>
+              <option value="城市賞金獵人 (Urban Bounty Hunter)">城市賞金獵人 (Urban Bounty Hunter)</option>
+              <option value="罪犯 (Criminal)">罪犯 (Criminal)</option>
+              <option value="變體罪犯 (間諜) (Spy)">變體罪犯 (間諜) (Spy)</option>
+              <option value="詐欺師 (Charlatan)">詐欺師 (Charlatan)</option>
+              <option value="貴族 (Noble)">貴族 (Noble)</option>
+              <option value="變體貴族 (騎士) (Knight)">變體貴族 (騎士) (Knight)</option>
+              <option value="深水城貴族 (Waterdhavian Noble)">深水城貴族 (Waterdhavian Noble)</option>
+              <option value="遠行者 (Far Traveler)">遠行者 (Far Traveler)</option>
+              <option value="噩夢纏身 (Haunted One)">噩夢纏身 (Haunted One)</option>
+              <option value="阿沙里人 (Ashari)">阿沙里人 (Ashari)</option>
+              <option value="魔法學院學者 (Lyceum Scholar)">魔法學院學者 (Lyceum Scholar)</option>
+              <option value="扣環黨成員 (Clasp Member)">扣環黨成員 (Clasp Member)</option>
+              <option value="重回正途的邪教徒 (Reformed Cultist)">重回正途的邪教徒 (Reformed Cultist)</option>
+              <option value="一無所有者 (Deprived)">一無所有者 (Deprived)</option>
+              <option value="俄佐立參議院官員 (Azorius Functionary)">俄佐立參議院官員 (Azorius Functionary)</option>
+              <option value="波洛斯教團軍團兵 (Boros Legionnaire)">波洛斯教團軍團兵 (Boros Legionnaire)</option>
+              <option value="析米克聯合科學家 (Simic Scientist)">析米克聯合科學家 (Simic Scientist)</option>
+              <option value="歐佐夫辛迪加代表 (Orzhov Representative)">歐佐夫辛迪加代表 (Orzhov Representative)</option>
+              <option value="伊捷聯盟工程師 (Izzet Engineer)">伊捷聯盟工程師 (Izzet Engineer)</option>
+              <option value="拉鐸司宗派狂歡者 (Cult of Rakdos)">拉鐸司宗派狂歡者 (Cult of Rakdos)</option>
+              <option value="古魯部族混亂者 (Gruul Anarch)">古魯部族混亂者 (Gruul Anarch)</option>
+              <option value="瑟雷尼亞盟會新倡者 (Selesnya Initiate)">瑟雷尼亞盟會新倡者 (Selesnya Initiate)</option>
+              <option value="葛加理群落特工 (Golgari Agent)">葛加理群落特工 (Golgari Agent)</option>
+              <option value="底密爾會堂特工 (House Dimir)">底密爾會堂特工 (House Dimir)</option>
             </select>
           </div>
 
           <div class="form-group">
             <label>等級 / 關鍵字：</label>
-            <input type="text" id="npcLevel" value="1" placeholder="例如：1、14、大魔導師、老兵、封印">
+            <input type="text" id="npcLevel" value="1" oninput="updateSubclassOptions()" placeholder="例如：1、14、大魔導師、老兵、封印">
           </div>
         </div>
 
@@ -462,6 +514,194 @@
       "半精靈 (Half-Elf)": { saves: "妖精血統", langs: ["通用語", "精靈語"], bonus: "魅力 +2、任選兩項 +1", darkvision: "60 呎" }
     };
 
+    const SUBCLASSES = {
+    "戰士 (Fighter)": {
+        "category": "武藝範型 (Martial Archetype)",
+        "unlock_level": 3,
+        "options": [
+            "勇士 (Champion)",
+            "戰鬥大師 (Battle Master)",
+            "魔能騎士 (Eldritch Knight)",
+            "武士 (Samurai)",
+            "符文騎士 (Rune Knight)",
+            "回音騎士 (Echo Knight)",
+            "靈能武士 (Psi Warrior)",
+            "騎兵 (Cavalier)",
+            "魔射手 (Arcane Archer)",
+            "紫龍騎士 (Purple Dragon Knight)"
+        ]
+    },
+    "法師 (Wizard)": {
+        "category": "奧術傳承 (Arcane Tradition)",
+        "unlock_level": 2,
+        "options": [
+            "塑能學派 (School of Evocation)",
+            "防護學派 (School of Abjuration)",
+            "咒法學派 (School of Conjuration)",
+            "死靈學派 (School of Necromancy)",
+            "預言學派 (School of Divination)",
+            "惑控學派 (School of Enchantment)",
+            "幻術學派 (School of Illusion)",
+            "變化學派 (School of Transmutation)",
+            "劍詠傳承 (Bladesinging)",
+            "戰爭魔法 (War Magic)",
+            "時間魔法 (Chronurgy Magic)",
+            "書士會 (Order of Scribes)"
+        ]
+    },
+    "遊盪者 (Rogue)": {
+        "category": "盜賊範型 (Roguish Archetype)",
+        "unlock_level": 3,
+        "options": [
+            "刺客 (Assassin)",
+            "竊賊 (Thief)",
+            "詭術師 (Arcane Trickster)",
+            "風流劍客 (Swashbuckler)",
+            "魂刃 (Soulknife)",
+            "斥候 (Scout)",
+            "審訊者 (Inquisitive)",
+            "策士 (Mastermind)",
+            "鬼魅 (Phantom)"
+        ]
+    },
+    "牧師 (Cleric)": {
+        "category": "神聖領域 (Divine Domain)",
+        "unlock_level": 1,
+        "options": [
+            "生命領域 (Life Domain)",
+            "光明領域 (Light Domain)",
+            "戰爭領域 (War Domain)",
+            "暴風領域 (Tempest Domain)",
+            "詭術領域 (Trickery Domain)",
+            "知識領域 (Knowledge Domain)",
+            "墳墓領域 (Grave Domain)",
+            "鍛造領域 (Forge Domain)",
+            "暮光領域 (Twilight Domain)",
+            "和平領域 (Peace Domain)"
+        ]
+    },
+    "德魯伊 (Druid)": {
+        "category": "德魯伊結社 (Druid Circle)",
+        "unlock_level": 2,
+        "options": [
+            "大地結社 (Circle of the Land)",
+            "月亮結社 (Circle of the Moon)",
+            "夢境結社 (Circle of Dreams)",
+            "牧人結社 (Circle of the Shepherd)",
+            "孢子結社 (Circle of Spores)",
+            "星辰結社 (Circle of Stars)",
+            "野火結社 (Circle of Wildfire)"
+        ]
+    },
+    "野蠻人 (Barbarian)": {
+        "category": "原初本道 (Primal Path)",
+        "unlock_level": 3,
+        "options": [
+            "狂戰士道途 (Path of the Berserker)",
+            "圖騰勇士道途 (Path of the Totem Warrior)",
+            "狂野魔法道途 (Path of Wild Magic)",
+            "狂熱者道途 (Path of the Zealot)",
+            "先祖守衛道途 (Path of the Ancestral Guardian)",
+            "巨人道途 (Path of the Giant)",
+            "風暴先驅道途 (Path of the Storm Herald)",
+            "野獸之路 (Path of the Beast)"
+        ]
+    },
+    "聖騎士 (Paladin)": {
+        "category": "神聖之誓 (Sacred Oath)",
+        "unlock_level": 3,
+        "options": [
+            "奉獻之誓 (Oath of Devotion)",
+            "復仇之誓 (Oath of Vengeance)",
+            "遠古之誓 (Oath of the Ancients)",
+            "征服之誓 (Oath of Conquest)",
+            "救贖之誓 (Oath of Redemption)",
+            "守望之誓 (Oath of the Watchers)",
+            "王冠之誓 (Oath of the Crown)",
+            "榮耀之誓 (Oath of Glory)"
+        ]
+    },
+    "遊俠 (Ranger)": {
+        "category": "遊俠原型 (Ranger Archetype)",
+        "unlock_level": 3,
+        "options": [
+            "獵人 (Hunter)",
+            "幽域追蹤者 (Gloom Stalker)",
+            "獸王 (Beast Master)",
+            "妖精漫遊者 (Fey Wanderer)",
+            "境界行者 (Horizon Walker)",
+            "怪物殺手 (Monster Slayer)",
+            "集群守衛 (Swarmkeeper)",
+            "龍獸守衛 (Drakewarden)"
+        ]
+    },
+    "吟遊詩人 (Bard)": {
+        "category": "吟遊詩人學院 (Bard College)",
+        "unlock_level": 3,
+        "options": [
+            "知識學院 (College of Lore)",
+            "勇氣學院 (College of Valor)",
+            "劍舞學院 (College of Swords)",
+            "迷惑學院 (College of Glamour)",
+            "低語學院 (College of Whispers)",
+            "雄辯學院 (College of Eloquence)",
+            "創造學院 (College of Creation)",
+            "靈魂學院 (College of Spirits)"
+        ]
+    },
+    "武僧 (Monk)": {
+        "category": "修道院修習 (Monastic Tradition)",
+        "unlock_level": 3,
+        "options": [
+            "散打宗 (Way of the Open Hand)",
+            "暗影宗 (Way of Shadow)",
+            "劍聖宗 (Way of the Kensei)",
+            "命流宗 (Way of Mercy)",
+            "日魂宗 (Way of the Sun Soul)",
+            "星我宗 (Way of the Astral Self)",
+            "醉拳宗 (Way of the Drunken Master)",
+            "神龍宗 (Way of the Ascendant Dragon)"
+        ]
+    },
+    "術士 (Sorcerer)": {
+        "category": "術法起源 (Sorcerous Origin)",
+        "unlock_level": 1,
+        "options": [
+            "龍族血脈 (Draconic Bloodline)",
+            "狂野魔法 (Wild Magic)",
+            "神聖之魂 (Divine Soul)",
+            "幽影魔法 (Shadow Magic)",
+            "風暴術法 (Storm Sorcery)",
+            "畸變心智 (Aberrant Mind)",
+            "時械之魂 (Clockwork Soul)"
+        ]
+    },
+    "契術師 (Warlock)": {
+        "category": "異界宗主 (Otherworldly Patron)",
+        "unlock_level": 1,
+        "options": [
+            "邪魔宗主 (The Fiend)",
+            "至高妖精 (The Archfey)",
+            "舊日支配者 (The Great Old One)",
+            "咒劍士 (The Hexblade)",
+            "天界宗主 (The Celestial)",
+            "不死宗主 (The Undead)",
+            "巨靈宗主 (The Genie)",
+            "深海意志 (The Fathomless)"
+        ]
+    },
+    "奇械師 (Artificer)": {
+        "category": "專業領域 (Artificer Specialist)",
+        "unlock_level": 3,
+        "options": [
+            "戰地匠師 (Battle Smith)",
+            "裝甲師 (Armorer)",
+            "魔炮師 (Artillerist)",
+            "煉金師 (Alchemist)"
+        ]
+    }
+};
+
     const CLASSES = {
       "戰士 (Fighter)": { hd: "1d10", hpBase: 10, hpPer: 6, saves: ["力量 (STR)", "體質 (CON)"], primary: ["STR", "CON", "DEX", "WIS", "CHA", "INT"], defaultWeapon: "長劍 (1d8/1d10 揮砍)", defaultArmor: "鏈甲 (16 AC)" },
       "法師 (Wizard)": { hd: "1d6", hpBase: 6, hpPer: 4, saves: ["智力 (INT)", "感知 (WIS)"], primary: ["INT", "CON", "DEX", "WIS", "CHA", "STR"], defaultWeapon: "短劍 / 匕首 (1d4 穿刺)", defaultArmor: "學者長袍 (10 + 敏捷)" },
@@ -507,6 +747,46 @@
       return mod >= 0 ? `+${mod}` : `${mod}`;
     }
 
+    
+    function updateSubclassOptions() {
+      const classSelect = document.getElementById('npcClass');
+      const subclassSelect = document.getElementById('npcSubclass');
+      const levelInput = document.getElementById('npcLevel');
+      if (!classSelect || !subclassSelect) return;
+
+      const classKey = classSelect.value;
+      const levelVal = parseLevel(levelInput ? levelInput.value : '1').level;
+
+      if (classKey === 'RANDOM' || !SUBCLASSES[classKey]) {
+        subclassSelect.innerHTML = '<option value="RANDOM">🎲 隨機決定範型 (Auto)</option>';
+        subclassSelect.disabled = false;
+        subclassSelect.style.opacity = '1';
+        return;
+      }
+
+      const subInfo = SUBCLASSES[classKey];
+      const unlockLevel = subInfo.unlock_level;
+      const cat = subInfo.category;
+
+      if (levelVal < unlockLevel) {
+        subclassSelect.innerHTML = `<option value="NONE">尚未解鎖${cat} (Lv.${unlockLevel} 解鎖)</option>`;
+        subclassSelect.disabled = true;
+        subclassSelect.style.opacity = '0.6';
+      } else {
+        subclassSelect.disabled = false;
+        subclassSelect.style.opacity = '1';
+        let optsHtml = '<option value="RANDOM">🎲 隨機決定範型 (Auto)</option>';
+        subInfo.options.forEach(opt => {
+          optsHtml += `<option value="${opt}">${opt}</option>`;
+        });
+        const currentVal = subclassSelect.value;
+        subclassSelect.innerHTML = optsHtml;
+        if (subInfo.options.includes(currentVal)) {
+          subclassSelect.value = currentVal;
+        }
+      }
+    }
+
     function parseLevel(input) {
       let text = (input || "").trim().toLowerCase();
       let lv = 1;
@@ -532,8 +812,10 @@
       if (type === 'farmer') {
         document.getElementById('npcName').value = "老丹恩";
         document.getElementById('npcClass').value = "戰士 (Fighter)";
-        document.getElementById('npcBackground').value = "民間英雄 (Folk Hero)";
-        document.getElementById('npcLevel').value = "1";
+        document.getElementById('npcLevel').value = "5";
+        updateSubclassOptions();
+        document.getElementById('npcSubclass').value = "戰鬥大師 (Battle Master)";
+        document.getElementById('npcBackground').value = "平民英雄 (Folk Hero)";
         document.getElementById('npcTrait').value = "無";
         document.getElementById('npcStory').value = "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙。";
         presetTitle = "老農戰士 (鋼草耙)";
@@ -541,6 +823,9 @@
         document.getElementById('npcName').value = "布倫希爾德學者";
         document.getElementById('npcClass').value = "法師 (Wizard)";
         document.getElementById('npcLevel').value = "大魔導師";
+        updateSubclassOptions();
+        document.getElementById('npcSubclass').value = "變化學派 (School of Transmutation)";
+        document.getElementById('npcBackground').value = "學者 (Sage)";
         document.getElementById('npcTrait').value = "無";
         document.getElementById('npcStory').value = "隱居在迷霧森林邊界的神秘老學者，不使用常規魔杖，施法時總是抽著一支刻印符文的石楠木老煙斗，透過吞吐青煙引導奧術。";
         presetTitle = "封印老法師 (符文煙斗)";
@@ -549,6 +834,9 @@
         document.getElementById('npcRace').value = "提夫林 (Tiefling)";
         document.getElementById('npcClass').value = "法師 (Wizard)";
         document.getElementById('npcLevel').value = "6";
+        updateSubclassOptions();
+        document.getElementById('npcSubclass').value = "死靈學派 (School of Necromancy)";
+        document.getElementById('npcBackground').value = "流浪兒 / 孤兒 (Urchin)";
         document.getElementById('npcTrait').value = "靈魂";
         document.getElementById('npcStory').value = "老守墓人摩斯，平日在鎮郊墓園挖土埋棺，看似駝背衰老，實則是隱退的死靈法師。他不帶法杖魔杖，施法時總是捧著一只裂紋的占卜茶杯喝冷茶；遇到盜墓賊時，便抄起隨身那把挖墳用的沉重鐵鎬砸向對方。";
         presetTitle = "守墓人摩斯 (挖墳鐵鎬)";
@@ -609,6 +897,7 @@
               name: name || undefined,
               race: raceKey === 'RANDOM' ? undefined : raceKey,
               class_name: classKey === 'RANDOM' ? undefined : classKey,
+              subclass_name: (document.getElementById('npcSubclass') && !['RANDOM', 'NONE'].includes(document.getElementById('npcSubclass').value)) ? document.getElementById('npcSubclass').value : undefined,
               background: bgKey === 'RANDOM' ? undefined : bgKey,
               level: levelVal,
               story_context: story || undefined,
@@ -714,9 +1003,28 @@
 
       let hp = clsData.hpBase + (level - 1) * clsData.hpPer;
 
+      // 離線子職業範型解析
+      let subKey = document.getElementById('npcSubclass') ? document.getElementById('npcSubclass').value : 'RANDOM';
+      let subInfo = SUBCLASSES[classKey];
+      let chosenSubclass = null;
+      let subclassDisplay = "";
+      if (subInfo) {
+        if (level < subInfo.unlock_level) {
+          subclassDisplay = `尚未解鎖${subInfo.category} (Lv.${subInfo.unlock_level} 解鎖)`;
+        } else {
+          if (subKey && subKey !== 'RANDOM' && subKey !== 'NONE' && subInfo.options.includes(subKey)) {
+            chosenSubclass = subKey;
+          } else {
+            chosenSubclass = subInfo.options[Math.floor(Math.random() * subInfo.options.length)];
+          }
+          subclassDisplay = `${subInfo.category}：${chosenSubclass}`;
+        }
+      }
+
       currentNPCData = {
         name, raceKey, classKey, bgKey, level, levelNote, pb, hp, hd: `${level}${clsData.hd}`,
-        rolls, stats, weapon, focus, trait, story: storyText, raceData, clsData
+        rolls, stats, weapon, focus, trait, story: storyText, raceData, clsData,
+        chosenSubclass, subclassDisplay
       };
       currentRawCardMarkdown = "";
 
@@ -773,7 +1081,7 @@
         </div>
 
         <div class="section-h3">👤 基礎身分與背景歷練</div>
-        <p>• <strong>種族</strong>：${d.race} ｜ <strong>職業</strong>：${d.class || d.class_name}</p>
+        <p>• <strong>種族</strong>：${d.race} ｜ <strong>職業與範型</strong>：${d.class || d.class_name} ${d.subclass_display ? `<span style="background: rgba(99, 102, 241, 0.25); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.5); padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 6px;">⭐ ${d.subclass_display}</span>` : ''}</p>
         <p>• <strong>性別與年齡</strong>：${d.gender || '未知'}，${(d.age && d.age.display) ? d.age.display : (d.age || '中年')}</p>
         <p>• <strong>陣營與信仰</strong>：${d.alignment} ｜ 信仰：${d.deity || '萬物有靈'}</p>
         <p>• <strong>背景歷練</strong>：${d.background || '平民民兵'}（${d.bg_feature || '市井歷練'}）</p>
@@ -875,7 +1183,7 @@
         </div>
 
         <div class="section-h3">👤 基礎身分與背景歷練</div>
-        <p>• <strong>種族</strong>：${d.raceKey} ｜ <strong>職業</strong>：${d.classKey}</p>
+        <p>• <strong>種族</strong>：${d.raceKey} ｜ <strong>職業與範型</strong>：${d.classKey} ${d.subclassDisplay ? `<span style="background: rgba(99, 102, 241, 0.25); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.5); padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 6px;">⭐ ${d.subclassDisplay}</span>` : ""}</p>
         <p>• <strong>背景歷練</strong>：${d.bgKey}</p>
         <p>• <strong>已知語言</strong>：${d.raceData.langs.join(", ")}</p>
 
@@ -1036,8 +1344,9 @@
     window.onload = function() {
       document.getElementById('npcName').value = "老丹恩";
       document.getElementById('npcClass').value = "戰士 (Fighter)";
-      document.getElementById('npcBackground').value = "民間英雄 (Folk Hero)";
+      document.getElementById('npcBackground').value = "平民英雄 (Folk Hero)";
       document.getElementById('npcLevel').value = "1";
+      updateSubclassOptions();
       document.getElementById('npcTrait').value = "無";
       document.getElementById('npcStory').value = "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙。";
 

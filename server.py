@@ -45,9 +45,10 @@ class DndWebHandler(SimpleHTTPRequestHandler):
                 gen = AINPCGenerator(api_key=api_key, model_name=model_name)
                 npc = gen.generate(
                     name=data.get("name"),
-                    race_name=data.get("race"),
-                    class_name=data.get("class_name"),
-                    background_name=data.get("background"),
+                    race_name=data.get("race") or data.get("race_name"),
+                    class_name=data.get("class_name") or data.get("class"),
+                    subclass_name=data.get("subclass_name") or data.get("subclass"),
+                    background_name=data.get("background") or data.get("background_name"),
                     level_input=data.get("level", "1"),
                     importance=data.get("importance", "次要劇情 NPC (Supporting)"),
                     story_context=data.get("story_context"),

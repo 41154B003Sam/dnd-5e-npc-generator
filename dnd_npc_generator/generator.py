@@ -14,7 +14,7 @@ import random
 import re
 from typing import Dict, List, Optional, Tuple
 from .database import (
-    ATTRIBUTES, RACES, CLASSES, BACKGROUNDS, DEITIES,
+    ATTRIBUTES, RACES, CLASSES, SUBCLASSES, BACKGROUNDS, DEITIES,
     STANDARD_LANGUAGES, EXOTIC_LANGUAGES, UNIQUE_TRAITS_PRESETS,
     SPELL_SLOTS_TABLE, ALIGNMENTS, THEMATIC_CUSTOM_WEAPONS, THEMATIC_ARCANE_FOCUSES
 )
@@ -32,6 +32,7 @@ class NPCGenerator:
     def __init__(self):
         self.races = RACES
         self.classes = CLASSES
+        self.subclasses = SUBCLASSES
         self.backgrounds = BACKGROUNDS
         self.deities = DEITIES
         self.unique_traits = UNIQUE_TRAITS_PRESETS
@@ -45,6 +46,7 @@ class NPCGenerator:
         name: Optional[str] = None,
         race_name: Optional[str] = None,
         class_name: Optional[str] = None,
+        subclass_name: Optional[str] = None,
         background_name: Optional[str] = None,
         level_input: Optional[str] = None,
         alignment_input: Optional[str] = None,
@@ -68,6 +70,11 @@ class NPCGenerator:
             else:
                 class_name = random.choice(list(self.classes.keys()))
         class_data = self.classes[class_name]
+
+        # 2.5 解析子職業 / 範型流派 (Subclass / Paradigm)
+        chosen_subclass, subclass_data, subclass_category, subclass_display = self._resolve_subclass(
+            class_name, level, subclass_name
+        )
 
         # 3. 決定種族
         if not race_name or race_name not in self.races:
@@ -121,7 +128,7 @@ class NPCGenerator:
         languages = list(race_data["languages"])
 
         # 13. 等級解鎖職業特長清單
-        unlocked_features = self._get_unlocked_features(class_data, level)
+        unlocked_features = self._get_unlocked_features(class_data, level, subclass_data, chosen_subclass)
 
         # 14. 施法者法術位與封印狀態
         spellcasting_info = self._get_spellcasting_info(class_data, level, level_note)
@@ -163,6 +170,11 @@ class NPCGenerator:
             "race": race_name,
             "racial_bonus_options": race_data["bonus_options"],
             "class": class_name,
+            "class_name": class_name,
+            "subclass": chosen_subclass,
+            "subclass_category": subclass_category,
+            "subclass_display": subclass_display,
+            "subclass_desc": subclass_data.get("desc", "") if subclass_data else "",
             "background": background_name,
             "age": age,
             "appearance": appearance,
@@ -340,14 +352,39 @@ class NPCGenerator:
 
         return equipment
 
-    def _get_unlocked_features(self, class_data: Dict, level: int) -> List[str]:
+    def _resolve_subclass(self, class_key: str, level: int, user_subclass: Optional[str] = None) -> Tuple[Optional[str], Optional[Dict], str, str]:
+        sub_info = self.subclasses.get(class_key)
+        if not sub_info:
+            return None, None, "", ""
+        category = sub_info.get("category", "範型流派")
+        unlock_lv = sub_info.get("unlock_level", 3)
+        options = sub_info.get("options", {})
+        if level < unlock_lv:
+            return None, None, category, f"尚未解鎖範型 (Lv.{unlock_lv} 解鎖)"
+        if not user_subclass or "隨機" in user_subclass or user_subclass == "RANDOM":
+            choice_key = random.choice(list(options.keys()))
+            return choice_key, options[choice_key], category, f"{category}：{choice_key}"
+        for k, v in options.items():
+            if k == user_subclass or k in user_subclass or user_subclass in k or k.split(" ")[0] in user_subclass:
+                return k, v, category, f"{category}：{k}"
+        choice_key = random.choice(list(options.keys()))
+        return choice_key, options[choice_key], category, f"{category}：{choice_key}"
+
+    def _get_unlocked_features(self, class_data: Dict, level: int, subclass_data: Optional[Dict] = None, subclass_name: Optional[str] = None) -> List[str]:
         features_dict = class_data.get("features_by_level", {})
         unlocked = []
-        for lv in sorted(features_dict.keys()):
-            if lv <= level:
+        for lv in range(1, level + 1):
+            if lv in features_dict:
                 for feat in features_dict[lv]:
                     unlocked.append(f"[Lv.{lv}] {feat}")
+            if subclass_data and "features_by_level" in subclass_data:
+                sub_prog = subclass_data["features_by_level"]
+                if lv in sub_prog:
+                    tag = f" ({subclass_name.split(' ')[0]})" if subclass_name else ""
+                    for sub_feat in sub_prog[lv]:
+                        unlocked.append(f"[Lv.{lv} 範型{tag}] {sub_feat}")
         return unlocked
+
 
     def _get_spellcasting_info(self, class_data: Dict, level: int, level_note: Optional[str]) -> Optional[Dict]:
         if not class_data.get("is_spellcaster"):

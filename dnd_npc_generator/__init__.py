@@ -22,9 +22,24 @@ from .exporter import (
     export_csv
 )
 
+from .database import (
+    CLASSES,
+    SUBCLASSES,
+    BACKGROUNDS,
+    RACES,
+    ALIGNMENTS,
+    DEITIES
+)
+
 __all__ = [
     "AINPCGenerator",
     "NPCGenerator",
+    "CLASSES",
+    "SUBCLASSES",
+    "BACKGROUNDS",
+    "RACES",
+    "ALIGNMENTS",
+    "DEITIES",
     "roll_4d6_drop_lowest",
     "calculate_modifier",
     "format_modifier",
