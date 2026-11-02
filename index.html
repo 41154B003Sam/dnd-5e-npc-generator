@@ -493,7 +493,7 @@
               <button type="button" onclick="saveApiKey()" style="padding: 6px 10px; background: #334155; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer; font-size: 11px;">記住金鑰</button>
             </div>
             <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 11px;">
-              <span>💡 留空即可 0 元完全免費使用純本地 5E 規則引擎</span>
+              <span id="keyStatusHint">💡 留空即可 0 元完全免費使用純本地 5E 規則引擎</span>
               <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #818cf8; text-decoration: none;">👉 免費取得 Google API Key (0元免費額度)</a>
             </div>
           </div>
@@ -927,9 +927,19 @@
     }
 
     // 瀏覽器直連 Gemini REST API (支援 GitHub Pages / Cloudflare Pages 靜態託管)
-    async function callGeminiDirectlyFromBrowser(apiKey, payload) {
-      const model = "gemini-2.5-flash";
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    async function callGeminiDirectlyFromBrowser(rawApiKey, payload) {
+      const apiKey = String(rawApiKey || "").trim().replace(/^[\"\']|[\"\']$/g, "");
+      if (!apiKey) {
+        throw new Error("API 金鑰為空，請輸入有效金鑰或留空使用離線規則");
+      }
+
+      // 支援 Google AI Studio 官方通用免費層模型清單（依相容性與穩定性依序嘗試）
+      const modelsToTry = [
+        "gemini-1.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash-8b",
+        "gemini-1.5-pro"
+      ];
 
       const prompt = `請為以下 D&D 5E NPC 角色設計深度的故事背景、非典型生活裝備與範型風格：
 【基本設定】
@@ -942,22 +952,22 @@
 - 非傳統特質/武器關鍵字：${payload.custom_trait || '無 (常規凡人，生活道具)'}
 
 【設計規範】
-1. 身分與戰力解耦：生活化市井身分（如麥農、守墓人、廚師），但戰鬥底層是真實職業實力。
-2. 範型流派融會：深度融入【${payload.subclass_display}】戰術或奧術本能。
+1. 身分與戰力徹底解耦：生活化市井身分（如麥農、守墓人、廚師），但戰鬥底層是真實職業實力。
+2. 範型流派深度融會：融入【${payload.subclass_display || '該職業'}】戰術、奧術或誓約風格。
 3. 非典型裝備規格化：將日常道具（長草耙、修枝剪、鐵鎬、符文煙斗、茶杯）規格化為 5E 武器/法器傷害骰與特性。
 4. 常規凡人原則：無神力不強加超常變異。
 5. DM 跑團伏筆：給予 DM 直接可用的劇情引入線索。
 
-請嚴格輸出符合以下結構的單一 JSON 物件（不要包含任何 markdown 標記外的文字）：
+請嚴格輸出符合以下結構的單一 JSON 物件（不要包含任何 markdown 標記外的贅字）：
 {
   "name": "${payload.name}",
-  "title": "稱號",
-  "background_story": "深度背景故事...",
+  "title": "角色稱號",
+  "backstory": "200~300 字的生動故事身世...",
   "appearance_age": "外貌神態描述...",
+  "personality_quirks": "2~3 項生活細節反差小動作與神態習慣...",
   "combat_philosophy": "戰鬥風格與範型哲學...",
-  "quirks_and_habits": "日常反差習慣小動作...",
-  "dm_plot_hook": "DM 跑團劇本線索伏筆...",
-  "ai_unorthodox_equipment": [
+  "quest_hook": "DM 跑團劇本線索伏筆...",
+  "unorthodox_equipment": [
     {
       "name": "裝備名稱（如：鋼齒農用長草耙）",
       "type": "武器或法器類型",
@@ -968,28 +978,64 @@
   ]
 }`;
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.7
-          }
-        })
-      });
+      let lastError = null;
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+      for (const model of modelsToTry) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature: 0.7
+              }
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            const errMsg = errData.error?.message || `HTTP ${res.status}`;
+            if (res.status === 404 || res.status === 429) {
+              lastError = new Error(`模型 ${model} 回報: ${errMsg}`);
+              continue;
+            }
+            if (errMsg.includes("API key not valid") || errMsg.includes("API_KEY_INVALID")) {
+              throw new Error("API 金鑰無效，請確認是否完整複製自 Google AI Studio (以 AIza 開頭)");
+            }
+            throw new Error(errMsg);
+          }
+
+          const data = await res.json();
+          if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+            throw new Error("Gemini 回傳內容格式不符");
+          }
+
+          const rawText = data.candidates[0].content.parts[0].text;
+          let cleanJson = rawText.trim();
+          
+          if (cleanJson.startsWith("```")) {
+            cleanJson = cleanJson.replace(/^```[a-zA-Z]*\n?/, "").replace(/\n?```$/, "").trim();
+          }
+          const sIdx = cleanJson.indexOf("{");
+          const eIdx = cleanJson.lastIndexOf("}");
+          if (sIdx !== -1 && eIdx !== -1) {
+            cleanJson = cleanJson.substring(sIdx, eIdx + 1);
+          }
+
+          const parsed = JSON.parse(cleanJson);
+          const usage = data.usageMetadata || {};
+          return { parsed, usage, model };
+        } catch (err) {
+          lastError = err;
+          if (err.message.includes("API 金鑰無效")) {
+            throw err;
+          }
+        }
       }
 
-      const data = await res.json();
-      const rawText = data.candidates[0].content.parts[0].text;
-      const parsed = JSON.parse(rawText);
-      const usage = data.usageMetadata || {};
-      return { parsed, usage };
+      throw lastError || new Error("無法連線至 Gemini 模型");
     }
 
     async function generateNPC() {
@@ -1067,11 +1113,11 @@
           }
         }
 
-        // 策略 2: 若在 GitHub Pages / Cloudflare Pages 且使用者提供自訂 API Key，瀏覽器直連 Gemini API
+        // 策略 2: 若使用者提供自訂 API Key，瀏覽器直連 Gemini API
         if (userKey) {
           try {
-            btn.innerHTML = '<span>⏳ 🌐 瀏覽器直連 Gemini API 創作中...</span>';
-            const { parsed, usage } = await callGeminiDirectlyFromBrowser(userKey, payload);
+            btn.innerHTML = '<span>⏳ 🌐 瀏覽器直連 Gemini AI 創作中...</span>';
+            const { parsed, usage, model } = await callGeminiDirectlyFromBrowser(userKey, payload);
             
             // 擲骰 4d6dl1 屬性分配
             let rolls = [];
@@ -1079,9 +1125,15 @@
             rolls.sort((a,b) => b-a);
             let clsData = CLASSES[payload.class_name || '戰士 (Fighter)'] || CLASSES['戰士 (Fighter)'];
             let raceData = RACES[payload.race || '人類 (Human)'] || RACES['人類 (Human)'];
-            let stats = {};
+            
+            let rec = {};
             clsData.primary.forEach((stat, idx) => {
-              stats[stat] = { score: rolls[idx], mod: calcMod(rolls[idx]) };
+              let score = rolls[idx];
+              let mod = calcMod(score);
+              rec[stat] = {
+                recommended_base: score,
+                base_mod_str: (mod >= 0 ? `+${mod}` : `${mod}`)
+              };
             });
 
             let combinedNPC = {
@@ -1098,14 +1150,15 @@
               pb: Math.floor((payload.level - 1) / 4) + 2,
               hp: clsData.hpBase + (payload.level - 1) * clsData.hpPer,
               hd: `${payload.level}${clsData.hd}`,
-              rolls: rolls,
-              stats: stats,
-              background_story: parsed.background_story || story,
-              appearance_age: parsed.appearance_age || "外貌融入市井，神情沉穩。",
-              combat_philosophy: parsed.combat_philosophy || "戰術與生活本能深度結合。",
-              quirks_and_habits: parsed.quirks_and_habits || "隨身攜帶日常習慣小動作。",
-              dm_plot_hook: parsed.dm_plot_hook || "可直接用於引導玩家推進冒險。",
-              ai_unorthodox_equipment: parsed.ai_unorthodox_equipment || []
+              recommended_allocation: rec,
+              raw_ability_rolls: `[${rolls.join(", ")}]`,
+              backstory: parsed.backstory || parsed.background_story || story,
+              appearance_age: parsed.appearance_age || "外貌融入市井，神態沉穩平靜。",
+              personality_quirks: parsed.personality_quirks || parsed.quirks_and_habits || "隨身攜帶日常習慣小動作。",
+              combat_philosophy: parsed.combat_philosophy || "戰術與市井生活本能深度結合。",
+              quest_hook: parsed.quest_hook || parsed.dm_plot_hook || "可直接用於引導玩家推進冒險。",
+              unorthodox_equipment: parsed.unorthodox_equipment || parsed.ai_unorthodox_equipment || [],
+              ai_crafted: true
             };
 
             currentNPCData = combinedNPC;
@@ -1113,14 +1166,19 @@
 
             const badge = document.getElementById('aiStatusBadge');
             if (badge) {
-              badge.innerText = '🟢 雲端 Gemini AI 直連完成';
+              badge.innerText = `🟢 Gemini AI (${model}) 直連生成完成`;
               badge.style.background = '#065f46';
+            }
+
+            const hint = document.getElementById('keyStatusHint');
+            if (hint) {
+              hint.innerHTML = '<span style="color: #34d399;">✅ 成功直連 Gemini API 創作！</span>';
             }
 
             const tokenBar = document.getElementById('tokenUsageBar');
             if (tokenBar && usage) {
               tokenBar.style.display = 'block';
-              tokenBar.innerHTML = `<strong>📊 【Gemini 3.5 Token 消耗遙測】</strong> 提示詞: ${usage.promptTokenCount || 0} Tokens ｜ 回覆: ${usage.candidatesTokenCount || 0} Tokens ｜ 總計: <strong>${usage.totalTokenCount || 0} Tokens</strong> (Google 0元免費額度)`;
+              tokenBar.innerHTML = `<strong>📊 【Gemini Token 消耗遙測】</strong> 模型: <code>${model}</code> ｜ 提示詞: ${usage.promptTokenCount || 0} Tokens ｜ 回覆: ${usage.candidatesTokenCount || 0} Tokens ｜ 總計: <strong>${usage.totalTokenCount || 0} Tokens</strong> (Google AI Studio 0元免費額度)`;
             }
 
             btn.innerHTML = originalBtnText;
@@ -1128,7 +1186,10 @@
             return;
           } catch (e) {
             console.warn("瀏覽器直連 Gemini API 失敗，轉入離線規則引擎:", e);
-            alert("⚠️ 雲端 Gemini API 呼叫失敗 (" + e.message + ")，系統已為您自動切換至純本地離線 5E 規則極速生成！");
+            const hint = document.getElementById('keyStatusHint');
+            if (hint) {
+              hint.innerHTML = `<span style="color: #f87171;">⚠️ ${escapeHtml(e.message)}（已自動切換離線 5E 規則極速開卡）</span>`;
+            }
           }
         }
 
@@ -1145,95 +1206,94 @@
         }
         btn.innerHTML = originalBtnText;
         btn.disabled = false;
-      }
 
-      // 離線本地規則生成回退
-      if (raceKey === 'RANDOM') {
-        let keys = Object.keys(RACES);
-        raceKey = keys[Math.floor(Math.random()*keys.length)];
-      }
-      if (classKey === 'RANDOM') {
-        let keys = Object.keys(CLASSES);
-        classKey = keys[Math.floor(Math.random()*keys.length)];
-      }
-      if (bgKey === 'RANDOM') {
-        let bgs = ["民間英雄 (Folk Hero)", "士兵 (Soldier)", "侍祭 (Acolyte)", "行會工匠 (Guild Artisan)", "貴族 (Noble)", "流浪兒 (Urchin)", "學者 (Sage)"];
-        bgKey = bgs[Math.floor(Math.random()*bgs.length)];
-      }
-      if (!name) {
-        let names = ["老丹恩", "達格瑪", "貝拉", "摩斯", "芬恩", "艾德加", "奧爾森", "莉莉安", "維克多", "賽蓮娜"];
-        name = names[Math.floor(Math.random()*names.length)];
-      }
-
-      let lvParsed = parseLevel(document.getElementById('npcLevel').value);
-      let level = lvParsed.level;
-      let levelNote = lvParsed.note;
-      let pb = Math.floor((level - 1) / 4) + 2;
-
-      let storyText = document.getElementById('npcStory').value.trim();
-      let traitVal = document.getElementById('npcTrait').value.trim();
-
-      // 骰出 6 組點數
-      let rolls = [];
-      for (let i = 0; i < 6; i++) rolls.push(roll4d6dl1().total);
-      rolls.sort((a,b) => b-a);
-
-      let clsData = CLASSES[classKey] || CLASSES["戰士 (Fighter)"];
-      let raceData = RACES[raceKey] || RACES["人類 (Human)"];
-
-      let stats = {};
-      clsData.primary.forEach((stat, idx) => {
-        stats[stat] = { score: rolls[idx], mod: calcMod(rolls[idx]) };
-      });
-
-      // 武器與生活法器映射
-      let combined = (storyText + " " + traitVal).toLowerCase();
-      let weapon = { name: clsData.defaultWeapon, type: "標準軍用武器", damage: "正常", properties: "常規配置" };
-      for (let w of THEMATIC_WEAPONS) {
-        if (w.keywords.some(k => combined.includes(k))) {
-          weapon = w;
-          break;
+        // 離線本地規則生成回退
+        if (raceKey === 'RANDOM') {
+          let keys = Object.keys(RACES);
+          raceKey = keys[Math.floor(Math.random()*keys.length)];
         }
-      }
-
-      let focus = null;
-      for (let f of THEMATIC_FOCUSES) {
-        if (f.keywords.some(k => combined.includes(k))) {
-          focus = f;
-          break;
+        if (classKey === 'RANDOM') {
+          let keys = Object.keys(CLASSES);
+          classKey = keys[Math.floor(Math.random()*keys.length)];
         }
-      }
+        if (bgKey === 'RANDOM') {
+          let bgs = ["民間英雄 (Folk Hero)", "士兵 (Soldier)", "侍祭 (Acolyte)", "行會工匠 (Guild Artisan)", "貴族 (Noble)", "流浪兒 (Urchin)", "學者 (Sage)"];
+          bgKey = bgs[Math.floor(Math.random()*bgs.length)];
+        }
+        if (!name) {
+          let names = ["老丹恩", "達格瑪", "貝拉", "摩斯", "芬恩", "艾德加", "奧爾森", "莉莉安", "維克多", "賽蓮娜"];
+          name = names[Math.floor(Math.random()*names.length)];
+        }
 
-      // 特質
-      let trait = null;
-      if (traitVal && !["無", "沒有", "none", "nothing"].includes(traitVal.toLowerCase())) {
-        if (traitVal.includes("火")) trait = { name: "炎脈共鳴", cat: "元素異能", desc: "受火焰傷害減半，攻擊自帶 1d4 火焰傷害。" };
-        else if (traitVal.includes("霜") || traitVal.includes("冰")) trait = { name: "霜凍微光", cat: "元素異能", desc: "受寒冷傷害減半，受到暴擊時爆發冰霧使周遭敵人減速。" };
-        else if (traitVal.includes("魂") || traitVal.includes("靈")) trait = { name: "靈視眼眸", cat: "超感官知", desc: "可看見 30 呎內靈體殘影，對幻術豁免優勢。" };
-        else trait = { name: `${traitVal}之印`, cat: "自訂超常特質", desc: `在【${traitVal}】領域具備非凡天賦，檢定具優勢。` };
-      }
+        let lvParsed = parseLevel(document.getElementById('npcLevel').value);
+        let level = lvParsed.level;
+        let levelNote = lvParsed.note;
+        let pb = Math.floor((level - 1) / 4) + 2;
 
-      let hp = clsData.hpBase + (level - 1) * clsData.hpPer;
+        let storyText = document.getElementById('npcStory').value.trim();
+        let traitVal = document.getElementById('npcTrait').value.trim();
 
-      // 離線子職業範型解析
-      let subKey = document.getElementById('npcSubclass') ? document.getElementById('npcSubclass').value : 'RANDOM';
-      let subInfo = SUBCLASSES[classKey];
-      let chosenSubclass = null;
-      let subclassDisplay = "";
-      if (subInfo) {
-        if (level < subInfo.unlock_level) {
-          subclassDisplay = `尚未解鎖${subInfo.category} (Lv.${subInfo.unlock_level} 解鎖)`;
-        } else {
-          if (subKey && subKey !== 'RANDOM' && subKey !== 'NONE' && subInfo.options.includes(subKey)) {
-            chosenSubclass = subKey;
-          } else {
-            chosenSubclass = subInfo.options[Math.floor(Math.random() * subInfo.options.length)];
+        // 骰出 6 組點數
+        let rolls = [];
+        for (let i = 0; i < 6; i++) rolls.push(roll4d6dl1().total);
+        rolls.sort((a,b) => b-a);
+
+        let clsData = CLASSES[classKey] || CLASSES["戰士 (Fighter)"];
+        let raceData = RACES[raceKey] || RACES["人類 (Human)"];
+
+        let stats = {};
+        clsData.primary.forEach((stat, idx) => {
+          stats[stat] = { score: rolls[idx], mod: calcMod(rolls[idx]) };
+        });
+
+        // 武器與生活法器映射
+        let combined = (storyText + " " + traitVal).toLowerCase();
+        let weapon = { name: clsData.defaultWeapon, type: "標準軍用武器", damage: "正常", properties: "常規配置" };
+        for (let w of THEMATIC_WEAPONS) {
+          if (w.keywords.some(k => combined.includes(k))) {
+            weapon = w;
+            break;
           }
-          subclassDisplay = `${subInfo.category}：${chosenSubclass}`;
         }
-      }
 
-      currentNPCData = {
+        let focus = null;
+        for (let f of THEMATIC_FOCUSES) {
+          if (f.keywords.some(k => combined.includes(k))) {
+            focus = f;
+            break;
+          }
+        }
+
+        // 特質
+        let trait = null;
+        if (traitVal && !["無", "沒有", "none", "nothing"].includes(traitVal.toLowerCase())) {
+          if (traitVal.includes("火")) trait = { name: "炎脈共鳴", cat: "元素異能", desc: "受火焰傷害減半，攻擊自帶 1d4 火焰傷害。" };
+          else if (traitVal.includes("霜") || traitVal.includes("冰")) trait = { name: "霜凍微光", cat: "元素異能", desc: "受寒冷傷害減半，受到暴擊時爆發冰霧使周遭敵人減速。" };
+          else if (traitVal.includes("魂") || traitVal.includes("靈")) trait = { name: "靈視眼眸", cat: "超感官知", desc: "可看見 30 呎內靈體殘影，對幻術豁免優勢。" };
+          else trait = { name: `${traitVal}之印`, cat: "自訂超常特質", desc: `在【${traitVal}】領域具備非凡天賦，檢定具優勢。` };
+        }
+
+        let hp = clsData.hpBase + (level - 1) * clsData.hpPer;
+
+        // 離線子職業範型解析
+        let subKey = document.getElementById('npcSubclass') ? document.getElementById('npcSubclass').value : 'RANDOM';
+        let subInfo = SUBCLASSES[classKey];
+        let chosenSubclass = null;
+        let subclassDisplay = "";
+        if (subInfo) {
+          if (level < subInfo.unlock_level) {
+            subclassDisplay = `尚未解鎖${subInfo.category} (Lv.${subInfo.unlock_level} 解鎖)`;
+          } else {
+            if (subKey && subKey !== 'RANDOM' && subKey !== 'NONE' && subInfo.options.includes(subKey)) {
+              chosenSubclass = subKey;
+            } else {
+              chosenSubclass = subInfo.options[Math.floor(Math.random() * subInfo.options.length)];
+            }
+            subclassDisplay = `${subInfo.category}：${chosenSubclass}`;
+          }
+        }
+
+        currentNPCData = {
         name, raceKey, classKey, bgKey, level, levelNote, pb, hp, hd: `${level}${clsData.hd}`,
         rolls, stats, weapon, focus, trait, story: storyText, raceData, clsData,
         chosenSubclass, subclassDisplay
