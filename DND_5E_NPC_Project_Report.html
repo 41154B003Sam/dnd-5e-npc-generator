@@ -13,7 +13,7 @@
       line-height: 1.8;
       background: #ffffff;
       padding: 50px 70px;
-      max-width: 920px;
+      max-width: 960px;
       margin: 0 auto;
     }
     h1, h2, h3, h4 { font-family: 'Noto Serif TC', serif; color: #0f172a; }
@@ -33,13 +33,13 @@
     }
     h2 {
       font-size: 19px;
-      margin-top: 30px;
-      margin-bottom: 12px;
+      margin-top: 32px;
+      margin-bottom: 14px;
       padding-bottom: 6px;
       border-bottom: 1px solid #e2e8f0;
       color: #4338ca;
     }
-    h3 { font-size: 15px; margin-top: 18px; margin-bottom: 8px; color: #1e293b; }
+    h3 { font-size: 15.5px; margin-top: 20px; margin-bottom: 10px; color: #1e293b; }
     p { margin-bottom: 12px; text-align: justify; font-size: 14px; }
     ul, ol { margin-left: 24px; margin-bottom: 14px; font-size: 14px; }
     li { margin-bottom: 6px; }
@@ -73,6 +73,58 @@
       border-radius: 0 6px 6px 0;
       font-size: 13.5px;
     }
+    
+    /* 插圖與實機截圖排版 */
+    .figure-single {
+      margin: 22px 0;
+      text-align: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      page-break-inside: avoid;
+    }
+    .figure-single img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .figure-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      page-break-inside: avoid;
+    }
+    .figure-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .figure-col img {
+      width: 100%;
+      height: 260px;
+      object-fit: contain;
+      background: #0f172a;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .figure-caption {
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: #64748b;
+      font-weight: 600;
+      text-align: center;
+    }
+
     @media print {
       body { padding: 25px 35px; max-width: 100%; font-size: 13px; }
       h1 { font-size: 22px; }
@@ -80,6 +132,8 @@
       h3 { font-size: 14px; }
       table { font-size: 12px; page-break-inside: avoid; }
       pre { font-size: 10.5px; padding: 10px; }
+      .figure-single, .figure-comparison { page-break-inside: avoid; margin: 14px 0; padding: 10px; }
+      .figure-col img { height: 210px; }
     }
   </style>
 </head>
@@ -102,43 +156,76 @@
   <ul>
     <li><strong>為玩家 (PC) 設計而非為故事 (NPC) 服務</strong>：傳統開卡工具強制套用死板的冒險者初始套裝與制式配點，無法靈活對應劇本情境。</li>
     <li><strong>缺乏故事溫度與非典型特色</strong>：傳統工具產出的戰士千篇一律穿著制式鎧甲配長劍盾牌；法師必定手持魔杖法杖。但在精彩冒險故事中，NPC 的魅力往往來自反差與市井生活感——例如「隱居在麥田裡、隨身拿著鋼齒長草耙，真實身分卻是退隱禁衛隊長的資深戰士」，或是「不依靠常規魔杖，而是抽著刻印符文的石楠木老煙斗施法的大魔導師」。</li>
-    <li><strong>子職業範型與背景過度匱乏</strong>：傳統工具往往只有單一職業，忽略了 D&D 角色在 1~3 等必須選擇核心範型流派（如戰士武藝範型、法師奧術傳承、牧師神聖領域），且背景選項稀少。</li>
-    <li><strong>多頁試算表翻找不易</strong>：大型 Excel 角色卡往往包含 10~19 個工作表，DM 在戰鬥與對話的緊張節奏下，極需「垂直排列、一眼掃視全局」的直向卡片。</li>
+    <li><strong>子職業範型與背景過度匱乏</strong>：傳統工具往往只有單一職業，忽略了 D&D 角色在 1~3 等必須選擇核心流派（如戰士選戰鬥大師、法師選死靈學派、遊俠選幽域追蹤者）；背景亦往往僅有 5~10 種，無法呈現多元市井小民。</li>
+    <li><strong>多頁試算表翻找痛點</strong>：傳統 Excel 角色卡往往橫跨 3~5 頁，DM 在激烈戰鬥中難以一眼掃視武器傷害、屬性加值與言行伏筆。</li>
   </ul>
 
   <h3>2. 系統核心功能矩陣</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">模組名稱</th>
+        <th style="width: 45%;">核心功能實作內容</th>
+        <th style="width: 30%;">TRPG 跑團價值</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>非典型生活裝備規格化</strong></td>
+        <td>將生活道具（長草耙、修枝剪、挖墳鐵鎬、符文煙斗、裂紋茶杯）自動轉譯適配為 D&D 5E 官方武器傷害骰、屬性詞綴與法器類型。</td>
+        <td>破除千篇一律長劍法杖，為路人角色注入市井靈魂與真實感。</td>
+      </tr>
+      <tr>
+        <td><strong>全13職業 ＋ 百種範型階梯解鎖</strong></td>
+        <td>完整收錄 PHB / XGE / TCE 之 13 大職業與近百種子職業範型；嚴格遵循等級階梯解鎖（戰士Lv.3、法師Lv.2、牧師Lv.1、聖騎士Lv.3）。</td>
+        <td>符合 D&D 5E 規則公信力，自動注入流派專屬特長與戰鬥風格。</td>
+      </tr>
+      <tr>
+        <td><strong>51 種繁體中文全背景庫</strong></td>
+        <td>整合《玩家手冊》與《劍灣冒險者指南》之 51 種完整官方背景（如平民英雄、公會工匠、隱士、修院學士、城市守衛、水手等）。</td>
+        <td>告別死板冒險者框架，涵蓋農工漁樵、三教九流市井百態。</td>
+      </tr>
+      <tr>
+        <td><strong>直向快速掃視角色卡</strong></td>
+        <td>垂直階梯式資訊流，依序呈現基本身分、流派徽章、4d6dl1 靈活屬性推薦、非典型武器傷害、已解鎖特長與 DM 任務伏筆。</td>
+        <td>DM 戰鬥中 3 秒一眼掃視全局，無須在多頁試算表間來回切換。</td>
+      </tr>
+      <tr>
+        <td><strong>API 即時監控與 0 消耗防護</strong></td>
+        <td>動態計算 Prompt 與 Completion 之 Token 消耗，精確即時顯示消耗量；冷啟動預載展示卡片，不消耗任何 API 額度。</td>
+        <td>額度掌控完全透明，保障使用者 API 安全與隱私。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 圖一：系統介面全景 -->
+  <div class="figure-single">
+    <img src="docs/images/generator_ui_overview.png" alt="D&D 5E NPC 智慧生成系統主介面全景">
+    <div class="figure-caption">圖一、D&D 5E 劇情導向非典型 NPC 智慧生成系統之主操作介面（含全職業範型、51種背景、快速預設情境與雙引擎配置）</div>
+  </div>
+
+  <h2>二、 誰在用 (Who)</h2>
+  <p>本系統之目標使用者為 <strong>TRPG 地下城主（Dungeon Master / Game Master）</strong>、TRPG 劇本創作者與奇幻小說作者：</p>
   <ul>
-    <li><strong>13 大全職業與完整子職業範型流派 (Subclasses)</strong>：收錄戰士、法師、遊盪者、牧師、德魯伊、野蠻人、聖騎士、遊俠、吟遊詩人、武僧、術士、契術師、奇械師全 13 職業，嚴格依據 5E 規則實現 <strong>等級階梯解鎖判定 (Lv.1/Lv.2/Lv.3)</strong>，未達等級標註「尚未解鎖」，達標時自動開放對應範型並注入專屬特長。</li>
-    <li><strong>51 種繁體中文全背景庫</strong>：完整收錄官方中文全資料庫背景（含行會工匠、修院學士、城市巡邏隊、部族成員、水手、角鬥士、間諜等），均附帶專屬技能熟練與獨特背景特長。</li>
-    <li><strong>Gemini AI 智慧敘事引擎</strong>：調用 Google Gemini 大模型，將選定之子職業戰鬥哲學與生活身分深度融合成連貫背景短史、反差言行小動作、DM 跑團伏筆線索與非典型生活裝備。</li>
-    <li><strong>非典型武器與生活化法器動態映射</strong>：自動將劇情敘述中的隨身物品（鋼齒長草耙、柴刀、挖墳鐵鎬、老煙斗、黃銅算盤、占卜茶杯）轉換為符合 D&D 5E 規則的傷害骰、護甲值與專注法器特性。</li>
-    <li><strong>真隨機 4d6dl1 屬性擲骰池與最優建議配置</strong>：忠實模擬實體骰子（擲 4 顆六面骰捨去最低值），產出原始點數池，並根據職業核心機制提供「建議配置」與「種族加值候選清單」，不強制綁死卡片數值。</li>
-    <li><strong>自然語言等級與狀態解析</strong>：支援輸入關鍵字（如「大魔導師」自動對應至 13~14 等，「老兵」對應至 5 等），並支援「被封印的大魔導師」等特殊情境，自動限制可用法術環位並下修預估挑戰等級 (CR)。</li>
-    <li><strong>直向快速掃視角色卡 (Vertical Quick-Scan Card)</strong>：輸出符合跑團習慣的直向排版預覽，DM 僅需 3 秒即可掌握 NPC 身分、數值、範型流派徽章、武器傷害骰、已解鎖特長與劇本推進線索。</li>
-    <li><strong>資安防護與 0 消耗原則</strong>：開機與範本切換絕不主動請求 API，即時透明統計 Prompt/Candidate Tokens 消耗與費用。</li>
+    <li><strong>即興應變場景（Improvised Play）</strong>：玩家突然在酒館搭話一名路過的老農或守墓人，DM 無需喊暫停翻規則書，點擊一秒產出具備戰鬥數據與生活反差言行的小人物。</li>
+    <li><strong>深度備戰場景（Session Prep）</strong>：DM 準備關鍵主線或支線 NPC，自訂「隱匿在麥田裡的禁衛長」，系統自動生成嚴謹戰鬥大師特長與 DM 劇情任務伏筆。</li>
+    <li><strong>新手友善場景</strong>：內建 4d6dl1 智慧推薦分配與直向掃視卡，即便對 D&D 規則不熟的入門 DM 也能精確掌握戰鬥數值。</li>
   </ul>
 
-  <h2>二、 給誰用 (Who)</h2>
-  <ol>
-    <li><strong>TRPG 地下城主 (Dungeon Master / Game Master)</strong>：解決跑團時「玩家突然向路人搭話」、「突發衝突需要護衛數據」的即興備戰壓力。能夠在瞬間提供兼具豐富劇情個性、子職業戰力與完整戰鬥數據的 NPC，將備戰效率提升 90% 以上。</li>
-    <li><strong>跑團玩家 (Players & Roleplayers)</strong>：作為設計隨從、傭兵、家族長輩、師承導師或宿敵背景的靈感工具，擺脫傳統「唯數據論」的制式模板。</li>
-    <li><strong>奇幻小說家與獨立遊戲劇本創作者</strong>：快速建構奇幻世界觀中的市井群像、公會長老與神秘隱士，提供符合嚴謹邏輯的戰力階層與外貌心理描寫。</li>
-  </ol>
-
   <h2>三、 怎麼做 (How)</h2>
-  <p>本專題採用 <strong>雙引擎架構 (Dual-Engine Architecture)</strong>，前端提供桌面原生視窗與免安裝 Web 版，核心層深度結合 AI 敘事與規則判定：</p>
+  <p>系統採用 <strong>「雙引擎架構」</strong>：以雲端 Gemini 大語言模型為主要智慧核心，輔以內建規則庫之純本地離線備用引擎，確保隨時皆可生成可用卡片：</p>
 
   <pre>
 ┌─────────────────────────────────────────────────────────────┐
-│                       雙重圖形化介面層                      │
-│   ┌───────────────────────────┐ ┌───────────────────────┐   │
-│   │ 原生桌面視窗 (gui.py)     │ │ 免安裝網頁版 (index)  │   │
-│   │ - Tkinter 現代深色高對比   │ │ - 動態範型等級連動  │   │
-│   │ - 動態範型等級解鎖連動    │ │ - 專屬列印/存PDF樣式  │   │
-│   │ - 支援一鍵複製與匯出      │ │ - 本地伺服器 (server) │   │
-│   └───────────────────────────┘ └───────────────────────┘   │
+│                   雙重前端介面層                            │
+│  ┌─────────────────────────────┐ ┌────────────────────────┐  │
+│  │ 網頁版 (Web Dashboard)      │ │ 桌面版 GUI (Tkinter)   │  │
+│  │ - 雙擊即開 (免裝伺服器)     │ │ - 本地單一視窗原生程式 │  │
+│  │ - 響應式現代暗黑奇幻 UI     │ │ - 即時屬性聯動下拉選單 │  │
+│  │ - 快捷情境按鈕 (丹恩/摩斯) │ │ - 一鍵複製直向角色卡   │  │
+│  └─────────────────────────────┘ └────────────────────────┘  │
 └──────────────────────────────┬──────────────────────────────┘
-                               │
+                               │ (JSON 參數交換)
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                 核心雙引擎層 (dnd_npc_generator)            │
@@ -161,17 +248,55 @@
   </pre>
 
   <h2>四、 怎麼測 (How it's tested)</h2>
+  <p>為驗證系統能否真正解決「非典型生活化特徵」、「生活武器 5E 規格化」與「等級階梯規則解鎖」，專案進行了三大關鍵極限測試：</p>
 
   <h3>測試案例一：非典型生活化戰士（退隱禁衛長老農夫 ＋ 戰鬥大師範型）</h3>
-  <p><strong>輸入條件</strong>：角色姓名：<code>老丹恩</code>、職業：<code>戰士 (Fighter)</code>、等級：<code>5</code>、子職業：<code>戰鬥大師 (Battle Master)</code>、背景：<code>平民英雄 (Folk Hero)</code>、故事：*「老丹恩，表面是麥農，真實身分是退隱禁衛長，戰鬥定位是戰士，武器是一柄鋼齒草耙。」*</p>
+  <p><strong>輸入條件</strong>：角色姓名：<code>老丹恩</code>、職業：<code>戰士 (Fighter)</code>、等級：<code>5</code>、子職業：<code>戰鬥大師 (Battle Master)</code>、背景：<code>平民英雄 (Folk Hero)</code>、故事：<em>「老丹恩，表面是麥農，真實身分是退隱禁衛長，戰鬥定位是戰士，武器是一柄鋼齒草耙。」</em></p>
   <p><strong>測試結果</strong>：武器精確匹配為 <strong>【鋼齒農用長草耙】</strong>，傷害骰為 <strong>1d8 (雙手 1d10) 穿刺</strong>；子職業正確識別為「武藝範型：戰鬥大師」，自動解鎖「卓越會戰」特長；4d6dl1 實擲池智慧推薦力量 16 (+3)、體魄 14 (+2)。</p>
 
+  <!-- 圖二：老丹恩對照 -->
+  <div class="figure-comparison">
+    <div class="figure-col">
+      <img src="docs/images/farmer_warrior_dan.jpg" alt="老農戰士丹恩概念插圖">
+      <div class="figure-caption">AI 角色概念肖像：退隱麥田的持草耙老戰士</div>
+    </div>
+    <div class="figure-col">
+      <img src="docs/images/generator_ui_dan.png" alt="丹恩實機生成角色卡">
+      <div class="figure-caption">實機生成卡片：戰鬥大師流派、草耙傷害規格化與 4d6dl1 推薦</div>
+    </div>
+  </div>
+
   <h3>測試案例二：非典型施法者（以石楠木老煙斗施法之死靈學派法師）</h3>
-  <p><strong>輸入條件</strong>：姓名：<code>守墓人摩斯</code>、職業：<code>法師 (Wizard)</code>、等級：<code>6</code>、子職業：<code>死靈學派 (School of Necromancy)</code>、背景：<code>流浪兒 / 孤兒 (Urchin)</code>、故事：*「平日在鎮郊墓園挖墳埋棺，施法時總是捧著占卜茶杯，武器是挖墳鐵鎬。」*</p>
+  <p><strong>輸入條件</strong>：姓名：<code>守墓人摩斯</code>、職業：<code>法師 (Wizard)</code>、等級：<code>6</code>、子職業：<code>死靈學派 (School of Necromancy)</code>、背景：<code>流浪兒 / 孤兒 (Urchin)</code>、故事：<em>「平日在鎮郊墓園挖墳埋棺，施法時總是捧著占卜茶杯，武器是挖墳鐵鎬。」</em></p>
   <p><strong>測試結果</strong>：子職業標註為「奧術傳承：死靈學派」，自動注入「死靈術博學者」與「嚴酷收割」特長；法器適配為 <strong>【裂紋占卜茶杯】</strong>，近戰武器適配為 <strong>【挖墳鐵鎬 (1d6 穿刺)】</strong>。</p>
 
-  <h3>測試案例三：等級階梯解鎖測試 (Level-Gating Verification)</h3>
-  <p>設定戰士等級為 <code>1</code> 時，範型選單自動切換為 <code>🔒 尚未解鎖範型 (Lv.3 解鎖)</code>；切換為等級 <code>3</code> 以上時，立即開放 10 大武藝範型。切換牧師時，於 <code>Lv.1</code> 即可自由選擇 10 大神聖領域。</p>
+  <!-- 圖三：守墓人摩斯對照 -->
+  <div class="figure-comparison">
+    <div class="figure-col">
+      <img src="docs/images/gravedigger_morse.jpg" alt="守墓人摩斯概念插圖">
+      <div class="figure-caption">AI 角色概念肖像：夜霧墓園中的持鎬捧杯施法者</div>
+    </div>
+    <div class="figure-col">
+      <img src="docs/images/generator_ui_morse.png" alt="摩斯實機生成角色卡">
+      <div class="figure-caption">實機生成卡片：死靈學派奧術傳承、挖墳鎬 1d6 與占卜茶杯法器</div>
+    </div>
+  </div>
+
+  <h3>測試案例三：等級階梯解鎖測試與封印傳奇法師 (Level-Gating Verification)</h3>
+  <p><strong>輸入條件</strong>：設定戰士等級為 <code>1</code> 時，範型選單自動切換為 <code>🔒 尚未解鎖範型 (Lv.3 解鎖)</code>；切換為等級 <code>3</code> 以上時，立即開放 10 大武藝範型。切換牧師時，於 <code>Lv.1</code> 即可自由選擇 10 大神聖領域。</p>
+  <p><strong>進階語意測試</strong>：設定傳奇大魔導師 <code>布倫希爾德</code>（故事描述力量遭古代詛咒封印），系統自動將其戰鬥 CR 適度調整，並將其法器適配為 <strong>【刻印符文的石楠木老煙斗】</strong>，完美融入非典型施法動作。</p>
+
+  <!-- 圖四：布倫希爾德對照 -->
+  <div class="figure-comparison">
+    <div class="figure-col">
+      <img src="docs/images/archmage_brunhilde.jpg" alt="大魔導師布倫希爾德概念插圖">
+      <div class="figure-caption">AI 角色概念肖像：手持符文石楠木老煙斗施法的大魔導師</div>
+    </div>
+    <div class="figure-col">
+      <img src="docs/images/generator_ui_brunhilde.png" alt="布倫希爾德實機生成角色卡">
+      <div class="figure-caption">實機生成卡片：符文煙斗奧術法器、法術位調適與傳奇背景線索</div>
+    </div>
+  </div>
 
   <h2>五、 下一步 (Next steps)</h2>
   <ol>

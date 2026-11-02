@@ -1359,8 +1359,9 @@
       document.getElementById('npcName').value = "老丹恩";
       document.getElementById('npcClass').value = "戰士 (Fighter)";
       document.getElementById('npcBackground').value = "平民英雄 (Folk Hero)";
-      document.getElementById('npcLevel').value = "1";
+      document.getElementById('npcLevel').value = "5";
       updateSubclassOptions();
+      document.getElementById('npcSubclass').value = "戰鬥大師 (Battle Master)";
       document.getElementById('npcTrait').value = "無";
       document.getElementById('npcStory').value = "老丹恩，表面上只是個鄉村麥農，但真實身分是退隱多年的王國禁衛長，戰鬥定位是戰士，武器是一柄隨身的鋼齒草耙。";
 
@@ -1376,6 +1377,17 @@
           </div>
         </div>
       `;
+
+      // 支援 URL 參數預載入範本與展示截圖
+      const urlParams = new URLSearchParams(window.location.search);
+      const presetParam = urlParams.get('preset');
+      const autoGen = urlParams.get('auto');
+      if (presetParam) {
+        applyPreset(presetParam);
+      }
+      if (autoGen === 'true') {
+        generateNPC();
+      }
     };
   </script>
 </body>

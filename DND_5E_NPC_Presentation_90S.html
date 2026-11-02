@@ -6,15 +6,10 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Noto Sans TC', sans-serif;
-      background-color: #0f172a;
+      background-color: #0b0f19;
       color: #f8fafc;
       overflow-x: hidden;
     }
@@ -26,53 +21,53 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 60px 80px;
+      padding: 50px 70px;
       page-break-after: always;
       position: relative;
-      background: radial-gradient(circle at 15% 20%, #1e293b 0%, #0f172a 100%);
+      background: radial-gradient(circle at 15% 20%, #1e293b 0%, #0b0f19 100%);
     }
 
     .slide-badge {
       position: absolute;
-      top: 40px;
-      left: 80px;
+      top: 35px;
+      left: 70px;
       background: rgba(99, 102, 241, 0.2);
       border: 1px solid rgba(129, 140, 248, 0.4);
       color: #818cf8;
-      padding: 6px 16px;
+      padding: 5px 14px;
       border-radius: 999px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       letter-spacing: 1px;
     }
 
     .slide-tag {
       position: absolute;
-      top: 40px;
-      right: 80px;
+      top: 35px;
+      right: 70px;
       background: rgba(245, 158, 11, 0.2);
       border: 1px solid rgba(251, 191, 36, 0.4);
       color: #fbbf24;
-      padding: 6px 16px;
+      padding: 5px 14px;
       border-radius: 999px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
     }
 
     .slide-number {
       position: absolute;
-      bottom: 30px;
-      right: 80px;
+      bottom: 25px;
+      right: 70px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
+      font-size: 13px;
       color: #64748b;
     }
 
     h1 {
-      font-size: 46px;
+      font-size: 42px;
       font-weight: 900;
       line-height: 1.25;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -80,9 +75,9 @@
     }
 
     h2 {
-      font-size: 34px;
+      font-size: 32px;
       font-weight: 800;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
       color: #f1f5f9;
       display: flex;
       align-items: center;
@@ -90,41 +85,38 @@
     }
 
     .subtitle {
-      font-size: 20px;
+      font-size: 18px;
       color: #94a3b8;
       max-width: 900px;
       text-align: center;
       line-height: 1.6;
-      margin-bottom: 36px;
+      margin-bottom: 28px;
     }
 
     .content-box {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1150px;
       display: grid;
-      gap: 22px;
+      gap: 20px;
     }
 
-    .grid-2 {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .grid-3 {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .grid-2-1 { grid-template-columns: 1.4fr 1fr; }
+    .grid-1-2 { grid-template-columns: 1fr 1.4fr; }
 
     .card {
       background: rgba(30, 41, 59, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 24px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
       backdrop-filter: blur(10px);
     }
 
     .card h3 {
-      font-size: 20px;
-      margin-bottom: 12px;
+      font-size: 18px;
+      margin-bottom: 10px;
       color: #38bdf8;
       display: flex;
       align-items: center;
@@ -132,15 +124,12 @@
     }
 
     .card p, .card li {
-      font-size: 15px;
+      font-size: 14px;
       color: #cbd5e1;
-      line-height: 1.7;
+      line-height: 1.65;
     }
 
-    .card ul {
-      list-style-type: none;
-    }
-
+    .card ul { list-style-type: none; }
     .card li::before {
       content: "▹ ";
       color: #818cf8;
@@ -151,12 +140,35 @@
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
       border: 1px solid rgba(168, 85, 247, 0.4);
     }
+    .highlight-card h3 { color: #c084fc; }
 
-    .highlight-card h3 {
-      color: #c084fc;
+    /* 圖片展示樣式 */
+    .img-frame {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      background: #020617;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* 現場 90 秒展示專用卡片 */
+    .img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .img-caption {
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+
     .demo-step {
       display: flex;
       flex-direction: column;
@@ -165,30 +177,29 @@
     }
 
     .step-tag {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #6366f1;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .step-title {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       color: #ffffff;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .code-snippet {
       background: #020617;
       border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 12px;
+      border-radius: 6px;
+      padding: 10px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12.5px;
+      font-size: 12px;
       color: #38bdf8;
-      overflow-x: auto;
-      margin: 8px 0;
+      margin: 6px 0;
       white-space: pre-wrap;
       word-break: break-all;
     }
@@ -207,7 +218,7 @@
     /* 列印與 PDF 最佳化 */
     @media print {
       body {
-        background-color: #0f172a !important;
+        background-color: #0b0f19 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
@@ -216,65 +227,86 @@
         break-after: page !important;
         min-height: 100vh !important;
         height: 100vh !important;
-        padding: 40px 60px !important;
+        padding: 35px 50px !important;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- 投影片 1：專題封面與問題痛點 -->
+  <!-- 投影片 1：封面與系統介面首度亮出 -->
   <div class="slide">
-    <div class="slide-badge">🎲 TRPG 智慧輔助系統</div>
-    <div class="slide-tag">專題簡報</div>
+    <div class="slide-badge">🎲 TRPG 智慧輔助創作系統</div>
+    <div class="slide-tag">專題成果簡報</div>
     <h1>D&D 5E 劇情導向非典型 NPC 智慧生成系統</h1>
-    <div class="subtitle">讓每一個市井路人角色，都擁有令人過目不忘的故事靈魂與嚴謹戰力數據</div>
+    <div class="subtitle">讓每一個市井路人角色，都擁有令人過目不忘的故事靈魂、生活道具與嚴謹 5E 戰力</div>
     
-    <div class="content-box grid-2">
-      <div class="card">
-        <h3>❌ 現有開卡工具的三大瓶頸</h3>
-        <ul>
-          <li><strong>為 PC 設計而非為故事服務</strong>：強制套用死板冒險者規則，缺乏劇本靈活度。</li>
-          <li><strong>千篇一律的刻板套路</strong>：戰士必穿板甲拿劍盾、法師必握魔杖，毫無故事驚喜。</li>
-          <li><strong>單一職業匱乏與背景受限</strong>：缺乏關鍵的子職業範型 (Subclasses) 與豐富背景。</li>
-          <li><strong>多頁試算表翻找不易</strong>：多達 10~19 頁工作表，跑團緊急查閱極易混亂。</li>
-        </ul>
+    <div class="content-box grid-2-1" style="align-items: center;">
+      <div class="img-frame" style="height: 380px;">
+        <img src="docs/images/generator_ui_overview.png" alt="產生器主介面實拍截圖">
+        <div class="img-caption">🖥️ 系統實體運作介面：左側直觀參數與非典型敘事輸入 ｜ 右側即時直向快速掃視角色卡</div>
       </div>
 
-      <div class="card highlight-card">
-        <h3>💡 我們的核心破局思維</h3>
-        <ul>
-          <li><strong>故事與規則徹底解耦</strong>：市井生活身分（老農夫）＋ 專業戰鬥底層（資深戰士）。</li>
-          <li><strong>非典型生活武器法器</strong>：鋼齒長草耙能當武器 (1d8/1d10)、老煙斗吞吐青煙施法。</li>
-          <li><strong>13職業百種範型 ＋ 51種全背景</strong>：官方 5E 繁中全庫整合，支援等級階梯解鎖。</li>
-          <li><strong>Gemini AI 敘事 ＋ 直向快速卡</strong>：深度融合戰鬥哲學與生活小動作，3秒掌握全局。</li>
-        </ul>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="card">
+          <h3>❌ 現有工具三大盲區</h3>
+          <ul>
+            <li><strong>為 PC 設計而非為故事服務</strong>：強制死板套路，缺乏劇本靈活度。</li>
+            <li><strong>千篇一律的冒險者刻板印象</strong>：戰士必拿長劍、法師必握魔杖。</li>
+            <li><strong>缺乏子職業範型與豐富背景</strong>：角色單一，無深度流派。</li>
+          </ul>
+        </div>
+
+        <div class="card highlight-card">
+          <h3>💡 本專案核心突破</h3>
+          <ul>
+            <li><strong>身分與戰力解耦</strong>：市井生活外貌 ＋ 專業戰鬥底層。</li>
+            <li><strong>非典型生活武器映射</strong>：農用長草耙、挖墳鐵鎬、符文老煙斗。</li>
+            <li><strong>13 職業百種範型 ＋ 51 種全繁中背景庫</strong>。</li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="slide-number">01 / 09</div>
   </div>
 
-  <!-- 投影片 2：核心破局理念：非典型與解耦 -->
+  <!-- 投影片 2：核心破局理念（生活反差魅力與概念插圖） -->
   <div class="slide">
     <div class="slide-badge">💡 核心設計理念</div>
-    <div class="slide-tag">哲學與思維</div>
+    <div class="slide-tag">故事與規則解耦</div>
     <h2>🎯 規則保護玩家公平，但 NPC 是 DM 推進劇情的資產</h2>
     
     <div class="content-box grid-3">
-      <div class="card">
-        <h3>🌾 1. 身分與戰力解耦</h3>
-        <p>傳統 D&D 認為「農夫就是農夫」。本系統打破常規：外貌可以是種田老漢或古董店老闆，但戰鬥底層完全能套用 Lv.5 甚至 Lv.14 的專業戰士或法師模板。</p>
+      <!-- 角色 1 插圖 -->
+      <div class="img-frame">
+        <img src="docs/images/farmer_warrior_dan.jpg" alt="老農戰士 丹恩" style="height: 260px;">
+        <div class="img-caption">
+          <strong style="color: #38bdf8;">🌾 老農戰士 丹恩 (Dan)</strong><br>
+          表面是麥農，實則是退隱禁衛長。<br>武器：<strong>鋼齒長草耙 (1d8/1d10)</strong>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>🔨 2. 生活武器與法器動態映射</h3>
-        <p>不強迫手持標準劍杖。日常所見的<strong>鋼齒長草耙、剁骨砍刀、挖墳鐵鎬、符文老煙斗、黃銅算盤</strong>，皆能精確映射至 5E 規則傷害骰與施法專注特性。</p>
+      <!-- 角色 2 插圖 -->
+      <div class="img-frame">
+        <img src="docs/images/gravedigger_morse.jpg" alt="守墓人 摩斯" style="height: 260px;">
+        <div class="img-caption">
+          <strong style="color: #a855f7;">⛏️ 守墓人 摩斯 (Morse)</strong><br>
+          隱退死靈法師，捧茶杯吞吐靈魂。<br>武器：<strong>挖墳鐵鎬 (1d6) ＋ 占卜茶杯</strong>
+        </div>
       </div>
 
-      <div class="card highlight-card">
-        <h3>🌿 3. 拒絕強加異能：支援「常規凡人」</h3>
-        <p>不是每個人都需要超自然神力。關鍵字支援輸入「無」，可隨心生成純粹依憑凡人歷練與手中熟稔工具立足的純樸百姓、商販與工匠。</p>
+      <!-- 角色 3 插圖 -->
+      <div class="img-frame">
+        <img src="docs/images/archmage_brunhilde.jpg" alt="符文老法師 布倫希爾德" style="height: 260px;">
+        <div class="img-caption">
+          <strong style="color: #fbbf24;">📜 符文老法師 布倫希爾德</strong><br>
+          抽煙斗施法的大魔導師 (Lv.14)。<br>法器：<strong>刻印符文石楠木老煙斗</strong>
+        </div>
       </div>
+    </div>
+
+    <div style="margin-top: 18px; max-width: 1100px; text-align: center; color: #cbd5e1; font-size: 14.5px;">
+      ✨ <strong>非典型生活武器法器</strong>：將劇本日常道具規格化為 5E 傷害骰與專注法器，打破「劍盾戰士與魔杖法師」的僵化枷鎖！
     </div>
     <div class="slide-number">02 / 09</div>
   </div>
@@ -307,8 +339,8 @@
         <ul>
           <li><strong>非主動不請求</strong>：開機與範本切換維持 <strong>0 Token 消耗</strong>。</li>
           <li><strong>前端金鑰零洩漏</strong>：徹底自 UI 移除 API Key，安全讀取本地 <code>.env</code>。</li>
-          <li><strong>額度透明化追蹤</strong>：即時統計 Prompt/Candidate Tokens 與預估成本。</li>
-          <li><strong>無縫離線備用</strong>：無網路或無金鑰時自動無縫降級為本地純 Python 規則生成。</li>
+          <li><strong>額度透明化追蹤</strong>：即時獨立統計 Prompt/Candidate Tokens 與預估成本。</li>
+          <li><strong>無縫離線備用</strong>：無網路或無金鑰時自動無縫降級為本地純 JavaScript 規則生成。</li>
         </ul>
       </div>
     </div>
@@ -344,84 +376,67 @@
     <div class="slide-number">04 / 09</div>
   </div>
 
-  <!-- 投影片 5：雙平台圖形化介面展示 -->
+  <!-- 投影片 5：雙平台圖形化介面實拍展示 -->
   <div class="slide">
     <div class="slide-badge">🖥️ 雙平台圖形化介面</div>
-    <div class="slide-tag">操作體驗</div>
+    <div class="slide-tag">操作實機展示</div>
     <h2>🖱️ 徹底告別黑窗終端機：雙擊即開的雙重介面</h2>
     
     <div class="content-box grid-2">
-      <div class="card">
-        <h3>💻 桌面原生視窗版 (Tkinter GUI)</h3>
-        <ul>
-          <li><strong>免終端機指令</strong>：雙擊 <code>點我啟動桌面程式.bat</code> 立即彈出原生桌面視窗。</li>
-          <li><strong>動態範型選單</strong>：選擇職業與等級時，子職業選單自動連動更新可選流派。</li>
-          <li><strong>一鍵劇情範本</strong>：內建「🌾 老農戰士」、「📜 封印老法師」、「⛏️ 守墓人」快捷載入。</li>
-          <li><strong>高對比暗黑排版</strong>：左側靈活輸入，右側即時渲染直向掃視角色卡。</li>
-        </ul>
+      <div class="img-frame">
+        <img src="docs/images/generator_ui_overview.png" alt="Web版視覺介面" style="height: 310px; object-fit: contain; background: #0f172a;">
+        <div class="img-caption">🌐 <strong>免安裝網頁版 (Web UI)</strong>：純前端自包含、動態範型選單、支援專屬列印 PDF 樣式</div>
       </div>
 
-      <div class="card highlight-card">
-        <h3>🌐 免安裝網頁版 (Web UI)</h3>
-        <ul>
-          <li><strong>純前端極致體驗</strong>：直接以瀏覽器點開 <code>index.html</code> 即可在離線環境完整運作。</li>
-          <li><strong>本地伺服器支援</strong>：提供 <code>點我開啟網頁版.bat</code>，自動開啟預設瀏覽器並串接 AI。</li>
-          <li><strong>多樣匯出選項</strong>：一鍵複製卡片、匯出通用 CSV、匯出 JSON 結構資料。</li>
-          <li><strong>專屬跑團列印樣式</strong>：點擊「🖨️ 列印/存PDF」，自動隱藏按鈕呈現高對比跑團紙本排版。</li>
-        </ul>
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-around;">
+        <div>
+          <h3>💻 桌面原生視窗版 (Tkinter GUI)</h3>
+          <ul>
+            <li><strong>雙擊批次檔秒開</strong>：<code>點我啟動桌面程式.bat</code> 自動尋找環境，免手動打指令。</li>
+            <li><strong>一鍵劇情範本</strong>：內建「🌾 老農戰士」、「📜 封印老法師」、「⛏️ 守墓人」快捷載入。</li>
+            <li><strong>動態範型階梯聯動</strong>：等級變動時，即時更新可選子職業流派。</li>
+          </ul>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.8); padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+          <strong style="color: #38bdf8;">⚡ 多格式無損資料交換：</strong><br>
+          <span style="font-size: 13px; color: #cbd5e1;">支援一鍵複製直向 Markdown 卡片、匯出乾淨 CSV 試算表、匯出結構化 JSON，並支援直接列印成紙本跑團卡片。</span>
+        </div>
       </div>
     </div>
     <div class="slide-number">05 / 09</div>
   </div>
 
-  <!-- 投影片 6：【核心重頭戲】現場 90 秒實機演示流程 -->
+  <!-- 投影片 6：【核心重頭戲】現場 90 秒實機演示（介面截圖 ＋ 概念插圖） -->
   <div class="slide">
     <div class="slide-badge" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(248, 113, 113, 0.4); color: #f87171;">🔥 核心重頭戲</div>
     <div class="slide-tag" style="background: rgba(16, 185, 129, 0.2); border-color: rgba(52, 211, 153, 0.4); color: #34d399;">⏱️ 現場 90 秒實機展示</div>
     <h2>🎬 現場 90 秒實機操作演示：打開什麼、做什麼、看到什麼</h2>
     
-    <div class="content-box grid-3">
-      <!-- 第一步 -->
-      <div class="card demo-step" style="border-top-color: #38bdf8;">
-        <div>
-          <div class="step-tag" style="color: #38bdf8;">00 ~ 15 秒</div>
-          <div class="step-title">1. 打開什麼？</div>
-          <p><strong>雙擊開啟網頁版或桌面視窗</strong></p>
-          <p style="margin-top: 8px; font-size: 14px; color: #94a3b8;">無需開啟終端機打指令！在資料夾直接雙擊 <code>點我開啟網頁版.bat</code> 或 <code>點我啟動桌面程式.bat</code>，<strong>0.1 秒瞬間啟動</strong>現代奇幻操作面板！此時 API 消耗嚴格為 0。</p>
-        </div>
-        <div class="result-badge" style="background: #0284c7;">零黑窗 0.1秒啟動</div>
+    <div class="content-box grid-2-1" style="align-items: center;">
+      <div class="img-frame" style="height: 420px;">
+        <img src="docs/images/generator_ui_morse.png" alt="守墓人摩斯實機生成截圖">
+        <div class="img-caption">📸 <strong>實機生成結果</strong>：法師（死靈學派）｜ 挖墳鐵鎬 (1d6) ＋ 占卜茶杯 ｜ 4d6dl1 靈活屬性推薦 ｜ 深度言行小動作</div>
       </div>
 
-      <!-- 第二步 -->
-      <div class="card demo-step" style="border-top-color: #a855f7;">
-        <div>
-          <div class="step-tag" style="color: #a855f7;">15 ~ 45 秒</div>
-          <div class="step-title">2. 做什麼？</div>
-          <p><strong>動態解鎖範型、51背景與生活故事</strong></p>
-          <div class="code-snippet">職業：法師 (Wizard) ｜ 等級：5 (解鎖奧術傳承)
-子職業：死靈學派 ｜ 背景：修院學士
-故事：老守墓人摩斯，挖墳埋棺，手拿占卜茶杯施法，遇到盜墓賊時抄起挖墳鐵鎬砸向對方。</div>
-          <p style="font-size: 13px; color: #c084fc; margin-top: 6px;">👉 點擊按鈕【🎲 立即智慧生成 NPC 角色卡】</p>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- 步驟 1 -->
+        <div class="card demo-step" style="border-top-color: #38bdf8; padding: 14px;">
+          <div class="step-tag" style="color: #38bdf8;">00 ~ 15 秒 ｜ 1. 打開什麼？</div>
+          <p style="font-size: 13px;">雙擊 <code>點我開啟網頁版.bat</code>，<strong>0.1秒極速開啟</strong>暗黑奇幻面板，API 0 消耗防護。</p>
         </div>
-        <div class="result-badge" style="background: #9333ea;">一鍵點擊觸發</div>
-      </div>
 
-      <!-- 第三步 -->
-      <div class="card demo-step highlight-card" style="border-top-color: #10b981;">
-        <div>
-          <div class="step-tag" style="color: #34d399;">45 ~ 90 秒</div>
-          <div class="step-title">3. 看到什麼？</div>
-          <p><strong>瞬間渲染出直向角色卡與 AI 故事：</strong></p>
-          <ul style="font-size: 13.5px; margin-top: 6px;">
-            <li>✅ <strong>流派徽章</strong>：法師（奧術傳承：死靈學派）</li>
-            <li>✅ <strong>生活裝備</strong>：挖墳鐵鎬 (1d6 穿刺) ＋ 占卜茶杯 (法器)</li>
-            <li>✅ <strong>特長注入</strong>：死靈術博學者、嚴酷收割</li>
-            <li>✅ <strong>4d6dl1 實擲</strong>：智力 16 (+3)、體質 14 (+2)</li>
-            <li>✅ <strong>AI 小動作與伏筆</strong>：輕敲茶杯邊緣、守墓伏筆</li>
-            <li>✅ <strong>Token 透明度</strong>：顯示消耗與費用，一鍵複製匯出！</li>
-          </ul>
+        <!-- 步驟 2 -->
+        <div class="card demo-step" style="border-top-color: #a855f7; padding: 14px;">
+          <div class="step-tag" style="color: #a855f7;">15 ~ 45 秒 ｜ 2. 做什麼？</div>
+          <p style="font-size: 13px;">選法師 Lv.5 動態解鎖【死靈學派】、背景選【修院學士】，輸入守墓人摩斯與挖墳鐵鎬故事，點擊生成！</p>
         </div>
-        <div class="result-badge">完成生成</div>
+
+        <!-- 步驟 3 -->
+        <div class="card demo-step highlight-card" style="border-top-color: #10b981; padding: 14px;">
+          <div class="step-tag" style="color: #34d399;">45 ~ 90 秒 ｜ 3. 看到什麼？</div>
+          <p style="font-size: 13px;">右側渲染直向角色卡：流派徽章、挖墳鐵鎬傷害骰、4d6dl1 屬性配置、輕敲茶杯小動作與 DM 伏筆，一鍵複製！</p>
+        </div>
       </div>
     </div>
     <div class="slide-number">06 / 09</div>
@@ -433,48 +448,64 @@
     <div class="slide-tag">數據標準化</div>
     <h2>📁 直向快速掃視角色卡 ＋ 通用無損資料交換</h2>
     
-    <div class="content-box grid-3">
-      <div class="card">
-        <h3>📜 1. 直向快速掃視卡</h3>
-        <p><strong>專門解決多頁試算表翻找痛點</strong>：垂直排版依序呈現基本身分 ➜ 範型流派 ➜ 4d6dl1 屬性建議 ➜ 非典型生活裝備 ➜ 已解鎖特長 ➜ 劇本推進線索，<strong>DM 只要 3 秒就能掌握全局</strong>。</p>
+    <div class="content-box grid-2-1" style="align-items: center;">
+      <div class="img-frame" style="height: 430px;">
+        <img src="docs/images/generator_ui_dan.png" alt="直向快速掃視卡與多格式匯出預覽">
+        <div class="img-caption">📸 <strong>老農戰士丹恩實機卡片</strong>：流派徽章 ｜ 鋼齒草耙 (1d8/1d10) ｜ 4d6dl1 推薦值 ｜ 一鍵複製純文字與匯出</div>
       </div>
 
-      <div class="card">
-        <h3>📑 2. 通用 CSV 試算表</h3>
-        <p>捨棄脆弱且容易損毀公式與繪圖的專有格式，改採全球通用的純淨資料交換標準：匯出的 CSV 可在 <strong>Microsoft Excel 或 Google Sheets 中完美開啟</strong>，絕不跑版或跳出毀損警告。</p>
-      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="card" style="padding: 14px;">
+          <h3 style="font-size: 15px;">📜 1. 直向快速掃視卡 (3秒掌握)</h3>
+          <p style="font-size: 12.5px;"><strong>徹底解決多頁翻找痛點</strong>：垂直排版依序呈現基本身分 ➜ 範型流派 ➜ 4d6dl1 屬性建議 ➜ 非典型生活裝備 ➜ 已解鎖特長 ➜ 劇本推進線索。</p>
+        </div>
 
-      <div class="card highlight-card">
-        <h3>💾 3. 標準 JSON 結構資料</h3>
-        <p>產出完整的結構化 NPC 物件，嚴格包含六大屬性、推薦值、裝備清單與自訂標籤，完全相容 <strong>Roll20 與 Foundry VTT</strong> 數位線上跑團平台之 Actor 規格匯入。</p>
+        <div class="card" style="padding: 14px;">
+          <h3 style="font-size: 15px;">📑 2. 通用 CSV 試算表 (零毀損)</h3>
+          <p style="font-size: 12.5px;">捨棄脆弱易壞的專有二進位格式，採用全球標準 CSV，在 <strong>Microsoft Excel / Google Sheets 完美開啟</strong>，絕不跑版或跳警告。</p>
+        </div>
+
+        <div class="card highlight-card" style="padding: 14px;">
+          <h3 style="font-size: 15px;">💾 3. 標準 JSON 結構資料 (VTT 相容)</h3>
+          <p style="font-size: 12.5px;">輸出包含六大屬性、推薦值、裝備清單與標籤之結構化物件，全面相容 <strong>Roll20 與 Foundry VTT</strong> 數位跑團平台規格。</p>
+        </div>
       </div>
     </div>
     <div class="slide-number">07 / 09</div>
   </div>
 
-  <!-- 投影片 8：嚴謹實測驗證與效能表現 -->
+  <!-- 投影片 8：三大極限實測案例（插圖 ＋ 生成截圖對照） -->
   <div class="slide">
-    <div class="slide-badge">✅ 嚴謹實測與效益驗證</div>
+    <div class="slide-badge">✅ 實機測試與驗證</div>
     <div class="slide-tag">測試驗收</div>
-    <h2>🔬 三大極限測試案例 ＋ 實機穩定度 100% 通過</h2>
+    <h2>🔬 三大極限測試案例：角色概念圖與實機生成對照</h2>
     
     <div class="content-box grid-3">
-      <div class="card">
-        <h3>🌾 測試一：老農戰士 (戰鬥大師 ＋ 鋼草耙)</h3>
-        <p><strong>驗證重點</strong>：身分與戰力解耦、武藝範型注入。<br>
-        成功產出【鋼齒長草耙 (1d8/1d10 穿刺)】，自動解鎖戰鬥大師特性，推薦力量 16 (+3)、體質 14 (+2)。</p>
+      <!-- 案例一 -->
+      <div class="card" style="padding: 14px;">
+        <div class="img-frame" style="height: 160px; margin-bottom: 10px;">
+          <img src="docs/images/farmer_warrior_dan.jpg" alt="丹恩">
+        </div>
+        <h3 style="font-size: 16px;">🌾 老農戰士 (丹恩)</h3>
+        <p style="font-size: 12.5px;">• 職業：戰士 Lv.5 [戰鬥大師]<br>• 武器：鋼齒長草耙 (1d8/1d10)<br>• 驗證：身分戰力解耦、生活武器規格化、戰鬥大師卓越會戰特長注入。</p>
       </div>
 
-      <div class="card">
-        <h3>📜 測試二：守墓人法師 (死靈學派 ＋ 鐵鎬)</h3>
-        <p><strong>驗證重點</strong>：奧術傳承解鎖與 AI 生活反差。<br>
-        精準映射為 Lv.5 死靈學派，適配【挖墳鐵鎬】與【占卜茶杯】，AI 深度描寫輕敲茶杯邊緣小動作與地下城伏筆。</p>
+      <!-- 案例二 -->
+      <div class="card" style="padding: 14px;">
+        <div class="img-frame" style="height: 160px; margin-bottom: 10px;">
+          <img src="docs/images/gravedigger_morse.jpg" alt="摩斯">
+        </div>
+        <h3 style="font-size: 16px; color: #c084fc;">⛏️ 守墓人 (摩斯)</h3>
+        <p style="font-size: 12.5px;">• 職業：法師 Lv.5 [死靈學派]<br>• 裝備：挖墳鐵鎬 (1d6) ＋ 占卜茶杯<br>• 驗證：奧術傳承解鎖、死靈術特長、生活反差言行舉止與 DM 伏筆。</p>
       </div>
 
-      <div class="card highlight-card">
-        <h3>⚙️ 測試三：階梯解鎖與 0 消耗驗證</h3>
-        <p><strong>驗證重點</strong>：5E 等級解鎖門檻與資安。<br>
-        Lv.1 戰士鎖定範型、Lv.3 戰士解鎖；牧師 Lv.1 即可選領域；開機與載入範本 0 API 消耗，Token 計數精確統計。</p>
+      <!-- 案例三 -->
+      <div class="card highlight-card" style="padding: 14px;">
+        <div class="img-frame" style="height: 160px; margin-bottom: 10px;">
+          <img src="docs/images/archmage_brunhilde.jpg" alt="布倫希爾德">
+        </div>
+        <h3 style="font-size: 16px; color: #fbbf24;">📜 封印老法師</h3>
+        <p style="font-size: 12.5px;">• 職業：法師 Lv.14 (封印中)<br>• 法器：刻印符文石楠木老煙斗<br>• 驗證：語意等級解析 (大魔導師)、法術位限制警告、預估 CR 精準下修。</p>
       </div>
     </div>
     <div class="slide-number">08 / 09</div>
@@ -489,7 +520,7 @@
     <div class="content-box grid-3">
       <div class="card">
         <h3>🏆 核心成果效益</h3>
-        <p>彻底打破制式 NPC 範本，結合 Gemini AI 敘事與嚴謹 5E 規則，產出兼具生活反差魅力與完整戰鬥數據的直向卡片，極大解放 DM 即興備戰壓力。</p>
+        <p>徹底打破制式 NPC 範本，結合 Gemini AI 敘事與嚴謹 5E 規則，產出兼具生活反差魅力與完整戰鬥數據的直向卡片，極大解放 DM 即興備戰壓力。</p>
       </div>
 
       <div class="card">
