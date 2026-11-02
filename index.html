@@ -890,6 +890,18 @@
     let currentRawCardMarkdown = "";
 
     
+    
+    // XSS 資安防護：過濾並轉義所有使用者輸入字串，杜絕惡意代碼注入
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     // 讀取與保存使用者的本地 API Key (僅保存在個人瀏覽器 localStorage，絕不上傳)
     function getSavedApiKey() {
       return localStorage.getItem('dnd_user_gemini_api_key') || '';
@@ -1274,7 +1286,7 @@
       }
 
       let html = `
-        <h2>📜 D&D 5E 劇情向 NPC 角色卡：${d.name}</h2>
+        <h2>📜 D&D 5E 劇情向 NPC 角色卡：${escapeHtml(d.name)}</h2>
         <div class="meta-strip">
           定位：${d.importance || '次要劇情 NPC'} | 等級：Lv.${d.level} ${d.level_note ? `(${d.level_note})` : ''} | 預估 CR：${d.cr || '1/4'} | 熟練加值 (PB)：${d.proficiency_bonus || '+2'} | 生命值約：${d.hp} HP | 速度：${d.speed || '30 呎'} | 感官：${d.darkvision || '常規視力'}
           ${d.ai_crafted ? `<br><span style="color: #38bdf8; font-weight: bold;">🤖 生成模式：【Gemini AI 原創深度敘事版】</span>` : ''}
@@ -1385,14 +1397,14 @@
       if (!d) return;
 
       let html = `
-        <h2>📜 D&D 5E 劇情向 NPC 角色卡：${d.name}</h2>
+        <h2>📜 D&D 5E 劇情向 NPC 角色卡：${escapeHtml(d.name)}</h2>
         <div class="meta-strip">
           等級：Lv.${d.level} ${d.levelNote ? `(${d.levelNote})` : ''} | 熟練加值 (PB)：+${d.pb} | 生命值約：${d.hp} (${d.hd}) | 感官：${d.raceData.darkvision}
         </div>
 
         <div class="section-h3">👤 基礎身分與背景歷練</div>
         <p>• <strong>種族</strong>：${d.raceKey} ｜ <strong>職業與範型</strong>：${d.classKey} ${d.subclassDisplay ? `<span style="background: rgba(99, 102, 241, 0.25); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.5); padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 6px;">⭐ ${d.subclassDisplay}</span>` : ""}</p>
-        <p>• <strong>背景歷練</strong>：${d.bgKey}</p>
+        <p>• <strong>背景歷練</strong>：${escapeHtml(d.bgKey)}</p>
         <p>• <strong>已知語言</strong>：${d.raceData.langs.join(", ")}</p>
 
         <div class="section-h3">🎲 靈活屬性面板 (4d6 drop lowest 1 實擲)</div>
@@ -1484,9 +1496,9 @@
       }
       if (!currentNPCData) return;
       let d = currentNPCData;
-      let md = `# 📜 D&D 5E 劇情向 NPC 角色卡：${d.name}\n` +
+      let md = `# 📜 D&D 5E 劇情向 NPC 角色卡：${escapeHtml(d.name)}\n` +
                `> 等級：Lv.${d.level} | 熟練加值 (PB)：+${d.pb} | 生命值約：${d.hp} (${d.hd})\n\n` +
-               `## 👤 基礎身分\n- 種族：${d.raceKey}\n- 職業：${d.classKey}\n- 背景：${d.bgKey}\n\n` +
+               `## 👤 基礎身分\n- 種族：${d.raceKey}\n- 職業：${d.classKey}\n- 背景：${escapeHtml(d.bgKey)}\n\n` +
                `## 🎲 靈活屬性建議 (4d6dl1 [${d.rolls.join(", ")}])\n` +
                `STR: ${d.stats.STR.score} (${d.stats.STR.mod}) | DEX: ${d.stats.DEX.score} (${d.stats.DEX.mod}) | CON: ${d.stats.CON.score} (${d.stats.CON.mod})\n` +
                `INT: ${d.stats.INT.score} (${d.stats.INT.mod}) | WIS: ${d.stats.WIS.score} (${d.stats.WIS.mod}) | CHA: ${d.stats.CHA.score} (${d.stats.CHA.mod})\n\n` +
@@ -1546,7 +1558,7 @@
       let url = URL.createObjectURL(blob);
       let a = document.createElement("a");
       a.href = url;
-      a.download = `NPC_${d.name}_角色數據.csv`;
+      a.download = `NPC_${escapeHtml(d.name)}_角色數據.csv`;
       a.click();
     }
 
