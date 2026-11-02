@@ -314,9 +314,17 @@
 
   <div class="container">
     <header>
-      <div class="badge">D&D 5E 劇情向專用生成器</div>
+      <div class="badge">D&D 5E 劇情向專用生成器 ｜ 雲端免裝部署版</div>
       <h1>D&D 5E 劇情導向非典型 NPC 智慧生成系統</h1>
       <p class="subtitle">告別死板冒險者模板 • 解耦生活外貌與戰鬥底層 • 生活道具自動映射武器法器</p>
+      
+      <!-- 線上部署版導覽列 -->
+      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+        <a href="index.html" style="background: rgba(99, 102, 241, 0.25); border: 1px solid #818cf8; color: #c7d2fe; padding: 5px 14px; border-radius: 999px; text-decoration: none; font-size: 12.5px; font-weight: bold;">🎲 智慧生成器</a>
+        <a href="DND_5E_NPC_Presentation_90S.html" target="_blank" style="background: rgba(30, 41, 59, 0.7); border: 1px solid #475569; color: #cbd5e1; padding: 5px 14px; border-radius: 999px; text-decoration: none; font-size: 12.5px;">🎬 90秒簡報 (線上看)</a>
+        <a href="DND_5E_NPC_Project_Report.html" target="_blank" style="background: rgba(30, 41, 59, 0.7); border: 1px solid #475569; color: #cbd5e1; padding: 5px 14px; border-radius: 999px; text-decoration: none; font-size: 12.5px;">📑 期末專題報告 (線上看)</a>
+        <a href="https://github.com/41154B003Sam/dnd-5e-npc-generator" target="_blank" style="background: rgba(30, 41, 59, 0.7); border: 1px solid #475569; color: #cbd5e1; padding: 5px 14px; border-radius: 999px; text-decoration: none; font-size: 12.5px;">📦 GitHub 倉儲</a>
+      </div>
     </header>
 
     <div class="main-grid">
@@ -463,17 +471,31 @@
           <textarea id="npcStory" placeholder="輸入當前劇情或生活描述。例如：『表面是麥農，但真實身分是退隱禁衛長戰士，武器是一柄鋼齒長草耙』"></textarea>
         </div>
 
-        <!-- Gemini AI 智慧敘事設定 (金鑰由後端安全隔離環境載入，前端完全不顯示亦無洩漏風險) -->
-        <div class="form-group" style="background: rgba(15, 23, 42, 0.7); padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <label style="color: #38bdf8; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 6px;">
-              <span>🤖 Gemini AI 智慧敘事核心</span>
+        <!-- 雙引擎設定：支援雲端線上部署 (GitHub Pages / Cloudflare Pages) 與本地離線免裝環境 -->
+        <div class="form-group" style="background: rgba(15, 23, 42, 0.7); padding: 12px 14px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <label style="color: #38bdf8; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 6px; font-size: 13px;">
+              <span>🤖 雙引擎架構（雲端線上 0元版 / 本地）</span>
             </label>
-            <span id="aiStatusBadge" style="font-size: 11px; background: #065f46; color: #a7f3d0; padding: 2px 8px; border-radius: 4px;">🟢 雲端引擎連線</span>
+            <span id="aiStatusBadge" style="font-size: 11px; background: #065f46; color: #a7f3d0; padding: 2px 8px; border-radius: 4px;">🟢 純本地離線規則引擎 (0元免費)</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
+
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
             <input type="checkbox" id="enableAiCheckbox" checked style="width: auto; margin: 0; cursor: pointer;">
-            <label for="enableAiCheckbox" style="margin: 0; font-size: 12px; color: #cbd5e1; cursor: pointer;">啟用 AI 深度撰寫身世、小動作與 5E 生活武器規格</label>
+            <label for="enableAiCheckbox" style="margin: 0; font-size: 12px; color: #cbd5e1; cursor: pointer;">啟用 Gemini AI 智慧敘事（若未提供金鑰，自動極速切換 5E 規則引擎）</label>
+          </div>
+
+          <!-- 可選金鑰設定區 (安全儲存於個人瀏覽器 localStorage，0 元免費使用) -->
+          <div style="margin-top: 6px; font-size: 11.5px; color: #94a3b8;">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input type="password" id="geminiApiKeyInput" placeholder="貼上自訂 Gemini API Key (可選，留空則以離線規則 0 秒極速開卡)" 
+                     style="padding: 6px 10px; font-size: 11.5px; background: #0b0f19; border: 1px solid #475569; border-radius: 4px; color: #f8fafc; flex: 1;">
+              <button type="button" onclick="saveApiKey()" style="padding: 6px 10px; background: #334155; color: #cbd5e1; border: 1px solid #475569; border-radius: 4px; cursor: pointer; font-size: 11px;">記住金鑰</button>
+            </div>
+            <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 11px;">
+              <span>💡 留空即可 0 元完全免費使用純本地 5E 規則引擎</span>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #818cf8; text-decoration: none;">👉 免費取得 Google API Key (0元免費額度)</a>
+            </div>
           </div>
         </div>
 
@@ -867,6 +889,97 @@
 
     let currentRawCardMarkdown = "";
 
+    
+    // 讀取與保存使用者的本地 API Key (僅保存在個人瀏覽器 localStorage，絕不上傳)
+    function getSavedApiKey() {
+      return localStorage.getItem('dnd_user_gemini_api_key') || '';
+    }
+
+    function saveApiKey() {
+      const input = document.getElementById('geminiApiKeyInput');
+      if (input) {
+        const val = input.value.trim();
+        if (val) {
+          localStorage.setItem('dnd_user_gemini_api_key', val);
+          alert('✅ Gemini API Key 已安全保存在您的個人瀏覽器中！');
+          const badge = document.getElementById('aiStatusBadge');
+          if (badge) {
+            badge.innerText = '🟢 Gemini AI 連線已就緒';
+            badge.style.background = '#065f46';
+          }
+        } else {
+          localStorage.removeItem('dnd_user_gemini_api_key');
+          alert('已清除自訂 API Key，系統將以純本地 5E 規則 0 秒極速開卡。');
+        }
+      }
+    }
+
+    // 瀏覽器直連 Gemini REST API (支援 GitHub Pages / Cloudflare Pages 靜態託管)
+    async function callGeminiDirectlyFromBrowser(apiKey, payload) {
+      const model = "gemini-2.5-flash";
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+      const prompt = `請為以下 D&D 5E NPC 角色設計深度的故事背景、非典型生活裝備與範型風格：
+【基本設定】
+- 角色姓名：${payload.name}
+- 種族：${payload.race}
+- 職業：${payload.class_name} (等級: Lv.${payload.level}${payload.level_note ? `，狀態: ${payload.level_note}` : ''})
+- 子職業範型：${payload.subclass_display || '尚未解鎖範型'}
+- 背景歷練：${payload.background}
+- DM 提供的情境故事：${payload.story_context || '無特定情境，請根據種族職業自由發揮市井生活身分'}
+- 非傳統特質/武器關鍵字：${payload.custom_trait || '無 (常規凡人，生活道具)'}
+
+【設計規範】
+1. 身分與戰力解耦：生活化市井身分（如麥農、守墓人、廚師），但戰鬥底層是真實職業實力。
+2. 範型流派融會：深度融入【${payload.subclass_display}】戰術或奧術本能。
+3. 非典型裝備規格化：將日常道具（長草耙、修枝剪、鐵鎬、符文煙斗、茶杯）規格化為 5E 武器/法器傷害骰與特性。
+4. 常規凡人原則：無神力不強加超常變異。
+5. DM 跑團伏筆：給予 DM 直接可用的劇情引入線索。
+
+請嚴格輸出符合以下結構的單一 JSON 物件（不要包含任何 markdown 標記外的文字）：
+{
+  "name": "${payload.name}",
+  "title": "稱號",
+  "background_story": "深度背景故事...",
+  "appearance_age": "外貌神態描述...",
+  "combat_philosophy": "戰鬥風格與範型哲學...",
+  "quirks_and_habits": "日常反差習慣小動作...",
+  "dm_plot_hook": "DM 跑團劇本線索伏筆...",
+  "ai_unorthodox_equipment": [
+    {
+      "name": "裝備名稱（如：鋼齒農用長草耙）",
+      "type": "武器或法器類型",
+      "damage": "傷害骰（如：1d8 (雙手 1d10) 穿刺）",
+      "properties": "特性（如：多用、長柄）",
+      "story_lore": "生活來歷背景"
+    }
+  ]
+}`;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.7
+          }
+        })
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const rawText = data.candidates[0].content.parts[0].text;
+      const parsed = JSON.parse(rawText);
+      const usage = data.usageMetadata || {};
+      return { parsed, usage };
+    }
+
     async function generateNPC() {
       const btn = document.querySelector('.btn-generate');
       const originalBtnText = btn.innerHTML;
@@ -893,50 +1006,133 @@
           </div>
         `;
 
-        try {
-          const resp = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: name || undefined,
-              race: raceKey === 'RANDOM' ? undefined : raceKey,
-              class_name: classKey === 'RANDOM' ? undefined : classKey,
-              subclass_name: (document.getElementById('npcSubclass') && !['RANDOM', 'NONE'].includes(document.getElementById('npcSubclass').value)) ? document.getElementById('npcSubclass').value : undefined,
-              background: bgKey === 'RANDOM' ? undefined : bgKey,
-              level: levelVal,
-              story_context: story || undefined,
-              custom_trait: traitInput || undefined,
-              force_ai: true
-            })
-          });
+        // 解析當前輸入條件
+        let subVal = (document.getElementById('npcSubclass') && !['RANDOM', 'NONE'].includes(document.getElementById('npcSubclass').value)) ? document.getElementById('npcSubclass').value : undefined;
+        let lvParsedLocal = parseLevel(levelVal);
+        let userKey = (document.getElementById('geminiApiKeyInput') ? document.getElementById('geminiApiKeyInput').value.trim() : '') || getSavedApiKey();
 
-          if (resp.ok) {
-            const data = await resp.json();
-            if (data.status === 'success' && data.npc) {
-              currentNPCData = data.npc;
-              currentRawCardMarkdown = data.card;
-              renderAICard(data.npc);
-              const badge = document.getElementById('aiStatusBadge');
-              if (badge) {
-                badge.innerText = '🟢 AI 生成完成';
-                badge.style.background = '#065f46';
+        let payload = {
+          name: name || undefined,
+          race: raceKey === 'RANDOM' ? undefined : raceKey,
+          class_name: classKey === 'RANDOM' ? undefined : classKey,
+          subclass_name: subVal,
+          subclass_display: subVal,
+          background: bgKey === 'RANDOM' ? undefined : bgKey,
+          level: lvParsedLocal.level,
+          level_note: lvParsedLocal.note,
+          story_context: story || undefined,
+          custom_trait: traitInput || undefined,
+          force_ai: true
+        };
+
+        // 策略 1: 若在本地伺服器，優先呼叫本地 /api/generate
+        let backendSuccess = false;
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          try {
+            const resp = await fetch('/api/generate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data.status === 'success' && data.npc) {
+                currentNPCData = data.npc;
+                currentRawCardMarkdown = data.card;
+                renderAICard(data.npc);
+                const badge = document.getElementById('aiStatusBadge');
+                if (badge) {
+                  badge.innerText = '🟢 本地伺服器 AI 生成完成';
+                  badge.style.background = '#065f46';
+                }
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+                return;
               }
-              btn.innerHTML = originalBtnText;
-              btn.disabled = false;
-              return;
             }
+          } catch (e) {
+            console.warn("本地後端 /api/generate 連線失敗，檢查雲端直連或離線回退:", e);
           }
-        } catch (e) {
-          console.warn("後端 API 連線失敗，自動轉入離線規則生成:", e);
-          const badge = document.getElementById('aiStatusBadge');
-          if (badge) {
-            badge.innerText = '⚪ 離線備用模式';
-            badge.style.background = '#475569';
-          }
-        } finally {
-          btn.innerHTML = originalBtnText;
-          btn.disabled = false;
         }
+
+        // 策略 2: 若在 GitHub Pages / Cloudflare Pages 且使用者提供自訂 API Key，瀏覽器直連 Gemini API
+        if (userKey) {
+          try {
+            btn.innerHTML = '<span>⏳ 🌐 瀏覽器直連 Gemini API 創作中...</span>';
+            const { parsed, usage } = await callGeminiDirectlyFromBrowser(userKey, payload);
+            
+            // 擲骰 4d6dl1 屬性分配
+            let rolls = [];
+            for (let i = 0; i < 6; i++) rolls.push(roll4d6dl1().total);
+            rolls.sort((a,b) => b-a);
+            let clsData = CLASSES[payload.class_name || '戰士 (Fighter)'] || CLASSES['戰士 (Fighter)'];
+            let raceData = RACES[payload.race || '人類 (Human)'] || RACES['人類 (Human)'];
+            let stats = {};
+            clsData.primary.forEach((stat, idx) => {
+              stats[stat] = { score: rolls[idx], mod: calcMod(rolls[idx]) };
+            });
+
+            let combinedNPC = {
+              name: parsed.name || name || "冒險者",
+              title: parsed.title || "",
+              race: payload.race || "人類 (Human)",
+              class: payload.class_name || "戰士 (Fighter)",
+              class_name: payload.class_name || "戰士 (Fighter)",
+              subclass: payload.subclass_name,
+              subclass_display: payload.subclass_name ? `範型流派：${payload.subclass_name}` : "",
+              background: payload.background || "平民英雄 (Folk Hero)",
+              level: payload.level,
+              level_note: payload.level_note,
+              pb: Math.floor((payload.level - 1) / 4) + 2,
+              hp: clsData.hpBase + (payload.level - 1) * clsData.hpPer,
+              hd: `${payload.level}${clsData.hd}`,
+              rolls: rolls,
+              stats: stats,
+              background_story: parsed.background_story || story,
+              appearance_age: parsed.appearance_age || "外貌融入市井，神情沉穩。",
+              combat_philosophy: parsed.combat_philosophy || "戰術與生活本能深度結合。",
+              quirks_and_habits: parsed.quirks_and_habits || "隨身攜帶日常習慣小動作。",
+              dm_plot_hook: parsed.dm_plot_hook || "可直接用於引導玩家推進冒險。",
+              ai_unorthodox_equipment: parsed.ai_unorthodox_equipment || []
+            };
+
+            currentNPCData = combinedNPC;
+            renderAICard(combinedNPC);
+
+            const badge = document.getElementById('aiStatusBadge');
+            if (badge) {
+              badge.innerText = '🟢 雲端 Gemini AI 直連完成';
+              badge.style.background = '#065f46';
+            }
+
+            const tokenBar = document.getElementById('tokenUsageBar');
+            if (tokenBar && usage) {
+              tokenBar.style.display = 'block';
+              tokenBar.innerHTML = `<strong>📊 【Gemini 3.5 Token 消耗遙測】</strong> 提示詞: ${usage.promptTokenCount || 0} Tokens ｜ 回覆: ${usage.candidatesTokenCount || 0} Tokens ｜ 總計: <strong>${usage.totalTokenCount || 0} Tokens</strong> (Google 0元免費額度)`;
+            }
+
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+            return;
+          } catch (e) {
+            console.warn("瀏覽器直連 Gemini API 失敗，轉入離線規則引擎:", e);
+            alert("⚠️ 雲端 Gemini API 呼叫失敗 (" + e.message + ")，系統已為您自動切換至純本地離線 5E 規則極速生成！");
+          }
+        }
+
+        // 策略 3: 若無 API Key 或連線失敗，直接在前端以純本地 5E 規則生成 (0 API 消耗、0 元費用)
+        const badge = document.getElementById('aiStatusBadge');
+        if (badge) {
+          badge.innerText = '🟢 離線純本地規則引擎 (0 API 消耗)';
+          badge.style.background = '#065f46';
+        }
+        const tokenBar = document.getElementById('tokenUsageBar');
+        if (tokenBar) {
+          tokenBar.style.display = 'block';
+          tokenBar.innerHTML = `⚡ <strong>純本地離線 5E 規則引擎極速開卡</strong> ｜ API 消耗: 0 Tokens ｜ 費用: <strong>$0.00 (100% 完全免費)</strong>`;
+        }
+        btn.innerHTML = originalBtnText;
+        btn.disabled = false;
       }
 
       // 離線本地規則生成回退
